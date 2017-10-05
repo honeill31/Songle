@@ -14,5 +14,6 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="toastButton">Toast!</string>
+    <string name="toastButton">Play</string>
+    <string name="title_activity_default_page">DefaultPage</string>
 </resources>
