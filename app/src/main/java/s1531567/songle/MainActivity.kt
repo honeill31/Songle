@@ -14,10 +14,6 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show()
     }
 
-    fun newIntent(context: Context): Intent {
-        val intent = Intent(this, LoginActivity::class.java)
-        return intent
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,8 +22,15 @@ class MainActivity : AppCompatActivity() {
         butt.setOnClickListener(object: View.OnClickListener{
             override fun onClick(v: View?) {
                 toast("Proceeding to Login Page")
-                val intent = Intent(this@MainActivity, LoginActivity::class.java)
-                startActivity(intent)
+                val login = Intent(this@MainActivity, LoginActivity::class.java)
+                startActivity(login)
+            }
+        })
+
+        button.setOnClickListener(object: View.OnClickListener{
+            override fun onClick(v: View?) {
+                val lead = Intent(this@MainActivity, LeaderboardActivity::class.java)
+                startActivity(lead)
             }
         })
     }
