@@ -20,7 +20,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.TextView
-
+import android.content.Intent
 import java.util.ArrayList
 import android.Manifest.permission.READ_CONTACTS
 
@@ -265,7 +265,8 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             showProgress(false)
 
             if (success!!) {
-                finish()
+                val redir = Intent(this@LoginActivity, DefaultPage::class.java)
+                startActivity(redir)
             } else {
                 password.error = getString(R.string.error_incorrect_password)
                 password.requestFocus()

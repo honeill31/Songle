@@ -19,19 +19,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        butt.setOnClickListener(object: View.OnClickListener{
-            override fun onClick(v: View?) {
-                toast("Proceeding to Login Page")
+        butt.setOnClickListener{
+                toast("Proceeding to login page...")
                 val login = Intent(this@MainActivity, LoginActivity::class.java)
                 startActivity(login)
-            }
-        })
 
-        button.setOnClickListener(object: View.OnClickListener{
-            override fun onClick(v: View?) {
-                val lead = Intent(this@MainActivity, LeaderboardActivity::class.java)
-                startActivity(lead)
+
+
             }
-        })
+
     }
 }
