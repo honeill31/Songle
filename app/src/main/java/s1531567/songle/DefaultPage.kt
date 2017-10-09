@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Environment
+import android.support.annotation.IntegerRes
 import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -13,20 +14,23 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import org.json.JSONException
-import java.io.IOException
-import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
-import java.io.File
 
 import kotlinx.android.synthetic.main.activity_default.*
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.*
+import java.net.URLConnection
 import java.util.jar.Manifest
 
 class DefaultPage : AppCompatActivity() {
-        val PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1
+        val WRITE_EXTERNAL_STORAGE = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val permissionCheck = ContextCompat.checkSelfPermission(
+                this@DefaultPage,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_default)
 
@@ -37,66 +41,58 @@ class DefaultPage : AppCompatActivity() {
         }
 
         update.setOnClickListener {
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                        this@DefaultPage,
+                        arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                        WRITE_EXTERNAL_STORAGE)
+            }
             val task = UpdateTask()
             task.execute()
         }
     }
 
     inner class UpdateTask() : AsyncTask<String,Int,String>() {
-        val permissionCheck = ContextCompat.checkSelfPermission(
-                this@DefaultPage,
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
 
         override fun onPreExecute() {
-            progBar.max = 100
-            progBar.visibility = View.VISIBLE
-        }
+            super.onPreExecute()
+            print("Starting Download")
 
-        override fun onProgressUpdate(vararg values: Int?) {
-            progBar.progress
         }
 
         override fun doInBackground(vararg p0: String?): String {
-            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(
-                        this@DefaultPage,
-                        arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                        PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE)
-            }
-
-            var stream: InputStream? = null
-            var Result: String = ""
-            print("HI")
-
+            var count : Int = 0
             try {
                 val url = java.net.URL("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml")
-                stream = url.openStream()
-                val br = stream.bufferedReader()
+                val connection : URLConnection = url.openConnection()
+                connection.connect()
+                val lengthOfFile = connection.contentLength
+                val input : InputStream = BufferedInputStream(url.openStream(), 8192)
+                val output : OutputStream = FileOutputStream(Environment.getExternalStorageDirectory().toString() + "songs.xml")
 
-                do {
-                    val line = br.readLine()
-                    Result += line
-                } while (line != null)
+                val data : ByteArray = byteArrayOf(1024.toByte())
+                var total : Long = 0
 
-            } catch (e: Exception) {
-                return ""
-            } finally {
-                try {
-                    if (stream != null) stream.close()
-                } catch (ioe: IOException) {
+                while (count != -1){
+                    total += count
+                    //publishProgress((total*100/lengthOfFile).toInt())
+                    output.write(data, 0, count )
                 }
+                output.flush()
+                output.close()
+                input.close()
+
+            } catch (e: Exception){
+                Log.e("Error", e.message)
             }
+            return ""
 
-            val file = File( Environment.getExternalStorageDirectory(), "songs.xml")
-
-            file.bufferedWriter().use { out -> out.write(Result) }
-            return Result
 
         }
 
         override fun onPostExecute(result: String?) {
-            progBar.progress = 100
-            progBar.visibility = View.INVISIBLE
+
         }
     }
 
