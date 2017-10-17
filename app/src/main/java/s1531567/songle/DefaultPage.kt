@@ -1,6 +1,6 @@
 package s1531567.songle
 
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.AsyncTask
@@ -21,18 +21,19 @@ import kotlinx.android.synthetic.main.activity_default.*
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.*
 import java.net.URLConnection
-import java.util.jar.Manifest
 
 class DefaultPage : AppCompatActivity() {
         val WRITE_EXTERNAL_STORAGE = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val permissionCheck = ContextCompat.checkSelfPermission(
-                this@DefaultPage,
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                )
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_default)
+
+
+        play.setOnClickListener {
+            val play = Intent(this, MapsActivity::class.java)
+            startActivity(play)
+        }
 
 
         leader.setOnClickListener {
@@ -41,60 +42,22 @@ class DefaultPage : AppCompatActivity() {
         }
 
         update.setOnClickListener {
-            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+                val task = DownloadXMLTask("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml")
+                task.execute()
+            } else {
                 ActivityCompat.requestPermissions(
                         this@DefaultPage,
                         arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
                         WRITE_EXTERNAL_STORAGE)
             }
-            val task = UpdateTask()
-            task.execute()
+
+
         }
     }
 
-    inner class UpdateTask() : AsyncTask<String,Int,String>() {
 
-
-        override fun onPreExecute() {
-            super.onPreExecute()
-            print("Starting Download")
-
-        }
-
-        override fun doInBackground(vararg p0: String?): String {
-            var count : Int = 0
-            try {
-                val url = java.net.URL("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml")
-                val connection : URLConnection = url.openConnection()
-                connection.connect()
-                val lengthOfFile = connection.contentLength
-                val input : InputStream = BufferedInputStream(url.openStream(), 8192)
-                val output : OutputStream = FileOutputStream(Environment.getExternalStorageDirectory().toString() + "songs.xml")
-
-                val data : ByteArray = byteArrayOf(1024.toByte())
-                var total : Long = 0
-
-                while (count != -1){
-                    total += count
-                    //publishProgress((total*100/lengthOfFile).toInt())
-                    output.write(data, 0, count )
-                }
-                output.flush()
-                output.close()
-                input.close()
-
-            } catch (e: Exception){
-                Log.e("Error", e.message)
-            }
-            return ""
-
-
-        }
-
-        override fun onPostExecute(result: String?) {
-
-        }
-    }
 
 
 }
