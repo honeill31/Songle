@@ -1,26 +1,17 @@
 package s1531567.songle
 
 import android.Manifest
+import android.util.Log
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.AsyncTask
 import android.os.Bundle
-import android.os.Environment
-import android.support.annotation.IntegerRes
-import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
-import android.view.View
-import org.json.JSONException
-import java.net.HttpURLConnection
-import java.net.URL
+
 
 import kotlinx.android.synthetic.main.activity_default.*
-import kotlinx.android.synthetic.main.activity_main.*
-import java.io.*
-import java.net.URLConnection
+
 
 class DefaultPage : AppCompatActivity() {
         val WRITE_EXTERNAL_STORAGE = 1
@@ -44,8 +35,10 @@ class DefaultPage : AppCompatActivity() {
         update.setOnClickListener {
             val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
             if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-                val task = DownloadXMLTask("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml")
+                val task = DownloadXMLTask()
                 task.execute()
+                val songs = task.get()
+                Log.v("SONG", songs)
             } else {
                 ActivityCompat.requestPermissions(
                         this@DefaultPage,
