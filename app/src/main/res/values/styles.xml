@@ -5,7 +5,8 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/primaryLightColor</item>
+        <item name="android:colorBackground">@android:color/background_light</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -17,4 +18,15 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+
+
+    <style name="Theme.MyTheme.NoActionBar" parent="Theme.AppCompat.NoActionBar" />
+
+    <color name="primaryColor">#80cbc4</color>
+    <color name="primaryLightColor">#b2fef7</color>
+    <color name="primaryDarkColor">#4f9a94</color>
+    <color name="primaryTextColor">#000000</color>
+
 </resources>
+
+
