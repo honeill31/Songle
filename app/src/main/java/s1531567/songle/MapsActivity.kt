@@ -3,23 +3,21 @@ package s1531567.songle
 import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Location
-
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.util.Log
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationListener
-
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.maps.android.data.kml.KmlLayer
+
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -33,6 +31,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     var mLocationPermissionGranted = false
     private lateinit var mLastLocation : Location
     val TAG = "MapsActivity"
+    val task = DownloadKMLTask("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/01/map1.kml")
+    val kml = task.get()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +68,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             println("Security Exception Thrown [onMapReady]")
         }
         mMap.uiSettings.isMyLocationButtonEnabled = true
+        val layer = KmlLayer(mMap, kml, applicationContext)
+        layer.addLayerToMap() //displaying the kml tags
     }
 
     override fun onStart() {
@@ -116,6 +119,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             ActivityCompat.requestPermissions(this,arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
+
     }
 
     override fun onLocationChanged(current: Location?) {

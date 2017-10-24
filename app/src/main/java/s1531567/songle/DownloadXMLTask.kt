@@ -1,14 +1,12 @@
 package s1531567.songle
 
-import android.content.res.Resources
+
 import android.os.AsyncTask
-import android.os.Environment
-import android.util.Log
 import org.xmlpull.v1.XmlPullParserException
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
-import java.net.URLConnection
+
 
 /**
  * Created by s1531567 on 17/10/17.
