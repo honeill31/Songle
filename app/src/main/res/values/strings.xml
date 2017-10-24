@@ -18,4 +18,5 @@
     <string name="title_activity_default_page">DefaultPage</string>
     <string name="title_activity_maps">Map</string>
     <string name="google_maps_key">AIzaSyDiAWV_NzQ7khIIac1eLfD_V1GB_ON_fao</string>
+    <string name="current_song">01</string>
 </resources>
