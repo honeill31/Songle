@@ -31,8 +31,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     var mLocationPermissionGranted = false
     private lateinit var mLastLocation : Location
     val TAG = "MapsActivity"
-    val task = DownloadKMLTask("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/01/map1.kml")
-    val kml = task.get()
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,7 +67,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             println("Security Exception Thrown [onMapReady]")
         }
         mMap.uiSettings.isMyLocationButtonEnabled = true
-        val layer = KmlLayer(mMap, kml, applicationContext)
+        val task = DownloadKMLTask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/01/map1.kml")
+        val layer = task.get()
+        Log.v("kml", layer.toString())
         layer.addLayerToMap() //displaying the kml tags
     }
 
