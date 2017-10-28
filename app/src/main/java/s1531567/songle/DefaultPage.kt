@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity
 
 
 import kotlinx.android.synthetic.main.activity_default.*
+import java.io.File
 
 
 class DefaultPage : AppCompatActivity() {
@@ -38,6 +39,7 @@ class DefaultPage : AppCompatActivity() {
                 val task = DownloadXMLTask()
                 task.execute()
                 val songs = task.get()
+                File("Songs.txt").bufferedWriter().use { out -> out.write(songs)}
                 Log.v("SONG", songs)
             } else {
                 ActivityCompat.requestPermissions(
@@ -48,6 +50,10 @@ class DefaultPage : AppCompatActivity() {
 
 
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
     }
 
 

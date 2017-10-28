@@ -1,6 +1,7 @@
 package s1531567.songle
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -33,8 +34,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     var mLocationPermissionGranted = false
     private lateinit var mLastLocation : Location
     val TAG = "MapsActivity"
-    val currentSong = "01"
-    val currentMap = "1"
+
 
 
 
@@ -94,14 +94,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         }
         mMap.uiSettings.isMyLocationButtonEnabled = true
 
-        for (i in 1..1){
-            for (j in 1..1) {
-                val task = DownloadKMLTask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/0$i/map$j.kml")
-                val layer = task.get()
-                Log.v("kml", layer.toString())
-                layer.addLayerToMap() //displaying the kml tags
-            }
-        }
+        val current = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+        val currentSong = current.getInt("Current Song", 1)
+        val currentMap = current.getInt("Current Map", 1)
+
+        val layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/0$currentSong/map$currentMap.kml")
+        val layer = layerTask.get()
+        val kmlTask = DownloadKMLTask().execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/0$currentSong/map$currentMap.kml")
+        val stream = kmlTask.get()
+        val handle = KMLHandler()
+        val close = handle.closeBy(stream, mLastLocation)
+        
+        Log.v("kml", layer.toString())
+        layer.addLayerToMap() //displaying the kml tags
+
+
+
+
+
+
 
     }
 

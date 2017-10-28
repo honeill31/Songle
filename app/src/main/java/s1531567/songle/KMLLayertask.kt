@@ -2,21 +2,23 @@ package s1531567.songle
 
 import android.content.Context
 import android.os.AsyncTask
-import com.google.android.gms.maps.GoogleMap
 import com.google.maps.android.data.kml.KmlLayer
 import java.io.IOException
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import com.google.android.gms.maps.GoogleMap
 
 /**
- * Created by s1531567 on 28/10/17.
+ * Created by holly on 24/10/17.
  */
-class DownloadKMLTask () : AsyncTask<String,Int,InputStream>() {
+class KMLLayertask(map: GoogleMap, context : Context) : AsyncTask<String,Int,KmlLayer>() {
+    private val mMap = map
+    private  val mContext = context
 
-    override fun doInBackground(vararg params: String): InputStream {
-        val stream = downloadUrl(params[0])
-        return stream
+    override fun doInBackground(vararg params: String): KmlLayer {
+        val stream =  downloadUrl(params[0])
+        return KmlLayer(mMap, stream, mContext)
     }
 
 
@@ -34,7 +36,7 @@ class DownloadKMLTask () : AsyncTask<String,Int,InputStream>() {
         return conn.inputStream
     }
 
-    override fun onPostExecute(result: InputStream) {
+    override fun onPostExecute(result: KmlLayer) {
         super.onPostExecute(result)
     }
 }
