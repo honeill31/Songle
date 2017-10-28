@@ -1,6 +1,7 @@
 package s1531567.songle
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.support.v7.app.AppCompatActivity
@@ -17,6 +18,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.maps.android.data.kml.KmlLayer
+import kotlinx.android.synthetic.main.activity_maps.*
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
@@ -49,6 +51,28 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build()
+
+        bar.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.menu_home -> {
+                    val home = Intent(this@MapsActivity, DefaultPage::class.java)
+                    startActivity(home)
+                }
+                R.id.menu_list -> {
+                    val list = Intent(this@MapsActivity, SongList::class.java)
+                    startActivity(list)
+                }
+                R.id.menu_fav -> {
+                    val fav = Intent(this@MapsActivity, Favourites::class.java)
+                    startActivity(fav)
+
+                }
+
+            }
+            true
+
+
+        }
     }
 
     /**
@@ -71,7 +95,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         mMap.uiSettings.isMyLocationButtonEnabled = true
 
         for (i in 1..1){
-            for (j in 1..4) {
+            for (j in 1..1) {
                 val task = DownloadKMLTask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/0$i/map$j.kml")
                 val layer = task.get()
                 Log.v("kml", layer.toString())
