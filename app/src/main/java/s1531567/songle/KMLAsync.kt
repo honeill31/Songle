@@ -1,24 +1,30 @@
 package s1531567.songle
 
-import android.content.Context
+import android.location.Location
 import android.os.AsyncTask
-import com.google.android.gms.maps.GoogleMap
-import com.google.maps.android.data.kml.KmlLayer
 import java.io.IOException
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
 /**
- * Created by s1531567 on 28/10/17.
+ * Created by holly on 29/10/17.
  */
-class DownloadKMLTask () : AsyncTask<String,Int,InputStream>() {
+class KMLAsync() : AsyncTask<String, Int, List<Placemark>>() {
 
-    override fun doInBackground(vararg params: String): InputStream {
+    override fun doInBackground(vararg params: String): List<Placemark> {
         val stream = downloadUrl(params[0])
-        return stream
+        return getPlacemarks(stream)
     }
 
+    fun getPlacemarks(stream: InputStream) : List<Placemark> {
+        val parser = KMLParser()
+        val placemarks = parser.parse(stream)
+
+        return placemarks
+
+
+    }
 
     @Throws(IOException::class)
     private fun downloadUrl(urlString: String): InputStream {
@@ -34,7 +40,7 @@ class DownloadKMLTask () : AsyncTask<String,Int,InputStream>() {
         return conn.inputStream
     }
 
-    override fun onPostExecute(result: InputStream) {
+    override fun onPostExecute(result: List<Placemark>) {
         super.onPostExecute(result)
     }
 }

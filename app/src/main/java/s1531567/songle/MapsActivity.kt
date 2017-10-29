@@ -18,7 +18,9 @@ import com.google.android.gms.location.LocationListener
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.data.kml.KmlLayer
+import com.google.maps.android.data.kml.KmlPoint
 import kotlinx.android.synthetic.main.activity_maps.*
 
 
@@ -34,6 +36,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     var mLocationPermissionGranted = false
     private lateinit var mLastLocation : Location
     val TAG = "MapsActivity"
+
 
 
 
@@ -85,6 +88,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
      * installed Google Play services and returned to the app.
      */
     override fun onMapReady(googleMap: GoogleMap) {
+        //val current = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+        val currentSong = 1//current.getInt("Current Song", 1)
+        val currentMap = 1//current.getInt("Current Map", 1)
+
         mMap = googleMap
 
         try {
@@ -94,31 +101,29 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         }
         mMap.uiSettings.isMyLocationButtonEnabled = true
 
-        val current = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-        val currentSong = current.getInt("Current Song", 1)
-        val currentMap = current.getInt("Current Map", 1)
-
         val layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/0$currentSong/map$currentMap.kml")
         val layer = layerTask.get()
-        val kmlTask = DownloadKMLTask().execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/0$currentSong/map$currentMap.kml")
-        val stream = kmlTask.get()
-        val handle = KMLHandler()
-        val close = handle.closeBy(stream, mLastLocation)
+        val marks = mutableListOf<KmlPoint>()
+
+        for (mark in layer.placemarks){
+            Log.v("boop", mark.toString())
+            if (mark.geometry.geometryType == ("Point")){
+                val point: KmlPoint = mark.geometry as KmlPoint
+                marks.add(point)
+                Log.v("marks", mark.toString())
+
+            }
+        }
+
         
         Log.v("kml", layer.toString())
         layer.addLayerToMap() //displaying the kml tags
-
-
-
-
-
-
-
     }
 
     override fun onStart() {
         super.onStart()
         mGoogleApiClient.connect()
+
     }
 
     override fun onStop() {
@@ -163,6 +168,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             ActivityCompat.requestPermissions(this,arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
+
+
 
     }
 
