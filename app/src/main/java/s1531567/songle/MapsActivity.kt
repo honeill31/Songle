@@ -19,9 +19,12 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.data.kml.KmlContainer
 import com.google.maps.android.data.kml.KmlLayer
+import com.google.maps.android.data.kml.KmlPlacemark
 import com.google.maps.android.data.kml.KmlPoint
 import kotlinx.android.synthetic.main.activity_maps.*
+import java.lang.Math.abs
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
@@ -35,10 +38,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
     var mLocationPermissionGranted = false
     private lateinit var mLastLocation : Location
+    //val current = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+    val currentSong = 1//current.getInt("Current Song", 1)
+    val currentMap = 1//current.getInt("Current Map", 1)
     val TAG = "MapsActivity"
-
-
-
+    val closeBy = mutableListOf<KmlPlacemark>()
+    lateinit var layer: KmlLayer
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,10 +93,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
      * installed Google Play services and returned to the app.
      */
     override fun onMapReady(googleMap: GoogleMap) {
-        //val current = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-        val currentSong = 1//current.getInt("Current Song", 1)
-        val currentMap = 1//current.getInt("Current Map", 1)
-
         mMap = googleMap
 
         try {
@@ -100,24 +101,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             println("Security Exception Thrown [onMapReady]")
         }
         mMap.uiSettings.isMyLocationButtonEnabled = true
-
         val layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/0$currentSong/map$currentMap.kml")
-        val layer = layerTask.get()
-        val marks = mutableListOf<KmlPoint>()
-
-        for (mark in layer.placemarks){
-            Log.v("boop", mark.toString())
-            if (mark.geometry.geometryType == ("Point")){
-                val point: KmlPoint = mark.geometry as KmlPoint
-                marks.add(point)
-                Log.v("marks", mark.toString())
-
-            }
-        }
-
-        
-        Log.v("kml", layer.toString())
+        layer = layerTask.get()
         layer.addLayerToMap() //displaying the kml tags
+
+
+
     }
 
     override fun onStart() {
@@ -171,17 +160,30 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
 
 
+
+
+
+
     }
 
     override fun onLocationChanged(current: Location?) {
         if (current == null){
             println("[onLocationChanged] Location unknown")
         } else {
-            println("""[onLocationChanged] Lat/long now
-                    (${current.latitude},
-                    ${current.longitude})"""
-                    )
+            val mLoc  = LatLng(current.latitude, current.longitude)
+            for (mark in layer.containers.iterator().next().placemarks){
+                val markLoc : LatLng = mark.geometry.geometryObject as LatLng
+                if ( abs(markLoc.latitude - mLoc.latitude) <0.05 && abs(markLoc.longitude - mLoc.longitude) <0.05){
+                    closeBy.add(mark)
+
+
+                }
+            }
+
         }
+        println("""[closeBy]: ${closeBy.toString()}""")
+
+
 
     }
 
