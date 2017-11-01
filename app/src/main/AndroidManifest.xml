@@ -28,6 +28,7 @@
         <activity android:name=".MapsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -58,7 +59,15 @@
             android:name=".SongList"
             android:label="@string/title_activity_song_list"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".Favourites"></activity>
+        <activity android:name=".Favourites" />
+        <activity
+            android:name=".ReviewActivity"
+            android:label="@string/title_activity_review"
+            android:parentActivityName=".DefaultPage">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="s1531567.songle.DefaultPage" />
+        </activity>
     </application>
 
 </manifest>

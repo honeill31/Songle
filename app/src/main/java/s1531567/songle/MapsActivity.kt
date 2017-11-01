@@ -5,11 +5,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.opengl.Visibility
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
+import android.view.View
+import android.widget.Toast
+import android.widget.Toast.makeText
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.LocationRequest
@@ -24,6 +28,7 @@ import com.google.maps.android.data.kml.KmlLayer
 import com.google.maps.android.data.kml.KmlPlacemark
 import com.google.maps.android.data.kml.KmlPoint
 import kotlinx.android.synthetic.main.activity_maps.*
+import s1531567.songle.R.id.bar
 import java.lang.Math.abs
 
 
@@ -104,6 +109,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         val layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/0$currentSong/map$currentMap.kml")
         layer = layerTask.get()
         layer.addLayerToMap() //displaying the kml tags
+   
+
+
 
 
 
@@ -173,15 +181,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             val mLoc  = LatLng(current.latitude, current.longitude)
             for (mark in layer.containers.iterator().next().placemarks){
                 val markLoc : LatLng = mark.geometry.geometryObject as LatLng
-                if ( abs(markLoc.latitude - mLoc.latitude) <0.05 && abs(markLoc.longitude - mLoc.longitude) <0.05){
-                    closeBy.add(mark)
+                if ( abs(markLoc.latitude - mLoc.latitude) <0.00005 && abs(markLoc.longitude - mLoc.longitude) <0.00005){
+                    if(mark !in closeBy){
+                        closeBy.add(mark)
+                    }
 
 
                 }
             }
 
         }
-        println("""[closeBy]: ${closeBy.toString()}""")
+        println("""[closeBy]: ${closeBy.size}""")
 
 
 
