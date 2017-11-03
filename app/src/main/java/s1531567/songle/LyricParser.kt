@@ -8,9 +8,9 @@ import com.google.maps.android.data.kml.KmlPlacemark
 //given a placemark this class will return the lyric associated
 class LyricParser() {
 
-    fun findLyrics(song: Int, map: Int, lyrics: String, placemark: Placemark) : Lyric {
+    fun findLyrics(song: Int, map: Int, lyrics: String, placemark: KmlPlacemark) : Lyric {
         var result = Lyric(0,0,"")
-        val name = placemark.name
+        val name = placemark.getProperty("name")
         val words = name.split(":")
         val lineNum = words[0].toInt()
         val wordNum = words[1].toInt()

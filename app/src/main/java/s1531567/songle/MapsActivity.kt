@@ -104,6 +104,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         layer = layerTask.get()
         layer.addLayerToMap() //displaying the kml tags
 
+        for (mark in layer.containers.iterator().next().placemarks) {
+            if (mark.hasProperty("name")) {
+                println(mark.getProperty("name"))
+
+            }
+        }
+
 
 
 
@@ -182,7 +189,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             val current = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
             for (mark in layer.containers.iterator().next().placemarks){
                 val markLoc : LatLng = mark.geometry.geometryObject as LatLng
-                if ( abs(markLoc.latitude - mLoc.latitude) <0.00005 && abs(markLoc.longitude - mLoc.longitude) <0.00005){
+                if ( abs(markLoc.latitude - mLoc.latitude) <0.0005 && abs(markLoc.longitude - mLoc.longitude) <0.0005){
                     if(mark !in closeBy){
                         closeBy.add(mark)
                     }
@@ -192,7 +199,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             }
             //parse kmlplacemarks to placemarks and add them to the collected number
             collect.setOnClickListener {
+                val writeWord : String = "$currentSong$currentMap"
+                println(writeWord)
                 val editor = current.edit()
+                for (mark in closeBy){
+
+                    val pmwords = mark.getProperty("name").split(":")
+                    editor.putInt("$writeWord$pmwords", 1)//setting this word to collected
+                }
+                editor.apply()
+                println("this is the nearest one: ${writeWord}553")
+
+                println(current.getString("${writeWord}553", "missing"))
 
             }
 
