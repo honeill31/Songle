@@ -17,9 +17,14 @@ class ReviewActivity : AppCompatActivity() {
                 startActivity(home)
             }
             R.id.navigation_dashboard -> {
+                val hmm = Intent(this@ReviewActivity, DefaultPage::class.java)
+                startActivity(hmm)
+
 
             }
             R.id.navigation_notifications -> {
+                val hmm = Intent(this@ReviewActivity, DefaultPage::class.java)
+                startActivity(hmm)
             }
         }
         true
