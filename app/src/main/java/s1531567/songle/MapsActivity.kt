@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.util.Log
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.LocationRequest
@@ -189,7 +190,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             val current = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
             for (mark in layer.containers.iterator().next().placemarks){
                 val markLoc : LatLng = mark.geometry.geometryObject as LatLng
-                if ( abs(markLoc.latitude - mLoc.latitude) <0.0005 && abs(markLoc.longitude - mLoc.longitude) <0.0005){
+                if ( abs(markLoc.latitude - mLoc.latitude) <0.05 && abs(markLoc.longitude - mLoc.longitude) <0.05){
                     if(mark !in closeBy){
                         closeBy.add(mark)
                     }
@@ -200,11 +201,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             //parse kmlplacemarks to placemarks and add them to the collected number
             collect.setOnClickListener {
                 val writeWord : String = "$currentSong$currentMap"
+                val parser = LyricParser()
                 println(writeWord)
                 val editor = current.edit()
                 for (mark in closeBy){
 
                     val pmwords = mark.getProperty("name").split(":")
+                    val dl = DownloadLyricTask("01")
+                    dl.execute()
+                    val lyrics = dl.get()
+                    val word = parser.findLyrics(1,1,lyrics, mark)
+                    Log.v("Word?", word.toString())
                     editor.putInt("$writeWord$pmwords", 1)//setting this word to collected
                 }
                 editor.apply()

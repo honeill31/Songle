@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import com.google.maps.android.data.Geometry
+import com.google.maps.android.data.kml.KmlPlacemark
 
 
 import kotlinx.android.synthetic.main.activity_default.*
@@ -39,8 +41,8 @@ class DefaultPage : AppCompatActivity() {
                 val task = DownloadXMLTask()
                 task.execute()
                 val songs = task.get()
-                File("Songs.txt").bufferedWriter().use { out -> out.write(songs)}
-                Log.v("SONG", songs)
+                //File("Songs.txt").bufferedWriter().use { out -> out.write(songs)}
+
             } else {
                 ActivityCompat.requestPermissions(
                         this@DefaultPage,

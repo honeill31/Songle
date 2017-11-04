@@ -1,5 +1,6 @@
 package s1531567.songle
 
+import android.util.Log
 import com.google.maps.android.data.kml.KmlPlacemark
 
 /**
@@ -14,16 +15,21 @@ class LyricParser() {
         val words = name.split(":")
         val lineNum = words[0].toInt()
         val wordNum = words[1].toInt()
-        lyrics.map { lyrics.replace(",", "") }
-        lyrics.map { lyrics.replace("?", "") }
-        lyrics.map { lyrics.replace("!", "") }
-        lyrics.map { lyrics.replace("(", "") }
-        lyrics.map { lyrics.replace(")", "") }
-        lyrics.map { lyrics.replace(".", "") }
+        var editedLyrics = lyrics
+        val remove = "[,|?|!|(|)|.|]".toRegex()
+        Log.v("name", name)
+        Log.v("words", words.toString())
+        Log.v("line", lineNum.toString())
+        Log.v("word", wordNum.toString())
+        editedLyrics = lyrics.replace(remove, "")
         //removing unnecessary punctuation
-        val lyric = lyrics.split("\n") //splitting into string array
 
-        for (line in lyric){
+        val lyric = editedLyrics.split("\n") //splitting into string array
+        Log.v("lyric", editedLyrics.toString())
+        println(editedLyrics.)
+
+        for (line in editedLyrics){
+            println(line.substring(0,1))
             if (line.substring(0,1).toInt() == lineNum ){
                 val lineWords = line.split(" ")
                 val result = Lyric(lineNum, wordNum, lineWords[wordNum])

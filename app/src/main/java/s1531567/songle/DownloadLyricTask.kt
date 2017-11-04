@@ -10,7 +10,7 @@ import java.net.URL
 /**
  * Created by s1531567 on 03/11/17.
  */
-class DownloadLyricTask(val song : Int, val placemark : KmlPlacemark) : AsyncTask<String, Int, String>(){
+class DownloadLyricTask(val song : String) : AsyncTask<String, Int, String>(){
 
     override fun doInBackground(vararg p0: String?): String {
         val url = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/$song/words.txt"
