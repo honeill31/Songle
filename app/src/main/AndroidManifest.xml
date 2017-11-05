@@ -25,7 +25,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MapsActivity">
+        <activity android:name=".DefaultPage">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -37,8 +37,8 @@
             android:label="@string/title_activity_login" />
         <activity android:name=".LeaderboardActivity" />
         <activity
-            android:name=".DefaultPage"
-            android:label="@string/title_activity_default_page"
+            android:name=".MapsActivity"
+            android:label="Map"
             android:theme="@style/AppTheme.NoActionBar" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -54,7 +54,7 @@
 
         <activity
             android:name=".MainActivity"
-            android:label="@string/title_activity_maps" />
+            android:label="Main" />
         <activity
             android:name=".SongList"
             android:label="@string/title_activity_song_list"

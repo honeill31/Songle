@@ -56,6 +56,11 @@ class DefaultPage : AppCompatActivity() {
         super.onStart()
     }
 
+    override fun onStop() {
+        super.onStop()
+        img.setBackgroundResource(0)
+    }
+
 
 
 
