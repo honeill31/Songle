@@ -11,6 +11,8 @@ import android.support.v7.app.AppCompatActivity
 
 
 import kotlinx.android.synthetic.main.activity_default.*
+import org.jetbrains.anko.progressDialog
+import org.jetbrains.anko.toast
 import java.io.File
 
 
@@ -25,6 +27,7 @@ class DefaultPage : AppCompatActivity() {
         play.setOnClickListener {
             val play = Intent(this, MapsActivity::class.java)
             startActivity(play)
+            toast("hi there")
         }
 
 
@@ -36,10 +39,11 @@ class DefaultPage : AppCompatActivity() {
         update.setOnClickListener {
             val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
             if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+                val dialog = progressDialog("Please be patient", "Getting funky" )
                 val task = DownloadXMLTask()
                 task.execute()
                 val songs = task.get()
-                File("Songs.txt").bufferedWriter().use { out -> out.write(songs)}
+                //File("Songs.txt").bufferedWriter().use { out -> out.write(songs)}
                 Log.v("SONG", songs)
             } else {
                 ActivityCompat.requestPermissions(
