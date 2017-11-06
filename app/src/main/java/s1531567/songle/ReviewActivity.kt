@@ -6,6 +6,9 @@ import android.support.v7.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_review.*
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toolbar
+import org.jetbrains.anko.findOptional
+import org.jetbrains.anko.toolbar
 
 class ReviewActivity : AppCompatActivity() {
     private var currentSong : Song? = null
@@ -33,7 +36,11 @@ class ReviewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_review)
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+        actionBar.title = "Review Activity"
+
+
+
+        bar.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         playsong.setOnClickListener{startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(currentSong?.url)))}
     }
 }
