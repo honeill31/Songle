@@ -147,6 +147,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         editor.putInt("Current Song", currentSong)
         editor.putInt("Current Map", currentMap)
         editor.apply()
+        val cur = current.getInt("Current Song", 100)
+        println("hmmhmhmhm: ${cur}")
     }
 
     fun createLocationRequest () {
@@ -164,7 +166,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
             )
         }
-
     }
 
     override fun onConnected(connectionHint : Bundle?){
@@ -184,13 +185,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             ActivityCompat.requestPermissions(this,arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
-
-
-
-
-
-
-
     }
 
 
@@ -224,20 +218,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                     val lyrics = dl.get()
                     val word = parser.findLyric(1,1,lyrics, mark)
                     Log.v("Word?", word.toString())
-                    editor.putInt("$writeWord$pmwords", 1)//setting this word to collected
+                    val toWrite = "$writeWord$pmwords[0]$pmwords[1]"
+                    editor.putString(toWrite,"Collected" )//setting this word to collected
+                    editor.apply()
                 }
-                editor.apply()
-                println("this is the nearest one: ${writeWord}553")
 
-                println(current.getString("${writeWord}553", "missing"))
-
+                //val hmm = current.getInt(0101)
+                println("test:")
             }
-
         }
-        println("""[closeBy]: ${closeBy.size}""")
-
-
-
     }
 
     override fun onConnectionSuspended(flag: Int) {
