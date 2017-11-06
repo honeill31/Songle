@@ -9,36 +9,35 @@ import com.google.maps.android.data.kml.KmlPlacemark
 //given a placemark this class will return the lyric associated
 class LyricParser() {
 
-    fun findLyrics(song: Int, map: Int, lyrics: String, placemark: KmlPlacemark) : Lyric {
-        var result = Lyric(0,0,"")
+    fun findLyric(song: Int, map: Int, lyrics: String, placemark: KmlPlacemark) : Lyric {
         val name = placemark.getProperty("name")
-        val words = name.split(":")
-        val lineNum = words[0].toInt()
-        val wordNum = words[1].toInt()
-        var editedLyrics = lyrics
-        val remove = "[,|?|!|(|)|.|]".toRegex()
-        Log.v("name", name)
-        Log.v("words", words.toString())
-        Log.v("line", lineNum.toString())
-        Log.v("word", wordNum.toString())
-        editedLyrics = lyrics.replace(remove, "")
-        //removing unnecessary punctuation
+        var result = Lyric(0,0,"")
+        val pm = name.split(":")
+        val lineNum = pm[0].toInt()
+        val wordNum = pm[1].toInt()
+        Log.v("linenum", lineNum.toString())
+        Log.v("wordnum:", wordNum.toString())
+        var editedLyrics : String = lyrics
+        val remove = "[,|?|!|(|)|.]".toRegex()
+        editedLyrics = lyrics.replace(remove, "") //removing unnecessary punctuation
+        val lines : List<String> = editedLyrics.split("\n") //splitting into string array)
+        val l = lines.map { value -> value.trim() } //removing whitespace from beginning and end of line
 
-        val lyric = editedLyrics.split("\n") //splitting into string array
-        Log.v("lyric", editedLyrics.toString())
-        println(editedLyrics.)
+        Log.v("lyrics", l.toString())
 
-        for (line in editedLyrics){
-            println(line.substring(0,1))
-            if (line.substring(0,1).toInt() == lineNum ){
-                val lineWords = line.split(" ")
-                val result = Lyric(lineNum, wordNum, lineWords[wordNum])
+        for (line in l) {
+            val words = line.split(" ", "\t") //splitting on whitespace and tabs
+            if (words[0].toInt()==(lineNum)){
+                result = Lyric(lineNum, wordNum, words[wordNum])
+                break
             }
             else {
-                println("Incorrect Line")
+                println("Wrong Line")
             }
-
         }
+
+
+
         return result
 
 

@@ -8,7 +8,6 @@ import android.location.Location
 import android.media.MediaPlayer
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
@@ -203,7 +202,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             val current = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
             for (mark in layer.containers.iterator().next().placemarks){
                 val markLoc : LatLng = mark.geometry.geometryObject as LatLng
-                if ( abs(markLoc.latitude - mLoc.latitude) <0.05 && abs(markLoc.longitude - mLoc.longitude) <0.05){
+                if ( abs(markLoc.latitude - mLoc.latitude) <0.0005 && abs(markLoc.longitude - mLoc.longitude) <0.0005){
                     if(mark !in closeBy){
                         closeBy.add(mark)
                     }
@@ -223,7 +222,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                     val dl = DownloadLyricTask("01")
                     dl.execute()
                     val lyrics = dl.get()
-                    val word = parser.findLyrics(1,1,lyrics, mark)
+                    val word = parser.findLyric(1,1,lyrics, mark)
                     Log.v("Word?", word.toString())
                     editor.putInt("$writeWord$pmwords", 1)//setting this word to collected
                 }
