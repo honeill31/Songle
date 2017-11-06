@@ -35,13 +35,13 @@ class LyricParser() {
                 println("Wrong Line")
             }
         }
-
-
-
         return result
+    }
 
-
-
+    fun editedLyrics(lyrics: String) : List<String>{
+        val editedLyrics = lyrics.split("\n") //splitting into string array)
+        val l = editedLyrics.map { value -> value.trim() } //removing whitespace from beginning and end
+        return l
     }
 
 }
