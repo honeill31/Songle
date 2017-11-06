@@ -44,7 +44,7 @@ class DefaultPage : AppCompatActivity() {
                 task.execute()
                 val songs = task.get()
                 //File("Songs.txt").bufferedWriter().use { out -> out.write(songs)}
-                Log.v("SONG", songs)
+                Log.v("SONG", songs.toString())
             } else {
                 ActivityCompat.requestPermissions(
                         this@DefaultPage,

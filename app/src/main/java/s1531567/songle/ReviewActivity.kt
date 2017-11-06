@@ -40,7 +40,7 @@ class ReviewActivity : AppCompatActivity() {
 
 
 
-        bar.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+        review_bar.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         playsong.setOnClickListener{startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(currentSong?.url)))}
     }
 }
