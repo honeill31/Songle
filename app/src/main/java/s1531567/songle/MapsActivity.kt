@@ -5,8 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.media.MediaPlayer
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
@@ -38,8 +40,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     private lateinit var mLastLocation : Location
     val closeBy = mutableListOf<KmlPlacemark>()
     lateinit var layer: KmlLayer
+    lateinit var mediaplayer : MediaPlayer
     var currentSong : Int = 0
     var currentMap : Int = 0
+
 
 
 
@@ -81,6 +85,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
 
         }
+
+        mediaplayer = MediaPlayer.create(this@MapsActivity, R.raw.song)
+
     }
 
     /**
@@ -125,8 +132,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        mediaplayer.start()
+    }
+
     override fun onStop() {
         super.onStop()
+        mediaplayer.stop()
         if (mGoogleApiClient.isConnected) {
             mGoogleApiClient.disconnect()
         }

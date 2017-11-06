@@ -1,20 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     tools:context="s1531567.songle.DefaultPage">
 
 
+    <ImageView
+        android:id="@+id/img"
+        android:background="@color/colorPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg"
+        android:alpha="0.5"/>
+    
     <Button
         android:id="@+id/leader"
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="101dp"
-        android:layout_marginStart="102dp"
+        android:layout_above="@+id/update"
+        android:layout_centerHorizontal="true"
         android:text="View Leaderboard"
         app:layout_constraintBottom_toTopOf="@+id/update"
         app:layout_constraintEnd_toEndOf="parent"
@@ -25,9 +33,9 @@
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="98dp"
-        android:layout_marginStart="98dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/leader"
+        android:layout_marginBottom="58dp"
         android:text="Check for Updates"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -37,9 +45,9 @@
         android:id="@+id/my_text"
         android:layout_width="219dp"
         android:layout_height="83dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="72dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="75dp"
         android:text="Songle"
         android:textAlignment="center"
         android:textSize="30sp"
@@ -54,8 +62,9 @@
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="136dp"
-        android:layout_marginStart="136dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="147dp"
         android:text="Play"
         app:layout_constraintBottom_toTopOf="@+id/leader"
         app:layout_constraintEnd_toEndOf="parent"
@@ -63,4 +72,4 @@
 
 
 
-</android.support.constraint.ConstraintLayout>
+</RelativeLayout>
