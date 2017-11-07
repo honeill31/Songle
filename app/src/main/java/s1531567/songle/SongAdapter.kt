@@ -13,55 +13,37 @@ import kotlinx.android.synthetic.main.songs_layout.view.*
 /**
  * Created by holly on 07/11/17.
  */
-class SongAdapter(val songs: List<Song>) : RecyclerView.Adapter<SongAdapter.SongHolder>() {
+class SongAdapter(val songs: List<Song>, val itemClick : (Song)->Unit ) : RecyclerView.Adapter<SongAdapter.SongHolder>() {
 
 
-    override fun onBindViewHolder(holder: SongHolder?, position: Int) {
-        holder!!.bind(songs[position])
+    override fun onBindViewHolder(holder: SongAdapter.SongHolder, position: Int) {
+        holder.bind(songs[position])
     }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) : SongAdapter.SongHolder {
         val layoutInflator = LayoutInflater.from(parent.context)
-        //val viewholder = ViewHolder(layoutInflator.inflate(R.layout.songs_layout, parent, false))
-        return SongHolder(layoutInflator.inflate(R.layout.songs_layout, parent, false))
+        return SongHolder(layoutInflator.inflate(R.layout.songs_layout, parent, false), itemClick)
     }
 
     override fun getItemCount(): Int {
         return songs.size
     }
 
+    override fun getItemViewType(position: Int): Int {
+        return super.getItemViewType(position)
+    }
 
 
-//    class SongHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
-//        fun bind(song: Song, listener: (Song) -> Unit) = with(itemView) {
-//            itemView.songTitle.text = song.title
-//            itemView.songArtist.text = song.artist
-//            setOnClickListener { listener(song) }
-//        }
-//
-//    }
-
-    class SongHolder(v: View) : RecyclerView.ViewHolder(v), View.OnClickListener {
-        private var view: View = v
-
-
-        init {
-            view.setOnClickListener(this)
-        }
-
-        override fun onClick(v: View?) {
-            println("Song key: ${SONG_KEY}")
-            println(("Song: ${song}"))
-            val showSongIntent = Intent(itemView.context, ReviewActivity::class.java)
-            showSongIntent.putExtra(SONG_KEY, song!!.title)
-            itemView.context.startActivity(showSongIntent)
-
-        }
+    class SongHolder(view: View, itemClick: (Song) -> Unit) : RecyclerView.ViewHolder(view) {
+        private val mClick = itemClick
 
         fun bind(song:Song)  {
-            itemView.songTitle.text = song.title
-            itemView.songArtist.text = song.artist
+            with(song) {
+                itemView.songTitle.text = song.title
+                itemView.songArtist.text = song.artist
+                itemView.setOnClickListener{mClick(this)}
+            }
 
         }
     }

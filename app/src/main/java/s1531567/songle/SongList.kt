@@ -13,11 +13,13 @@ import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import kotlinx.android.synthetic.main.activity_song_list.*
+import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.toast
 
 class SongList : AppCompatActivity() {
 
     private var myAdapter : SongAdapter? = null
-    private var songList : List<Song>? = null
+    private lateinit var songList : List<Song>
     private var layoutManager : RecyclerView.LayoutManager? = null
 
 
@@ -34,8 +36,10 @@ class SongList : AppCompatActivity() {
         task.execute()
         songList = task.get()
         layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
-        val listener = View.OnClickListener {  }
-        myAdapter = SongAdapter(songList!!, listener = listener )
+        myAdapter = SongAdapter(songList){
+            toast("${it.title} selected!")
+
+        }
         val decor = DividerItemDecoration(this)
         songlist.addItemDecoration(decor)
         songlist.layoutManager = layoutManager
