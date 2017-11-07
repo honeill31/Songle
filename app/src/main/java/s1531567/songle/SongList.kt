@@ -12,9 +12,11 @@ import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
+import kotlinx.android.synthetic.main.activity_review.*
 import kotlinx.android.synthetic.main.activity_song_list.*
 import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.toast
+import s1531567.songle.R.string.current_song
 
 class SongList : AppCompatActivity() {
 
@@ -38,6 +40,9 @@ class SongList : AppCompatActivity() {
         layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
         myAdapter = SongAdapter(songList){
             toast("${it.title} selected!")
+            val activ = Intent(this@SongList, ReviewActivity::class.java)
+            activ.putExtra("Song", it.title)
+            startActivity(activ)
 
         }
         val decor = DividerItemDecoration(this)

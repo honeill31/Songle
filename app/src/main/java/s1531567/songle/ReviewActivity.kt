@@ -46,6 +46,9 @@ class ReviewActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_review)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        val extras = intent.extras
+        val song = extras.getString("Song")
+        review_title.text = song
 
         review_bar.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         playsong.setOnClickListener{startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(currentSong?.url)))}
