@@ -35,10 +35,11 @@ class SongList : AppCompatActivity() {
     fun initialise(){
         val task = DownloadXMLTask()
         task.execute()
-        val dialog = progressDialog(message = "Please wait a bit…", title = "Fetching songs")
         songList = task.get()
         layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
+        songlist.layoutManager = layoutManager
         myAdapter = SongAdapter(songList!!, this, R.layout.songs_layout)
+        songlist.adapter = myAdapter
 
     }
 
