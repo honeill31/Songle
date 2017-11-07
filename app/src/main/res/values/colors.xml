@@ -3,4 +3,9 @@
     <color name="colorPrimary">#80cbc4</color>
     <color name="colorPrimaryDark">#4f9a94</color>
     <color name="colorAccent">#7fb984</color>
+    <color name="songPrimary">#3F51B5</color>
+    <color name="songPrimaryDark">#303F9F</color>
+    <color name="songAccent">#FF4081</color>
+    <color name="genre">#999999</color>
+    <color name="title">#222222</color>
 </resources>

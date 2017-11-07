@@ -3,31 +3,32 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:focusable="true"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:clickable="true"
+    android:background="?android:attr/selectableItemBackground"
+    android:orientation="vertical">
     >
 
     <TextView
         android:id="@+id/songTitle"
-        android:layout_width="wrap_content"
+        android:textColor="@color/title"
+        android:textSize="16dp"
+        android:textStyle="bold"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="16sp"
-        android:layout_marginLeft="15dp"
-        android:lines="1"
-        android:paddingTop="10dp"
-        android:ellipsize="marquee"
-        android:text="TextView"/>
+        android:text="songTitle"/>
 
     <TextView
         android:id="@+id/songArtist"
-        android:layout_width="wrap_content"
+        android:layout_below="@id/songTitle"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:layout_marginRight="15dp"
-        android:lines="1"
-        android:paddingTop="10dp"
-        android:ellipsize="end"
-        android:text="TextView"/>
+        android:text="songArtist"/>
 
 
 

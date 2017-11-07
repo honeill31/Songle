@@ -1,20 +1,18 @@
 package s1531567.songle
 
-import android.app.ActionBar
+
+import android.content.Context
+import android.content.Intent
+import android.graphics.Canvas
+import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.Gravity
+import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout
-import android.widget.ListView
-import android.widget.ProgressBar
 import kotlinx.android.synthetic.main.activity_song_list.*
-import org.jetbrains.anko.progressDialog
-import java.security.KeyStore
 
 class SongList : AppCompatActivity() {
 
@@ -27,30 +25,61 @@ class SongList : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_song_list)
-
         initialise()
 
         }
 
-    fun initialise(){
+    private fun initialise(){
         val task = DownloadXMLTask()
         task.execute()
         songList = task.get()
         layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
+        val listener = View.OnClickListener {  }
+        myAdapter = SongAdapter(songList!!, listener = listener )
+        val decor = DividerItemDecoration(this)
+        songlist.addItemDecoration(decor)
         songlist.layoutManager = layoutManager
-        myAdapter = SongAdapter(songList!!, this, R.layout.songs_layout)
         songlist.adapter = myAdapter
 
     }
-
-
-
     override fun onResume() {
         super.onResume()
 
 
+    }
+
+    inner class DividerItemDecoration(context: Context) : RecyclerView.ItemDecoration(){
+        private var divider: Drawable? = null
+
+        init {
+            val a = context.obtainStyledAttributes(intArrayOf(android.R.attr.listDivider))
+            divider = a.getDrawable(0)
+            a.recycle()
+        }
+
+        override fun onDraw(c: Canvas?, parent: RecyclerView?) {
+            drawVertical(c!!, parent!!)
+        }
+
+        fun drawVertical(c: Canvas, parent: RecyclerView) {
+            val left = parent.paddingLeft
+            val right = parent.width - parent.paddingRight
+
+            val childCount = parent.childCount
+            for (i in 0..childCount - 1) {
+                val child = parent.getChildAt(i)
+                val params = child.layoutParams as RecyclerView.LayoutParams
+                val top = child.bottom + params.bottomMargin
+                val bottom = top + divider!!.intrinsicHeight
+                divider?.setBounds(left, top, right, bottom)
+                divider?.draw(c)
+            }
+        }
+
 
     }
+
+
 
 
     }
