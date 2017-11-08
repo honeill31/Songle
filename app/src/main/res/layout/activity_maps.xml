@@ -19,12 +19,13 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/bar"
+        android:layout_alignBottom="@+id/collect"
         android:layout_alignParentEnd="true"
+        android:layout_marginEnd="11dp"
+        android:tint="@color/colorPrimaryDark"
         app:backgroundTint="@color/primaryColor"
         app:rippleColor="@color/primaryDarkColor"
-        app:srcCompat="@drawable/ic_audiotrack_black_24dp"
-        android:tint="@color/colorPrimaryDark"/>
+        app:srcCompat="@drawable/ic_audiotrack_black_24dp" />
 
 
     <android.support.design.widget.BottomNavigationView
@@ -44,10 +45,13 @@
 
     <Button
         android:id="@+id/collect"
+        style="@style/MyButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/bar"
         android:layout_alignParentStart="true"
+        android:layout_marginBottom="11dp"
+        android:layout_marginStart="23dp"
         android:text="Collect" />
 
 

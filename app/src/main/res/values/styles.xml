@@ -9,20 +9,11 @@
         <item name="android:colorBackground">@android:color/background_light</item>
     </style>
 
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
+
+    <style name="MyButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:textColor">@color/primaryDarkColor</item>
+        <item name="colorButtonNormal">@color/primaryTextColor</item>
     </style>
-
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-    <style name="MyTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
-    </style>
-
-    <style name="Theme.MyTheme.NoActionBar" parent="Theme.AppCompat.NoActionBar" />
 
     <color name="primaryColor">#80cbc4</color>
     <color name="primaryLightColor">#b2fef7</color>

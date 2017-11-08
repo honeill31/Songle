@@ -66,7 +66,8 @@ class SongList : AppCompatActivity() {
         myAdapter = SongAdapter(songList){
             toast("${it.title} selected!")
             val activ = Intent(this@SongList, ReviewActivity::class.java)
-            activ.putExtra("Song", it.title)
+            activ.putExtra("title", it.title)
+            activ.putExtra("artist", it.artist)
             activ.putExtra("url", it.url)
             startActivity(activ)
 

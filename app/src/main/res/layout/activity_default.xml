@@ -15,31 +15,25 @@
         android:scaleType="centerCrop"
         android:src="@drawable/bg"
         android:alpha="0.5"/>
-    
+
     <Button
-        android:id="@+id/leader"
-        style="@style/Widget.AppCompat.Button.Colored"
+        android:id="@+id/songref"
+        style="@style/MyButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/update"
         android:layout_centerHorizontal="true"
-        android:text="View Leaderboard"
-        app:layout_constraintBottom_toTopOf="@+id/update"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:text="View Song List" />
 
     <Button
         android:id="@+id/update"
-        style="@style/Widget.AppCompat.Button.Colored"
+        style="@style/MyButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignStart="@+id/leader"
-        android:layout_marginBottom="58dp"
-        android:text="Check for Updates"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="33dp"
+        android:text="Check for Updates" />
 
     <TextView
         android:id="@+id/my_text"
@@ -53,22 +47,16 @@
         android:textSize="30sp"
         android:typeface="normal"
         android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+ />
 
     <Button
         android:id="@+id/play"
-        style="@style/Widget.AppCompat.Button.Colored"
+        style="@style/MyButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/songref"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="147dp"
-        android:text="Play"
-        app:layout_constraintBottom_toTopOf="@+id/leader"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:text="Play" />
 
 
 

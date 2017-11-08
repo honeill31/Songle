@@ -31,7 +31,7 @@ class DefaultPage : AppCompatActivity() {
         }
 
 
-        leader.setOnClickListener {
+        songref.setOnClickListener {
             val lead = Intent(this@DefaultPage, LeaderboardActivity::class.java)
             startActivity(lead)
         }
