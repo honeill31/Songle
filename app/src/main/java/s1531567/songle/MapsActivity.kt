@@ -2,6 +2,7 @@ package s1531567.songle
 
 import android.Manifest
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -10,7 +11,16 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
+import android.text.InputType.TYPE_CLASS_TEXT
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.LocationRequest
@@ -23,6 +33,9 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.data.kml.KmlLayer
 import com.google.maps.android.data.kml.KmlPlacemark
 import kotlinx.android.synthetic.main.activity_maps.*
+import kotlinx.android.synthetic.main.guess_dialog.*
+import org.jetbrains.anko.*
+import org.jetbrains.anko.appcompat.v7.alertDialogLayout
 import java.lang.Math.abs
 
 
@@ -42,6 +55,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     lateinit var mediaplayer : MediaPlayer
     var currentSong : Int = 0
     var currentMap : Int = 0
+    private lateinit var txt : EditText
 
 
 
@@ -49,6 +63,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
@@ -73,9 +88,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                     val list = Intent(this@MapsActivity, SongList::class.java)
                     startActivity(list)
                 }
-                R.id.menu_fav -> {
-                    val fav = Intent(this@MapsActivity, Favourites::class.java)
-                    startActivity(fav)
+                R.id.menu_map -> {
+
 
                 }
 
@@ -118,11 +132,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             }
         }
 
-
-
-
-
-
     }
 
     override fun onStart() {
@@ -131,9 +140,38 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     }
 
+
+
+
     override fun onResume() {
         super.onResume()
         mediaplayer.start()
+
+        fab.setOnClickListener{
+            val b = AlertDialog.Builder(this)
+            val inf = layoutInflater
+            val view = inf.inflate(R.layout.guess_dialog, null)
+            b.setView(inf.inflate(R.layout.guess_dialog, null))
+
+
+            b.setPositiveButton("Submit") { dialog, whichButton ->
+                val txt : EditText = view.findViewById(R.id.user_guess)
+                val userGuess = txt.text.toString()
+                Log.v("User guess", userGuess)
+                println("USEW GUESS!!!! $userGuess")
+                toast("Boop!")
+            }
+            b.setNegativeButton( "Cancel"){
+                dialog, which ->
+                toast("aww")
+            }
+            val alertDialog = b.create()
+            alertDialog.show()
+
+
+        }
+
+
     }
 
     override fun onStop() {

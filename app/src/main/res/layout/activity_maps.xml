@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:design="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/map"
@@ -16,12 +16,15 @@
         />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/floatingActionButton"
+        android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/bar"
         android:layout_alignParentEnd="true"
-        app:fabSize="normal" />
+        app:backgroundTint="@color/primaryColor"
+        app:rippleColor="@color/primaryDarkColor"
+        app:srcCompat="@drawable/ic_audiotrack_black_24dp"
+        android:tint="@color/colorPrimaryDark"/>
 
 
     <android.support.design.widget.BottomNavigationView

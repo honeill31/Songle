@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
         <item
             android:id="@+id/menu_home"
             android:title="@string/menu_home"
             android:icon="@drawable/ic_home_black"
+            app:showAsAction="always"
             />
         <item
-            android:id="@+id/menu_fav"
-            android:title="@string/menu_favourite"
-            android:icon="@drawable/ic_favorite_black"
+            android:id="@+id/menu_map"
+            android:title="Map"
+            android:icon="@drawable/ic_map_black_24dp"
+            app:showAsAction="always"
             />
 
         <item
             android:id="@+id/menu_list"
             android:title="@string/menu_list"
-            android:icon="@drawable/ic_list_black" />
+            android:icon="@drawable/ic_list_black"
+            app:showAsAction="always"/>
     </menu>
 
 

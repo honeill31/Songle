@@ -14,22 +14,21 @@ import org.jetbrains.anko.startActivityForResult
 import org.jetbrains.anko.toolbar
 
 class ReviewActivity : AppCompatActivity() {
-    private var currentSong : Song? = null
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
-            R.id.navigation_home -> {
+            R.id.menu_home -> {
                 val home = Intent(this@ReviewActivity, DefaultPage::class.java)
                 startActivity(home)
             }
-            R.id.navigation_dashboard -> {
-                val hmm = Intent(this@ReviewActivity, DefaultPage::class.java)
+            R.id.menu_map -> {
+                val hmm = Intent(this@ReviewActivity, MapsActivity::class.java)
                 startActivity(hmm)
 
 
             }
-            R.id.navigation_notifications -> {
-                val hmm = Intent(this@ReviewActivity, DefaultPage::class.java)
+            R.id.menu_list -> {
+                val hmm = Intent(this@ReviewActivity, SongList::class.java)
                 startActivity(hmm)
             }
         }
@@ -48,10 +47,11 @@ class ReviewActivity : AppCompatActivity() {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         val extras = intent.extras
         val song = extras.getString("Song")
+        val url = extras.getString("url")
         review_title.text = song
 
         review_bar.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-        playsong.setOnClickListener{startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(currentSong?.url)))}
+        playsong.setOnClickListener{startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))}
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

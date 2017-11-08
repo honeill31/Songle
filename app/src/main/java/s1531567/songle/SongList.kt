@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -17,8 +18,30 @@ import kotlinx.android.synthetic.main.activity_song_list.*
 import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.toast
 import s1531567.songle.R.string.current_song
+import s1531567.songle.R.string.menu_list
 
 class SongList : AppCompatActivity() {
+
+
+    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+        when (item.itemId) {
+            R.id.menu_home -> {
+                val home = Intent(this@SongList, DefaultPage::class.java)
+                startActivity(home)
+            }
+            R.id.menu_map -> {
+                val hmm = Intent(this@SongList, MapsActivity::class.java)
+                startActivity(hmm)
+
+
+            }
+            R.id.menu_list -> {
+
+
+            }
+        }
+        true
+    }
 
     private var myAdapter : SongAdapter? = null
     private lateinit var songList : List<Song>
@@ -29,6 +52,8 @@ class SongList : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_song_list)
+        list_bar.selectedItemId = R.id.menu_list
+        list_bar.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         initialise()
 
         }
@@ -42,6 +67,7 @@ class SongList : AppCompatActivity() {
             toast("${it.title} selected!")
             val activ = Intent(this@SongList, ReviewActivity::class.java)
             activ.putExtra("Song", it.title)
+            activ.putExtra("url", it.url)
             startActivity(activ)
 
         }
