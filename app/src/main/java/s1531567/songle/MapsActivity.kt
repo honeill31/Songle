@@ -1,6 +1,7 @@
 package s1531567.songle
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -11,16 +12,10 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
-import android.support.v7.app.AlertDialog
-import android.text.InputType.TYPE_CLASS_TEXT
+
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.LocationRequest
@@ -125,13 +120,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         layer = layerTask.get()
         layer.addLayerToMap() //displaying the kml tags
 
-        for (mark in layer.containers.iterator().next().placemarks) {
-            if (mark.hasProperty("name")) {
-                println(mark.getProperty("name"))
-
-            }
-        }
-
     }
 
     override fun onStart() {
@@ -148,14 +136,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         mediaplayer.start()
 
         fab.setOnClickListener{
+
+
+
             val b = AlertDialog.Builder(this)
-            val inf = layoutInflater
+            val inf = LayoutInflater.from(this)
             val view = inf.inflate(R.layout.guess_dialog, null)
             b.setView(inf.inflate(R.layout.guess_dialog, null))
-
+            val txt  = view.findViewById<EditText>(R.id.user_guess) as EditText
 
             b.setPositiveButton("Submit") { dialog, whichButton ->
-                val txt : EditText = view.findViewById(R.id.user_guess)
+
                 val userGuess = txt.text.toString()
                 Log.v("User guess", userGuess)
                 println("USEW GUESS!!!! $userGuess")
@@ -165,8 +156,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 dialog, which ->
                 toast("aww")
             }
-            val alertDialog = b.create()
-            alertDialog.show()
+            b.show()
 
 
         }

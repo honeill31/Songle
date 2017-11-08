@@ -9,6 +9,10 @@
     tools:context="s1531567.songle.ReviewActivity">
 
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/review_bar"
         android:layout_width="match_parent"
@@ -22,28 +26,39 @@
         />
 
 
-
     <TextView
         android:id="@+id/review_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/review_artist"
+        android:layout_centerHorizontal="true"
+        android:text="@string/current_song"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/review_artist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="22dp"
         android:text="@string/current_song"
-        android:textSize="36sp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+
 
     <Button
         android:id="@+id/playsong"
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/bar"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="26dp"
-        android:layout_marginEnd="14dp"
+        android:layout_above="@+id/review_bar"
+        android:layout_centerHorizontal="true"
         android:text="Play Song"
         app:layout_constraintBottom_toTopOf="@+id/review_bar"
         app:layout_constraintEnd_toEndOf="parent"
