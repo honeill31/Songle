@@ -7,17 +7,7 @@
     tools:context="s1531567.songle.DefaultPage">
 
 
-    <TextView
-        android:id="@+id/app_title"
-        android:layout_width="wrap_content"
-        android:layout_height="80dp"
-        android:layout_above="@+id/songref"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="128dp"
-        android:ellipsize="start"
-        android:text="Son𝄞le"
-        android:textAppearance="@style/TextAppearance.AppCompat"
-        android:textSize="36sp" />
+
 
     <ImageView
         android:id="@+id/img"
@@ -30,24 +20,6 @@
         android:scaleType="centerCrop"
         android:src="@drawable/bg" />
 
-    <Button
-        android:id="@+id/songref"
-        style="@style/MyButton"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/update"
-        android:layout_centerHorizontal="true"
-        android:text="View Song List" />
-
-    <Button
-        android:id="@+id/update"
-        style="@style/MyButton"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/userprofile"
-        android:layout_centerHorizontal="true"
-        android:text="Check for Updates" />
-
 
     <Button
         android:id="@+id/play"
@@ -59,6 +31,15 @@
         android:text="Play" />
 
     <Button
+        android:id="@+id/songref"
+        style="@style/MyButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/update"
+        android:layout_centerHorizontal="true"
+        android:text="View Song List" />
+
+    <Button
         android:id="@+id/userprofile"
         style="@style/MyButton"
         android:layout_width="200dp"
@@ -66,7 +47,34 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="27dp"
+        android:text="Check For Updates" />
+
+    <Button
+        android:id="@+id/update"
+        style="@style/MyButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/userprofile"
+        android:layout_centerHorizontal="true"
         android:text="User Profile" />
+
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/play"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="83dp"
+        android:cropToPadding="true"
+        android:paddingBottom="16dp"
+        android:paddingEnd="16dp"
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp"
+        android:paddingStart="32dp"
+        android:paddingTop="8dp"
+        android:scaleType="centerCrop"
+        app:srcCompat="@drawable/ic_logo" />
 
 
 </RelativeLayout>

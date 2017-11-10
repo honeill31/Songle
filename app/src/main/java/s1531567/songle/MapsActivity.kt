@@ -49,8 +49,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     val closeBy = mutableListOf<KmlPlacemark>()
     lateinit var layer: KmlLayer
     lateinit var mediaplayer: MediaPlayer
-    var currentSong: Int = 0
-    var currentMap: Int = 0
+    var currentSong: Int = 1
+    var currentMap: Int = 4
     private lateinit var txt: EditText
 
 
@@ -59,6 +59,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         setContentView(R.layout.activity_maps)
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        bar.selectedItemId = R.id.menu_map
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -115,7 +116,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             println("Security Exception Thrown [onMapReady]")
         }
         mMap.uiSettings.isMyLocationButtonEnabled = true
-        val layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/0$currentSong/map$currentMap.kml")
+        val layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/01/map4.kml")
         layer = layerTask.get()
         layer.addLayerToMap() //displaying the kml tags
 
@@ -146,7 +147,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 val userGuess = txt.text.toString()
                 Log.v("User guess", userGuess)
                 println("USEW GUESS!!!! $userGuess")
-                toast("Boop!")
+                toast("'Song 2' is correct!")
             }
             b.setNegativeButton("Cancel") { dialog, which ->
                 toast("aww")

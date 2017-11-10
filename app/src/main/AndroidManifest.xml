@@ -51,9 +51,6 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
-        <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
 
         <activity
             android:name=".MainActivity"
@@ -71,6 +68,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="s1531567.songle.DefaultPage" />
         </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
     </application>
 
 </manifest>

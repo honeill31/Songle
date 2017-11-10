@@ -41,9 +41,20 @@ class MapAdapter (val maps: List<MapInfo>, val itemClick : (MapInfo)->Unit ) : R
 
         fun bind(map: MapInfo) {
             with(map) {
-                val mapnum = "Map $map.mapNumber"
-                itemView.map_number.text = mapnum
-                itemView.locked.setImageResource(R.drawable.ic_lock_outline_black_24dp)
+                val mapnum = map.mapNumber
+                val collected = map.collectedPlacemark
+                val total = map.totalPlacemark
+                itemView.map_number.text = "Map ${mapnum}"
+
+                if (map.locked){
+                    itemView.locked.setImageResource(R.drawable.ic_lock_outline_black_24dp)
+                    itemView.collected_placemarks_review.text = ""
+
+                }
+                if (map.locked==false){
+                    itemView.collected_placemarks_review.text = "$collected/$total"
+                }
+
                 itemView.setOnClickListener { mClick(this) }
             }
 

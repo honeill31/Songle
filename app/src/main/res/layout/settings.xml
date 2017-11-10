@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:design="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <PreferenceCategory android:title="Settings" >
+        <EditTextPreference
+            android:title="Sounds"
+            android:summary="Turn sounds on/off"
+            android:key="prefSounds"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Update" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="prefUpdate"
+            android:summary="Check for updates on game start"
+            android:title="Game Update" >
+        </CheckBoxPreference>
+    </PreferenceCategory>
+
+</PreferenceScreen>

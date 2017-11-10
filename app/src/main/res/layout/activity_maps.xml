@@ -23,7 +23,7 @@
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="11dp"
         android:tint="@color/colorPrimaryDark"
-        app:backgroundTint="@color/primaryColor"
+        app:background="@color/colorPrimary"
         app:rippleColor="@color/primaryDarkColor"
         app:srcCompat="@drawable/ic_audiotrack_black_24dp" />
 

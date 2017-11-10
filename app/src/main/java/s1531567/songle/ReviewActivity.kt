@@ -58,11 +58,11 @@ class ReviewActivity : AppCompatActivity() {
         val task = DownloadXMLTask()
         task.execute()
 
-        mapList.add(MapInfo(782,10,1))
-        mapList.add(MapInfo(460,100,2))
-        mapList.add(MapInfo(620,603,3))
-        mapList.add(MapInfo(173,20,4))
-        mapList.add(MapInfo(200,20,5))
+        mapList.add(MapInfo(30,20,1, false))
+        mapList.add(MapInfo(46,4,2, false))
+        mapList.add(MapInfo(620,603,3, true))
+        mapList.add(MapInfo(173,20,4, true))
+        mapList.add(MapInfo(200,20,5, true))
         layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
         myAdapter = MapAdapter(mapList){
             toast("${it.collectedPlacemark} Collected!")
@@ -80,13 +80,13 @@ class ReviewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_review)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         val extras = intent.extras
         val title = extras.getString("title")
         val artist = extras.getString("artist")
         val url = extras.getString("url")
-        review_title.text = title
-        review_artist.text = artist
+        review_bar.selectedItemId = R.id.menu_list
+        review_title.text = "???"
+        review_artist.text = "???"
         initialise()
 
         review_bar.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
