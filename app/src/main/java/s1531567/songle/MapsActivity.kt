@@ -14,6 +14,7 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.EditText
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
@@ -49,9 +50,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     val closeBy = mutableListOf<KmlPlacemark>()
     lateinit var layer: KmlLayer
     lateinit var mediaplayer: MediaPlayer
-    var currentSong: Int = 1
+    var currentSong: Int = 11
     var currentMap: Int = 4
     private lateinit var txt: EditText
+    private lateinit var songs : List<Song>
+    val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+    val editor = pref.edit()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,6 +99,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         }
 
         mediaplayer = MediaPlayer.create(this@MapsActivity, R.raw.song)
+        val task = DownloadXMLTask()
+        task.execute()
+        songs = task.get()
 
     }
 
@@ -116,7 +123,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             println("Security Exception Thrown [onMapReady]")
         }
         mMap.uiSettings.isMyLocationButtonEnabled = true
-        val layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/01/map4.kml")
+        val layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/11/map4.kml")
         layer = layerTask.get()
         layer.addLayerToMap() //displaying the kml tags
 
@@ -128,32 +135,54 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     }
 
+    fun displayGuess() : AlertDialog {
+
+        val b = AlertDialog.Builder(this)
+        val inf = LayoutInflater.from(this)
+        val view = inf.inflate(R.layout.guess_dialog, null)
+        b.setView(view)
+
+        var txt = view.findViewById<EditText>(R.id.user_guess) as EditText
+
+        b.setPositiveButton("Submit") { dialog, whichButton ->
+
+            dialog.dismiss()
+            var userGuess = txt.text.toString()
+            Log.v("User guess", userGuess)
+            println("USEW GUESS!!!! $userGuess")
+            println("current song: ${songs[currentSong-1].title}")
+            if (userGuess.trim().toLowerCase() == songs[currentSong].title.trim().toLowerCase()){
+                //add currency,
+                toast("${userGuess} is the correct song!")
+            }
+            if (userGuess.toLowerCase() != songs[currentSong].title.toLowerCase()){
+                var tries = pref.getInt("Tries11", 3)
+                tries -= tries
+                toast("$userGuess is not the correct song, $tries tries remaining.")
+                editor.putInt("Tries11", tries)
+            }
+
+        }
+        b.setNegativeButton("Cancel") { dialog, which ->
+            dialog.dismiss()
+            toast("aww")
+        }
+
+        val dialog = b.create()
+        return dialog
+
+
+
+    }
+
 
     override fun onResume() {
         super.onResume()
         mediaplayer.start()
 
         fab.setOnClickListener {
-
-
-            val b = AlertDialog.Builder(this)
-            val inf = LayoutInflater.from(this)
-            val view = inf.inflate(R.layout.guess_dialog, null)
-            b.setView(inf.inflate(R.layout.guess_dialog, null))
-            val txt = view.findViewById<EditText>(R.id.user_guess) as EditText
-
-            b.setPositiveButton("Submit") { dialog, whichButton ->
-
-                val userGuess = txt.text.toString()
-                Log.v("User guess", userGuess)
-                println("USEW GUESS!!!! $userGuess")
-                toast("'Song 2' is correct!")
-            }
-            b.setNegativeButton("Cancel") { dialog, which ->
-                toast("aww")
-            }
-            b.show()
-
+            val dialog = displayGuess()
+            dialog.show()
 
         }
 
@@ -243,8 +272,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             val writeWord: String = "$currentSong$currentMap"
             val parser = LyricParser()
             println(writeWord)
-            val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-            val editor = pref.edit()
             for (mark in closeBy) {
 
                 val pmwords = mark.getProperty("name").split(":")
