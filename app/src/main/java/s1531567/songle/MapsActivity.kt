@@ -34,6 +34,7 @@ import kotlinx.coroutines.experimental.runBlocking
 import org.jetbrains.anko.*
 import org.jetbrains.anko.appcompat.v7.alertDialogLayout
 import java.lang.Math.abs
+import java.net.InetAddress
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
@@ -52,10 +53,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     lateinit var mediaplayer: MediaPlayer
     var currentSong: Int = 11
     var currentMap: Int = 4
-    private lateinit var txt: EditText
     private lateinit var songs : List<Song>
-    val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-    val editor = pref.edit()
+
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -138,6 +138,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     fun displayGuess() : AlertDialog {
 
         val b = AlertDialog.Builder(this)
+        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+        val editor = pref.edit()
         val inf = LayoutInflater.from(this)
         val view = inf.inflate(R.layout.guess_dialog, null)
         b.setView(view)
@@ -152,14 +154,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             println("USEW GUESS!!!! $userGuess")
             println("current song: ${songs[currentSong-1].title}")
             if (userGuess.trim().toLowerCase() == songs[currentSong].title.trim().toLowerCase()){
-                //add currency,
+                var currentSongles = pref.getInt("songles", 0)
+                currentSongles++
+                editor.putInt("songles", currentSongles)
                 toast("${userGuess} is the correct song!")
             }
             if (userGuess.toLowerCase() != songs[currentSong].title.toLowerCase()){
-                var tries = pref.getInt("Tries11", 3)
-                tries -= tries
-                toast("$userGuess is not the correct song, $tries tries remaining.")
-                editor.putInt("Tries11", tries)
+                var tries = pref.getInt("Tries$currentSong", 3)
+                Log.v("Current tries", tries.toString())
+                tries--
+                if (tries >0) {
+                    toast("Incorrect song guess, $tries tries remaining.")
+                    editor.putInt("Tries$currentSong", tries)
+                    editor.apply()
+                }
+                //decrease score
+                toast("Incorrect song guess, Score decreasing")
             }
 
         }
@@ -175,9 +185,30 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     }
 
+    fun checkInternet(): Boolean {
+        try {
+            val address = InetAddress.getByName("google.com")
+            Log.v("Address:", address.toString())
+            return !address.equals("")
+        } catch (e: Exception) {
+            return false
+        }
+    }
+
 
     override fun onResume() {
         super.onResume()
+        val connected = checkInternet()
+
+        if (connected){
+            //display error
+            println("Not connected")
+            val intent = Intent(this, DefaultPage::class.java)
+            startActivity(intent)
+        }
+
+
+
         mediaplayer.start()
 
         fab.setOnClickListener {
@@ -251,7 +282,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 val current = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
                 for (mark in layer.containers.iterator().next().placemarks) {
                     val markLoc: LatLng = mark.geometry.geometryObject as LatLng
-                    if (abs(markLoc.latitude - mLoc.latitude) < 0.05 && abs(markLoc.longitude - mLoc.longitude) < 0.05) {
+                    if (abs(markLoc.latitude - mLoc.latitude) < 0.0005 && abs(markLoc.longitude - mLoc.longitude) < 0.0005) {
                         if (mark !in closeBy) {
                             Log.v("boop! I am in here", markLoc.toString())
                             closeBy.add(mark)
@@ -267,6 +298,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     override fun onLocationChanged(current: Location?) {
         checkCloseBy(current)
+        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+        val editor = pref.edit()
         //parse kmlplacemarks to placemarks and add them to the collected number
         collect.setOnClickListener {
             val writeWord: String = "$currentSong$currentMap"
