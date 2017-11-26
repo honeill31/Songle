@@ -54,6 +54,24 @@
         android:layout_marginStart="23dp"
         android:text="Collect" />
 
+    <ImageView
+        android:id="@+id/currency"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:padding="@dimen/activity_horizontal_margin"
+        design:srcCompat="@drawable/ic_music_note_black_24dp" />
+
+    <ImageView
+        android:id="@+id/walking"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@+id/currency"
+        android:padding="@dimen/activity_horizontal_margin"
+        design:srcCompat="@drawable/ic_monetization_on_black_24dp" />
+
 
 </RelativeLayout>
 

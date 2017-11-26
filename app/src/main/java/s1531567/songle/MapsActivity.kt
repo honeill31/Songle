@@ -6,6 +6,10 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.location.Location
 import android.media.MediaPlayer
 import android.support.v7.app.AppCompatActivity
@@ -14,7 +18,6 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.EditText
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
@@ -28,11 +31,9 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.data.kml.KmlLayer
 import com.google.maps.android.data.kml.KmlPlacemark
 import kotlinx.android.synthetic.main.activity_maps.*
-import kotlinx.android.synthetic.main.guess_dialog.*
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
 import org.jetbrains.anko.*
-import org.jetbrains.anko.appcompat.v7.alertDialogLayout
 import java.lang.Math.abs
 import java.net.InetAddress
 
@@ -40,7 +41,9 @@ import java.net.InetAddress
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+        LocationListener,
+        SensorEventListener,
+        StepListener {
 
 
     private lateinit var mMap: GoogleMap
@@ -54,6 +57,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     var currentSong: Int = 11
     var currentMap: Int = 4
     private lateinit var songs : List<Song>
+    val sensorManager: SensorManager by lazy {
+        getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    }
+    val detect = StepDetector()
 
 
 
@@ -61,6 +68,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
+        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+        val editor = pref.edit()
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         bar.selectedItemId = R.id.menu_map
@@ -76,6 +85,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build()
+
 
         bar.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
@@ -102,6 +112,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         val task = DownloadXMLTask()
         task.execute()
         songs = task.get()
+
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
+
+    override fun onSensorChanged(event: SensorEvent) {
+       if (event.sensor.type == Sensor.TYPE_ACCELEROMETER){
+           detect.updateAccel(event.timestamp, event.values[0], event.values[1], event.values[2])
+       }
+    }
+
+    override fun step(timeNs: Long) {
+        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+        var steps = pref.getInt("steps",0)
+        steps++
+        val editor = pref.edit()
+        editor.putInt("steps", steps)
+        editor.apply()
+        toast("Steps: $steps")
 
     }
 
@@ -138,11 +167,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     fun displayGuess() : AlertDialog {
 
         val b = AlertDialog.Builder(this)
-        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-        val editor = pref.edit()
         val inf = LayoutInflater.from(this)
         val view = inf.inflate(R.layout.guess_dialog, null)
         b.setView(view)
+        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+        val editor = pref.edit()
 
         var txt = view.findViewById<EditText>(R.id.user_guess) as EditText
 
@@ -198,14 +227,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     override fun onResume() {
         super.onResume()
-        val connected = checkInternet()
 
+
+
+
+        val connected = checkInternet()
         if (connected){
             //display error
             println("Not connected")
             val intent = Intent(this, DefaultPage::class.java)
             startActivity(intent)
         }
+
+
+        val accel = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        detect.registerListener(this)
+        sensorManager.registerListener(this@MapsActivity, accel, SensorManager.SENSOR_DELAY_FASTEST)
 
 
 
