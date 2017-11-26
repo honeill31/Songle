@@ -199,6 +199,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 var currentSongles = pref.getInt("songles", 0)
                 currentSongles++
                 editor.putInt("songles", currentSongles)
+                editor.apply()
                 toast("${userGuess} is the correct song!")
             }
             if (userGuess.toLowerCase() != songs[currentSong].title.toLowerCase()){
@@ -211,7 +212,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                     editor.apply()
                 }
                 //decrease score
-                toast("Incorrect song guess, Score decreasing")
+                toast("Incorrect song guess, points decreasing")
+                var points = pref.getInt("points", 0)
+                points--
+                editor.putInt("points", points)
+                editor.apply()
             }
 
         }
@@ -239,20 +244,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         var total = 0
 
         if (from == "points"){
-            var convert = pref.getInt(from, 0)
-            var total = pref.getInt(to, 0)
+            convert = pref.getInt(from, 0)
+            total = pref.getInt(to, 0)
 
         }
         if (from == "songles"){
-            var convert = pref.getInt(from, 0)
-            var total = pref.getInt(to, 0)
+            convert = pref.getInt(from, 0)
+            total = pref.getInt(to, 0)
         }
 
-        var txt = view.findViewById<EditText>(R.id.convert) as EditText
-        var before = view.findViewById<TextView>(R.id.currencyNow)
-        var after = view.findViewById<TextView>(R.id.currencyAfter)
-        before.text = convert.toString()
-        after.text = total.toString()
+        val txt = view.findViewById<EditText>(R.id.convert) as EditText
+        val before = view.findViewById<TextView>(R.id.currencyNow)
+        val after = view.findViewById<TextView>(R.id.currencyAfter)
+        before.text = "Current $from: $convert"
+        after.text = "Current $to: $total"
 
         b.setPositiveButton("Convert") { dialog, whichButton ->
 
@@ -263,7 +268,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             val toTotal = userAmount + total
             editor.putInt(from, fromTotal)
             editor.putInt(to,toTotal)
+            editor.apply()
             toast("successful conversion")
+            println("User Amount: $userAmount")
+            println("Cost $cost")
+            println("from total: $fromTotal")
+            println("to total")
+
 
         }
         b.setNegativeButton("Cancel") { dialog, which ->
