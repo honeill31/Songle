@@ -14,13 +14,12 @@ import android.location.Location
 import android.media.MediaPlayer
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.os.VibrationEffect
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.view.LayoutInflater
-import android.widget.EditText
-import android.widget.TextView
+import android.view.View
+import android.widget.*
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.LocationRequest
@@ -38,7 +37,6 @@ import kotlinx.coroutines.experimental.runBlocking
 import org.jetbrains.anko.*
 import java.lang.Math.abs
 import java.net.InetAddress
-import android.os.Vibrator
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
@@ -57,8 +55,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     val closeBy = mutableListOf<KmlPlacemark>()
     lateinit var layer: KmlLayer
     lateinit var mediaplayer: MediaPlayer
-    var currentSong: Int = 11
-    var currentMap: Int = 4
+    var currentSong : String = "01"
+    var currentMap: String = "0"
     private lateinit var songs : List<Song>
     val sensorManager: SensorManager by lazy {
         getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -71,6 +69,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
+
         val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
         val editor = pref.edit()
 
@@ -80,8 +79,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
         val current = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-        currentSong = current.getInt("Current Song", 1)
-        currentMap = current.getInt("Current Map", 1)
+        currentSong = current.getString("Current Song", "01")
+        currentMap = current.getString("Current Map", "1")
 
         mGoogleApiClient = GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -147,6 +146,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     }
 
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -165,7 +165,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             println("Security Exception Thrown [onMapReady]")
         }
         mMap.uiSettings.isMyLocationButtonEnabled = true
-        val layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/11/map4.kml")
+        val layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/$currentSong/map$currentMap.kml")
         layer = layerTask.get()
         layer.addLayerToMap() //displaying the kml tags
 
@@ -194,15 +194,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             var userGuess = txt.text.toString()
             Log.v("User guess", userGuess)
             println("USEW GUESS!!!! $userGuess")
-            println("current song: ${songs[currentSong-1].title}")
-            if (userGuess.trim().toLowerCase() == songs[currentSong].title.trim().toLowerCase()){
+            println("current song: ${songs[currentSong.toInt()-1].title}")
+            if (userGuess.trim().toLowerCase() == songs[currentSong.toInt()].title.trim().toLowerCase()){
                 var currentSongles = pref.getInt("songles", 0)
                 currentSongles++
                 editor.putInt("songles", currentSongles)
                 editor.apply()
                 toast("${userGuess} is the correct song!")
             }
-            if (userGuess.toLowerCase() != songs[currentSong].title.toLowerCase()){
+            if (userGuess.toLowerCase() != songs[currentSong.toInt()].title.toLowerCase()){
                 var tries = pref.getInt("Tries$currentSong", 3)
                 Log.v("Current tries", tries.toString())
                 tries--
@@ -240,40 +240,53 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         b.setView(view)
         val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
         val editor = pref.edit()
-        var convert = 0
-        var total = 0
+        var fromCurrency = 0
+        var toCurrency = 0
+        var cost = 0
 
         if (from == "points"){
-            convert = pref.getInt(from, 0)
-            total = pref.getInt(to, 0)
+            fromCurrency = pref.getInt(from, 0)
+            toCurrency = pref.getInt(to, 0)
 
         }
         if (from == "songles"){
-            convert = pref.getInt(from, 0)
-            total = pref.getInt(to, 0)
+            fromCurrency = pref.getInt(from, 0)
+            toCurrency = pref.getInt(to, 0)
         }
 
         val txt = view.findViewById<EditText>(R.id.convert) as EditText
         val before = view.findViewById<TextView>(R.id.currencyNow)
         val after = view.findViewById<TextView>(R.id.currencyAfter)
-        before.text = "Current $from: $convert"
-        after.text = "Current $to: $total"
+        before.text = "Current $from: $fromCurrency"
+        after.text = "Current $to: $toCurrency"
 
         b.setPositiveButton("Convert") { dialog, whichButton ->
 
             dialog.dismiss()
             var userAmount = txt.text.toString().toInt()
-            val cost = userAmount*convert
-            val fromTotal = convert-cost
-            val toTotal = userAmount + total
-            editor.putInt(from, fromTotal)
-            editor.putInt(to,toTotal)
-            editor.apply()
-            toast("successful conversion")
-            println("User Amount: $userAmount")
-            println("Cost $cost")
-            println("from total: $fromTotal")
-            println("to total")
+
+            if (from == "points") {
+                cost = userAmount * 10
+            }
+            if (from == "songles") {
+                cost = userAmount / 10
+            }
+
+            val fromTotal = fromCurrency-cost
+            val toTotal = userAmount + toCurrency
+
+            if (fromTotal>=0){
+                editor.putInt(from, fromTotal)
+                editor.putInt(to,toTotal)
+                editor.apply()
+            }
+            if (fromTotal<0){
+                toast("You do not have enough $from to make this conversion!")
+            }
+
+
+            toast("Conversion Successful")
+
 
 
         }
@@ -326,6 +339,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
         }
 
+        fab.setOnLongClickListener {
+            val menu = PopupMenu(this@MapsActivity, findViewById(R.id.fab))
+            for (i in songs) {
+                menu.menu.add(i.title)
+            }
+            menu.show()
+            true
+
+        }
+
         points.setOnClickListener{
             val dialog = convertCurrency("points", "songles")
             dialog.show()
@@ -348,8 +371,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         }
         val current = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
         val editor = current.edit()
-        editor.putInt("Current Song", currentSong)
-        editor.putInt("Current Map", currentMap)
+        editor.putString("Current Song", currentSong)
+        editor.putString("Current Map", currentMap)
         editor.apply()
         val cur = current.getInt("Current Song", 100)
         println("hmmhmhmhm: ${cur}")
