@@ -2,6 +2,7 @@ package s1531567.songle
 
 import android.Manifest
 import android.app.AlertDialog
+import android.app.usage.UsageEvents.Event.NONE
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -18,6 +19,7 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import com.google.android.gms.common.ConnectionResult
@@ -341,8 +343,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
         fab.setOnLongClickListener {
             val menu = PopupMenu(this@MapsActivity, findViewById(R.id.fab))
-            for (i in songs) {
-                menu.menu.add(i.title)
+            for (i in songs.indices) {
+                menu.menu.add(NONE,i,NONE,songs[i].title)
+            }
+            menu.setOnMenuItemClickListener {
+                Log.v("Song Before", currentSong)
+                currentSong = it.itemId.toString()
+                Log.v("Song now:", currentSong)
+                true
             }
             menu.show()
             true
