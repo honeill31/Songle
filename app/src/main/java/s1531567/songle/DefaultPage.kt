@@ -1,6 +1,7 @@
 package s1531567.songle
 
 import android.Manifest
+import android.content.Context
 import android.util.Log
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -8,6 +9,7 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.widget.TextView
 
 
 import kotlinx.android.synthetic.main.activity_default.*
@@ -27,7 +29,6 @@ class DefaultPage : AppCompatActivity() {
         play.setOnClickListener {
             val play = Intent(this, MapsActivity::class.java)
             startActivity(play)
-            toast("hi there")
         }
 
 
@@ -63,6 +64,15 @@ class DefaultPage : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         img.setBackgroundResource(0)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+        val editor = pref.edit()
+        val steps = pref.getInt("steps", 0)
+        var txt = findViewById<TextView>(R.id.textView)
+        txt.text = steps.toString()
     }
 
 

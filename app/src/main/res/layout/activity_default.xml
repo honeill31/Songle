@@ -45,8 +45,8 @@
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="27dp"
+        android:layout_alignStart="@+id/update"
+        android:layout_marginBottom="54dp"
         android:text="Check For Updates" />
 
     <Button
@@ -75,6 +75,15 @@
         android:paddingTop="8dp"
         android:scaleType="centerCrop"
         app:srcCompat="@drawable/ic_logo" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/userprofile"
+        android:layout_centerHorizontal="true"
+        android:text="TextView"
+        tools:text="default" />
 
 
 </RelativeLayout>

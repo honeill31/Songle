@@ -131,6 +131,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         editor.putInt("steps", steps)
         editor.apply()
         toast("Steps: $steps")
+        if (steps%1000==0 && steps!= 0){
+            var points = pref.getInt("points", 0)
+            points++
+            editor.putInt("points", points)
+            editor.apply()
+            toast("You walked 1000 more steps! Point added.")
+        }
 
     }
 
