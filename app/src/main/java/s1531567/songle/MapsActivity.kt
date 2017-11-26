@@ -14,11 +14,13 @@ import android.location.Location
 import android.media.MediaPlayer
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.VibrationEffect
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.EditText
+import android.widget.TextView
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.LocationRequest
@@ -36,6 +38,7 @@ import kotlinx.coroutines.experimental.runBlocking
 import org.jetbrains.anko.*
 import java.lang.Math.abs
 import java.net.InetAddress
+import android.os.Vibrator
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
@@ -131,7 +134,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         editor.putInt("steps", steps)
         editor.apply()
         toast("Steps: $steps")
-        if (steps%1000==0 && steps!= 0){
+        if (steps%10==0 && steps!= 0){
+            val v = vibrator
+            v.vibrate(100)
+
             var points = pref.getInt("points", 0)
             points++
             editor.putInt("points", points)
@@ -221,6 +227,54 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     }
 
+    fun convertCurrency(from: String, to: String) : AlertDialog {
+
+        val b = AlertDialog.Builder(this)
+        val inf = LayoutInflater.from(this)
+        val view = inf.inflate(R.layout.convert_dialog, null)
+        b.setView(view)
+        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+        val editor = pref.edit()
+        var convert = 0
+        var total = 0
+
+        if (from == "points"){
+            var convert = pref.getInt(from, 0)
+            var total = pref.getInt(to, 0)
+
+        }
+        if (from == "songles"){
+            var convert = pref.getInt(from, 0)
+            var total = pref.getInt(to, 0)
+        }
+
+        var txt = view.findViewById<EditText>(R.id.convert) as EditText
+        var before = view.findViewById<TextView>(R.id.currencyNow)
+        var after = view.findViewById<TextView>(R.id.currencyAfter)
+        before.text = convert.toString()
+        after.text = total.toString()
+
+        b.setPositiveButton("Convert") { dialog, whichButton ->
+
+            dialog.dismiss()
+            var userAmount = txt.text.toString().toInt()
+            val cost = userAmount*convert
+            val fromTotal = convert-cost
+            val toTotal = userAmount + total
+            editor.putInt(from, fromTotal)
+            editor.putInt(to,toTotal)
+            toast("successful conversion")
+
+        }
+        b.setNegativeButton("Cancel") { dialog, which ->
+            dialog.dismiss()
+        }
+
+        val dialog = b.create()
+        return dialog
+
+    }
+
     fun checkInternet(): Boolean {
         try {
             val address = InetAddress.getByName("google.com")
@@ -260,6 +314,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             dialog.show()
 
         }
+
+        points.setOnClickListener{
+            val dialog = convertCurrency("points", "songles")
+            dialog.show()
+        }
+
+        songles.setOnClickListener {
+            val dialog = convertCurrency("songles", "points")
+            dialog.show()
+        }
+
 
 
     }

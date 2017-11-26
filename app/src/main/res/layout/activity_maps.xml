@@ -19,8 +19,8 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
         android:layout_alignTop="@+id/collect"
-        android:layout_toEndOf="@+id/walking"
         android:tint="@color/colorPrimaryDark"
         app:background="@color/colorPrimary"
         app:rippleColor="@color/primaryDarkColor"
@@ -54,22 +54,22 @@
         android:text="Collect" />
 
     <ImageView
-        android:id="@+id/walking"
+        android:id="@+id/points"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/currency"
         android:adjustViewBounds="false"
         android:padding="@dimen/activity_horizontal_margin"
         android:tint="@color/colorPrimary"
         design:srcCompat="@drawable/ic_monetization_on_black_24dp" />
 
     <ImageView
-        android:id="@+id/currency"
+        android:id="@+id/songles"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_toStartOf="@+id/walking"
         android:padding="@dimen/activity_horizontal_margin"
         android:tint="@color/colorPrimary"
         design:srcCompat="@drawable/ic_music_note_black_24dp" />
