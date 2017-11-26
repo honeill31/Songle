@@ -28,6 +28,7 @@
         <activity android:name=".DefaultPage">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -69,7 +70,10 @@
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+            android:label="@string/title_activity_settings" />
+        <activity
+            android:name=".AchievementActivity"
+            android:label="@string/title_activity_achievement"></activity>
     </application>
 
 </manifest>

@@ -72,7 +72,7 @@ class DefaultPage : AppCompatActivity() {
         val editor = pref.edit()
         val steps = pref.getInt("steps", 0)
         var txt = findViewById<TextView>(R.id.textView)
-        txt.text = steps.toString()
+        txt.text = "Total number of steps walked: $steps"
     }
 
 
