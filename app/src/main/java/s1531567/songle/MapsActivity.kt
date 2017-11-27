@@ -404,6 +404,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 Log.v("Song Before", currentSong.toString())
                 currentSong = it.itemId
                 Log.v("Song now:", currentSong.toString())
+                menu.dismiss()
                 recreate()
                 true
 
@@ -522,12 +523,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 val word = parser.findLyric(currentSong, currentMap, lyrics, mark)
                 Log.v("Word?", word.toString())
                 val toWrite = "$songMap $line $w"
-                editor.putBoolean(toWrite, true)//setting this word to collected
-                var collected = pref.getInt("$songMap words collected", 0)
-                collected++
-                editor.putInt("$songMap words collected", collected)
-                editor.apply()
-                toast("You collected the word '${word.word}'!")
+                val collectedPrev = pref.getBoolean(toWrite, false)
+                if (!collectedPrev){
+                    editor.putBoolean(toWrite, true)//setting this word to collected
+                    var collected = pref.getInt("$songMap words collected", 0)
+                    collected++
+                    editor.putInt("$songMap words collected", collected)
+                    editor.apply()
+                    toast("You collected the word '${word.word}'!")
+
+                }
+
             }
         }
 

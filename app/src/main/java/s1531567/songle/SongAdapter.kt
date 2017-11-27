@@ -39,15 +39,16 @@ class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (S
     class SongHolder(context: Context,view: View, itemClick: (Song) -> Unit) : RecyclerView.ViewHolder(view) {
         private val mClick = itemClick
         val pref = context.getSharedPreferences(context.getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-        val editor = pref.edit()
 
         fun totalPlacemarks(songNum : Int) : String {
             val rand = Random()
             var collected = 0
 
             for (i in 1..5){
+                //change to for in in 1 to unlocked
                 val songMap = "$songNum $i"
                 collected += pref.getInt("$songMap words collected",0 )
+                Log.v("collected and pos", collected.toString() + " " + i.toString())
 
             }
 
@@ -56,22 +57,20 @@ class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (S
             return "$collected/$total"
 
         }
-        fun totalGuessed(): Int {
-            val guessed = 10000
-            val notguessed = 22222
-
-            return guessed or notguessed
-
-
-        }
 
         fun stringToInt(num : String) : Int {
             var str = 0
-            if (num.toInt() >9){
+            Log.v("num to int", num.toInt().toString())
+            Log.v("num", num)
+            if (num.toInt() > 9){
                 str = num.toInt()
             }
             else {
-                str = num[1].toInt()
+                Log.v("num[0]", num[0].toString())
+                Log.v("num[1]", num[1].toString())
+                Log.v("str", str.toString())
+
+                str = num[1].toString().toInt()
             }
             return str
 
@@ -93,6 +92,8 @@ class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (S
                     itemView.song_icon.setImageResource(R.drawable.ic_lock_outline_black_24dp)
 
                 }
+                Log.v("Song", song.toString())
+                Log.v("string to int", "${stringToInt(song.number)}")
 
                 itemView.collected_placemarks.text = totalPlacemarks(stringToInt(song.number))
                 itemView.setOnClickListener{mClick(this)}
