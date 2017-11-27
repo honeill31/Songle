@@ -46,6 +46,8 @@ class SongList : AppCompatActivity() {
     private var myAdapter : SongAdapter? = null
     private lateinit var songList : List<Song>
     private var layoutManager : RecyclerView.LayoutManager? = null
+    val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+    val editor = pref.edit()
 
 
 
@@ -63,12 +65,24 @@ class SongList : AppCompatActivity() {
         task.execute()
         songList = task.get()
         layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
-        myAdapter = SongAdapter(songList){
-            toast("${it.title} selected!")
+        myAdapter = SongAdapter(this, songList){
             val activ = Intent(this@SongList, ReviewActivity::class.java)
-            activ.putExtra("title", it.title)
-            activ.putExtra("artist", it.artist)
-            activ.putExtra("url", it.url)
+            val guessed = pref.getBoolean("Song ${it}.number} guessed", false)
+
+            if (guessed){
+                activ.putExtra("title", it.title)
+                activ.putExtra("artist", it.artist)
+                activ.putExtra("url", it.url)
+            }
+
+            if (!guessed){
+                activ.putExtra("title", "???")
+                activ.putExtra("artist", "???")
+                activ.putExtra("url", it.url)
+
+            }
+
+
             startActivity(activ)
 
         }

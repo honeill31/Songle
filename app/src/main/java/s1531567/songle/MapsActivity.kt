@@ -57,8 +57,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     val closeBy = mutableListOf<KmlPlacemark>()
     lateinit var layer: KmlLayer
     lateinit var mediaplayer: MediaPlayer
-    var currentSong : String = "01"
-    var currentMap: String = "0"
+    var currentSong : Int = 1
+    var currentMap: Int = 1
     private lateinit var songs : List<Song>
     val sensorManager: SensorManager by lazy {
         getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -81,14 +81,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
         val current = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-        currentSong = current.getString("Current Song", "01")
-        currentMap = current.getString("Current Map", "1")
+        currentSong = current.getInt("Current Song", 1)
+        currentMap = current.getInt("Current Map", 1)
 
         mGoogleApiClient = GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build()
+
 
 
         bar.setOnNavigationItemSelectedListener { item ->
@@ -135,7 +136,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         editor.putInt("steps", steps)
         editor.apply()
         toast("Steps: $steps")
-        if (steps%10==0 && steps!= 0){
+        if (steps%1000==0 && steps!= 0){
+            //for user feedback while walking
             val v = vibrator
             v.vibrate(100)
 
@@ -159,6 +161,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
      * installed Google Play services and returned to the app.
      */
     override fun onMapReady(googleMap: GoogleMap) {
+        val song = intToString(currentSong)
         mMap = googleMap
 
         try {
@@ -167,7 +170,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             println("Security Exception Thrown [onMapReady]")
         }
         mMap.uiSettings.isMyLocationButtonEnabled = true
-        val layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/$currentSong/map$currentMap.kml")
+        val layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/$song/map$currentMap.kml")
         layer = layerTask.get()
         layer.addLayerToMap() //displaying the kml tags
 
@@ -196,15 +199,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             var userGuess = txt.text.toString()
             Log.v("User guess", userGuess)
             println("USEW GUESS!!!! $userGuess")
-            println("current song: ${songs[currentSong.toInt()-1].title}")
-            if (userGuess.trim().toLowerCase() == songs[currentSong.toInt()].title.trim().toLowerCase()){
+            println("current song: ${songs[currentSong-1].title}")
+            if (userGuess.trim().toLowerCase() == songs[currentSong].title.trim().toLowerCase()){
                 var currentSongles = pref.getInt("songles", 0)
                 currentSongles++
                 editor.putInt("songles", currentSongles)
+                editor.putBoolean("Song $currentSong guessed", true)
                 editor.apply()
+
                 toast("${userGuess} is the correct song!")
             }
-            if (userGuess.toLowerCase() != songs[currentSong.toInt()].title.toLowerCase()){
+            if (userGuess.toLowerCase() != songs[currentSong].title.toLowerCase()){
                 var tries = pref.getInt("Tries$currentSong", 3)
                 Log.v("Current tries", tries.toString())
                 tries--
@@ -234,6 +239,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     }
 
+    //Function to convert from one currency to another.
     fun convertCurrency(from: String, to: String) : AlertDialog {
 
         val b = AlertDialog.Builder(this)
@@ -277,19 +283,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             val fromTotal = fromCurrency-cost
             val toTotal = userAmount + toCurrency
 
-            if (fromTotal>=0){
+            if (fromTotal>0){
                 editor.putInt(from, fromTotal)
                 editor.putInt(to,toTotal)
                 editor.apply()
+                toast("Conversion Successful")
             }
-            if (fromTotal<0){
+            if (fromTotal<=0){
                 toast("You do not have enough $from to make this conversion!")
             }
-
-
-            toast("Conversion Successful")
-
-
 
         }
         b.setNegativeButton("Cancel") { dialog, which ->
@@ -309,6 +311,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         } catch (e: Exception) {
             return false
         }
+    }
+
+    fun intToString(num : Int) : String {
+        var str = ""
+        if (num <=9){
+            str = "0$num"
+        }
+        else {
+            str = "$num"
+        }
+        return str
+
     }
 
 
@@ -347,10 +361,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 menu.menu.add(NONE,i,NONE,songs[i].title)
             }
             menu.setOnMenuItemClickListener {
-                Log.v("Song Before", currentSong)
-                currentSong = it.itemId.toString()
-                Log.v("Song now:", currentSong)
+                Log.v("Song Before", currentSong.toString())
+                currentSong = it.itemId
+                Log.v("Song now:", currentSong.toString())
+                recreate()
                 true
+
             }
             menu.show()
             true
@@ -379,10 +395,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         }
         val current = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
         val editor = current.edit()
-        editor.putString("Current Song", currentSong)
-        editor.putString("Current Map", currentMap)
+        editor.putInt("Current Song", currentSong)
+        editor.putInt("Current Map", currentMap)
         editor.apply()
-        val cur = current.getInt("Current Song", 100)
+        val cur = current.getInt("Current Song", 1)
         println("hmmhmhmhm: ${cur}")
     }
 
@@ -422,7 +438,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     }
 
 
-    fun checkCloseBy(current: Location?) = runBlocking<Unit>() {
+    fun checkCloseBy(current: Location?) = runBlocking {
         val job = launch {
 
 
@@ -435,7 +451,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                     val markLoc: LatLng = mark.geometry.geometryObject as LatLng
                     if (abs(markLoc.latitude - mLoc.latitude) < 0.0005 && abs(markLoc.longitude - mLoc.longitude) < 0.0005) {
                         if (mark !in closeBy) {
-                            Log.v("boop! I am in here", markLoc.toString())
                             closeBy.add(mark)
                         }
 
@@ -453,24 +468,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         val editor = pref.edit()
         //parse kmlplacemarks to placemarks and add them to the collected number
         collect.setOnClickListener {
-            val writeWord: String = "$currentSong$currentMap"
+            val songMap = "$currentSong $currentMap"
             val parser = LyricParser()
-            println(writeWord)
+            println(songMap)
             for (mark in closeBy) {
 
-                val pmwords = mark.getProperty("name").split(":")
-                val dl = DownloadLyricTask("01")
+                val lineWord = mark.getProperty("name").split(":")
+                val line = intToString(lineWord[0].toInt())
+                val w = intToString(lineWord[1].toInt())
+                val dl = DownloadLyricTask("${intToString(currentSong)}")
                 dl.execute()
                 val lyrics = dl.get()
-                val word = parser.findLyric(1, 1, lyrics, mark)
+                val word = parser.findLyric(currentSong, currentMap, lyrics, mark)
                 Log.v("Word?", word.toString())
-                val toWrite = "$writeWord$pmwords[0]$pmwords[1]"
-                editor.putString(toWrite, "Collected")//setting this word to collected
+                val toWrite = "$songMap $line $w"
+                editor.putBoolean(toWrite, true)//setting this word to collected
                 editor.apply()
+                toast("You collected the word '${word.word}'!")
             }
-
-            //val hmm = current.getInt(0101)
-            println("test:")
         }
 
     }

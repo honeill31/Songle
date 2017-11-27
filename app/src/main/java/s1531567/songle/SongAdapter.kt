@@ -1,21 +1,19 @@
 package s1531567.songle
 
 import android.content.Context
-import android.content.Intent
 import android.support.v7.widget.RecyclerView
+import android.content.SharedPreferences
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import kotlinx.android.synthetic.main.songs_layout.view.*
-import org.jetbrains.anko.image
 import java.util.*
 
 /**
  * Created by holly on 07/11/17.
  */
-class SongAdapter(val songs: List<Song>, val itemClick : (Song)->Unit ) : RecyclerView.Adapter<SongAdapter.SongHolder>() {
+class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (Song)->Unit) : RecyclerView.Adapter<SongAdapter.SongHolder>() {
 
 
     override fun onBindViewHolder(holder: SongAdapter.SongHolder, position: Int) {
@@ -25,7 +23,7 @@ class SongAdapter(val songs: List<Song>, val itemClick : (Song)->Unit ) : Recycl
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) : SongAdapter.SongHolder {
         val layoutInflator = LayoutInflater.from(parent.context)
-        return SongHolder(layoutInflator.inflate(R.layout.songs_layout, parent, false), itemClick)
+        return SongHolder(context, layoutInflator.inflate(R.layout.songs_layout, parent, false), itemClick)
     }
 
     override fun getItemCount(): Int {
@@ -37,8 +35,10 @@ class SongAdapter(val songs: List<Song>, val itemClick : (Song)->Unit ) : Recycl
     }
 
 
-    class SongHolder(view: View, itemClick: (Song) -> Unit) : RecyclerView.ViewHolder(view) {
+    class SongHolder(context: Context,view: View, itemClick: (Song) -> Unit) : RecyclerView.ViewHolder(view) {
         private val mClick = itemClick
+        val pref = context.getSharedPreferences(context.getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+        val editor = pref.edit()
 
         fun dummyPlacemarks() : String {
             val rand = Random()
@@ -84,11 +84,21 @@ class SongAdapter(val songs: List<Song>, val itemClick : (Song)->Unit ) : Recycl
 
         fun bind(song:Song)  {
             with(song) {
-                val s = dummySong(song)
-                itemView.songTitle.text = s[1]
-                itemView.songArtist.text = s[0]
-                itemView.song_icon.setImageResource(R.drawable.ic_music_note_black_24dp)
-                itemView.song_icon.setColorFilter(dummyGuessed())
+                val guessed = pref.getBoolean("Song ${song.number} guessed", false)
+                if (guessed){
+                    itemView.songTitle.text = song.title
+                    itemView.songArtist.text = song.artist
+                    itemView.song_icon.setImageResource(R.drawable.ic_music_note_black_24dp)
+                    //itemView.song_icon.setColorFilter(dummyGuessed())
+
+                }
+                if (!guessed){
+                    itemView.songTitle.text = "???"
+                    itemView.songArtist.text = "???"
+                    itemView.song_icon.setImageResource(R.drawable.ic_lock_outline_black_24dp)
+
+                }
+
                 itemView.collected_placemarks.text = dummyPlacemarks()
                 itemView.setOnClickListener{mClick(this)}
             }
