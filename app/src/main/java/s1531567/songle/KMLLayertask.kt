@@ -18,7 +18,7 @@ class KMLLayertask(map: GoogleMap, context : Context) : AsyncTask<String,Int,Kml
 
     override fun doInBackground(vararg params: String): KmlLayer {
         val stream =  downloadUrl(params[0])
-        return KmlLayer(mMap, stream, mContext)
+        return KmlLayer(mMap, stream,mContext )
     }
 
 

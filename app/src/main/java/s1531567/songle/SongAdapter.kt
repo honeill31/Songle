@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.google.maps.android.data.kml.KmlLayer
 import kotlinx.android.synthetic.main.songs_layout.view.*
 import java.util.*
 
@@ -40,14 +41,22 @@ class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (S
         val pref = context.getSharedPreferences(context.getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
         val editor = pref.edit()
 
-        fun dummyPlacemarks() : String {
+        fun totalPlacemarks(songNum : Int) : String {
             val rand = Random()
-            val collected = rand.nextInt(100-0) + 0
-            val total = rand.nextInt(500)
+            var collected = 0
+
+            for (i in 1..5){
+                val songMap = "$songNum $i"
+                collected += pref.getInt("$songMap words collected",0 )
+
+            }
+
+
+            val total = pref.getInt("Song $songNum total Placemarks", 0)
             return "$collected/$total"
 
         }
-        fun dummyGuessed(): Int {
+        fun totalGuessed(): Int {
             val guessed = 10000
             val notguessed = 22222
 
@@ -56,31 +65,17 @@ class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (S
 
         }
 
-        fun dummySong(song:Song) : List<String> {
-
-            val guessed = mutableListOf<String>()
-            guessed.add(song.artist)
-            guessed.add(song.title)
-            val not = mutableListOf<String>()
-            var chosen = mutableListOf<String>()
-            not.add("???")
-            not.add("???")
-
-            val rand = Random()
-            val ret = rand.nextInt(2)
-            Log.d("rand", ret.toString())
-
-            when(ret){
-                0 -> chosen = guessed
-                1 -> chosen =  not
+        fun stringToInt(num : String) : Int {
+            var str = 0
+            if (num.toInt() >9){
+                str = num.toInt()
             }
-
-            return chosen
-
-
+            else {
+                str = num[1].toInt()
+            }
+            return str
 
         }
-
 
         fun bind(song:Song)  {
             with(song) {
@@ -99,7 +94,7 @@ class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (S
 
                 }
 
-                itemView.collected_placemarks.text = dummyPlacemarks()
+                itemView.collected_placemarks.text = totalPlacemarks(stringToInt(song.number))
                 itemView.setOnClickListener{mClick(this)}
             }
 

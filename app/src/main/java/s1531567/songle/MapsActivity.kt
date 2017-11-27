@@ -57,15 +57,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     val closeBy = mutableListOf<KmlPlacemark>()
     lateinit var layer: KmlLayer
     lateinit var mediaplayer: MediaPlayer
-    var currentSong : Int = 1
+    var currentSong: Int = 1
     var currentMap: Int = 1
-    private lateinit var songs : List<Song>
+    private lateinit var songs: List<Song>
     val sensorManager: SensorManager by lazy {
         getSystemService(Context.SENSOR_SERVICE) as SensorManager
     }
     val detect = StepDetector()
-
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -123,20 +121,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
 
     override fun onSensorChanged(event: SensorEvent) {
-       if (event.sensor.type == Sensor.TYPE_ACCELEROMETER){
-           detect.updateAccel(event.timestamp, event.values[0], event.values[1], event.values[2])
-       }
+        if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
+            detect.updateAccel(event.timestamp, event.values[0], event.values[1], event.values[2])
+        }
     }
 
     override fun step(timeNs: Long) {
         val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-        var steps = pref.getInt("steps",0)
+        var steps = pref.getInt("steps", 0)
         steps++
         val editor = pref.edit()
         editor.putInt("steps", steps)
         editor.apply()
         toast("Steps: $steps")
-        if (steps%1000==0 && steps!= 0){
+        if (steps % 1000 == 0 && steps != 0) {
             //for user feedback while walking
             val v = vibrator
             v.vibrate(100)
@@ -163,6 +161,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     override fun onMapReady(googleMap: GoogleMap) {
         val song = intToString(currentSong)
         mMap = googleMap
+        firstRun()
+
 
         try {
             mMap.isMyLocationEnabled = true
@@ -174,7 +174,47 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         layer = layerTask.get()
         layer.addLayerToMap() //displaying the kml tags
 
+
+
     }
+
+
+    fun firstRun() { //= runBlocking {
+      // val job = launch {
+            val firstRun = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE).getBoolean("firstRun", true)
+            val editor = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE).edit()
+            if (firstRun) {
+                for (i in 1..20) {
+                    var songTotal = 0
+                    for (j in 1..5) {
+                        Log.v("Got this far", "i:$i, j:$j")
+                        var mapTotal = 0
+                        var layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${intToString(i)}/map$j.kml")
+                        layer = layerTask.get()
+                        layer.addLayerToMap()
+                        doAsync {
+                            mapTotal = layer.containers.iterator().next().placemarks.count()
+                            editor.putInt("Song $i Map $j Placemarks", mapTotal)
+                            editor.apply()
+                            songTotal += mapTotal
+
+                        }
+                        layer.removeLayerFromMap()
+
+
+                    }
+                    editor.putInt("Song $i total Placemarks", songTotal)
+
+                }
+                editor.putBoolean("firstRun", false)
+                editor.apply()
+
+            }
+      //  }
+     //   job.join()
+    }
+
+
 
     override fun onStart() {
         super.onStart()
@@ -449,7 +489,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 val current = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
                 for (mark in layer.containers.iterator().next().placemarks) {
                     val markLoc: LatLng = mark.geometry.geometryObject as LatLng
-                    if (abs(markLoc.latitude - mLoc.latitude) < 0.0005 && abs(markLoc.longitude - mLoc.longitude) < 0.0005) {
+                    if (abs(markLoc.latitude - mLoc.latitude) < 0.05 && abs(markLoc.longitude - mLoc.longitude) < 0.05) {
                         if (mark !in closeBy) {
                             closeBy.add(mark)
                         }
@@ -483,6 +523,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 Log.v("Word?", word.toString())
                 val toWrite = "$songMap $line $w"
                 editor.putBoolean(toWrite, true)//setting this word to collected
+                var collected = pref.getInt("$songMap words collected", 0)
+                collected++
+                editor.putInt("$songMap words collected", collected)
                 editor.apply()
                 toast("You collected the word '${word.word}'!")
             }

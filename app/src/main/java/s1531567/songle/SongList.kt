@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
+import com.google.maps.android.data.kml.KmlLayer
 import kotlinx.android.synthetic.main.activity_review.*
 import kotlinx.android.synthetic.main.activity_song_list.*
 import org.jetbrains.anko.startActivity
@@ -46,8 +47,7 @@ class SongList : AppCompatActivity() {
     private var myAdapter : SongAdapter? = null
     private lateinit var songList : List<Song>
     private var layoutManager : RecyclerView.LayoutManager? = null
-    val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-    val editor = pref.edit()
+
 
 
 
@@ -62,6 +62,8 @@ class SongList : AppCompatActivity() {
 
     private fun initialise(){
         val task = DownloadXMLTask()
+        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+        val editor = pref.edit()
         task.execute()
         songList = task.get()
         layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
