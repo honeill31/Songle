@@ -69,7 +69,7 @@ class SongList : AppCompatActivity() {
         layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
         myAdapter = SongAdapter(this, songList){
             val activ = Intent(this@SongList, ReviewActivity::class.java)
-            val guessed = pref.getBoolean("Song ${it}.number} guessed", false)
+            val guessed = pref.getBoolean("Song ${it.number} guessed", false)
 
             if (guessed){
                 activ.putExtra("title", it.title)

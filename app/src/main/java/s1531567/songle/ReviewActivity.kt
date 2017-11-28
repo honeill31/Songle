@@ -15,14 +15,18 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.MenuItem
+import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toolbar
 import kotlinx.android.synthetic.main.activity_song_list.*
 import org.jetbrains.anko.findOptional
 import org.jetbrains.anko.startActivityForResult
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.toolbar
+import android.app.AlertDialog
 
 class ReviewActivity : AppCompatActivity() {
 
@@ -71,6 +75,7 @@ class ReviewActivity : AppCompatActivity() {
 
         layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
         myAdapter = MapAdapter(mapList){
+            unlockMapDialog(it.mapNumber, it.songNumber).show()
 
         }
 
@@ -78,6 +83,45 @@ class ReviewActivity : AppCompatActivity() {
         maplist.addItemDecoration(decor)
         maplist.layoutManager = layoutManager
         maplist.adapter = myAdapter
+
+    }
+
+    fun unlockMapDialog(mapNum: Int, songNum: Int) : AlertDialog {
+        val b = android.app.AlertDialog.Builder(this)
+        b.setTitle("Unlock Map $mapNum?")
+        b.setMessage("If you unlock before guessing, your score will change.")
+        b.setPositiveButton("Unlock") { dialog, whichButton ->
+            val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+            val guessed = pref.getBoolean("Song $songNum guessed", false)
+            var collected = 0
+            var total = 0
+            var i = 1
+            while (i <= mapNum){
+                collected += pref.getInt("$songNum $i words collected", 0)
+                total += pref.getInt("Song $songNum Map $i Placemarks", 0)
+                i++
+            }
+            if (collected/total<2/3){
+                toast("Error, you have not collected enough placemarks to unlock the next map")
+            }
+
+            if (collected/total>=2/3){
+                val editor = pref.edit()
+                editor.putBoolean("Song $songNum locked", false)
+                editor.apply()
+            }
+
+
+
+
+        }
+        b.setNegativeButton("Cancel") { dialog, which ->
+            dialog.dismiss()
+        }
+
+        val dialog = b.create()
+        return dialog
+
 
     }
 

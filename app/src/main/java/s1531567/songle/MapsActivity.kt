@@ -193,16 +193,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                     Log.v("Got this far", "i:$i, j:$j")
                     var mapTotal = 0
                     var layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${intToString(i)}/map$j.kml")
-                    layer = layerTask.get()
-                    layer.addLayerToMap()
+                    val thisLayer = layerTask.get()
+                    thisLayer.addLayerToMap()
                     doAsync {
-                        mapTotal = layer.containers.iterator().next().placemarks.count()
+                        mapTotal = thisLayer.containers.iterator().next().placemarks.count()
                         editor.putInt("Song $i Map $j Placemarks", mapTotal)
                         editor.apply()
                         songTotal += mapTotal
 
                     }
-                    layer.removeLayerFromMap()
+                    thisLayer.removeLayerFromMap()
 
 
                 }
@@ -262,18 +262,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                     editor.putInt("Tries$currentSong", tries)
                     editor.apply()
                 }
-                //decrease score
-                toast("Incorrect song guess, points decreasing")
-                var points = pref.getInt("points", 0)
-                points--
-                editor.putInt("points", points)
-                editor.apply()
+                if (tries <=0){
+                    //decrease score
+                    toast("Incorrect song guess, points decreasing")
+                    var points = pref.getInt("points", 0)
+                    points--
+                    editor.putInt("points", points)
+                    editor.apply()
+                }
+
             }
 
         }
         b.setNegativeButton("Cancel") { dialog, which ->
             dialog.dismiss()
-            toast("aww")
         }
 
         val dialog = b.create()
@@ -402,13 +404,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         fab.setOnLongClickListener {
             val menu = PopupMenu(this@MapsActivity, findViewById(R.id.fab))
             for (i in songs.indices) {
-                menu.menu.add(NONE,i,NONE,songs[i].title)
+                menu.menu.add(NONE,i+1,NONE,songs[i].title)
             }
             menu.setOnMenuItemClickListener {
                 Log.v("Song Before", currentSong.toString())
                 currentSong = it.itemId
                 Log.v("Song now:", currentSong.toString())
                 menu.dismiss()
+                onStop()
                 recreate()
                 true
 
