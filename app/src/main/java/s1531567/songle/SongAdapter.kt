@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import com.google.maps.android.data.kml.KmlLayer
 import kotlinx.android.synthetic.main.songs_layout.view.*
 import java.util.*
+import org.jetbrains.anko.toast
 
 /**
  * Created by holly on 07/11/17.
@@ -59,39 +60,46 @@ class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (S
         }
 
         fun stringToInt(num : String) : Int {
-            var str = 0
-            Log.v("num to int", num.toInt().toString())
-            Log.v("num", num)
-            if (num.toInt() > 9){
-                str = num.toInt()
-            }
-            else {
-                Log.v("num[0]", num[0].toString())
-                Log.v("num[1]", num[1].toString())
-                Log.v("str", str.toString())
-
-                str = num[1].toString().toInt()
-            }
-            return str
+//            var str = 0
+//            Log.v("num to int", num.toInt().toString())
+//            Log.v("num", num)
+//            if (num.toInt() > 9){
+//                str = num.toInt()
+//            }
+//            else {
+//                Log.v("num[0]", num[0].toString())
+//                Log.v("num[1]", num[1].toString())
+//                Log.v("str", str.toString())
+//
+//                str = num[1].toString().toInt()
+//            }
+//            return str
+            return num.toInt()
 
         }
 
         fun bind(song:Song)  {
             with(song) {
                 val guessed = pref.getBoolean("Song ${song.number} guessed", false)
+                val locked = pref.getBoolean("Song ${song.number} locked", true)
                 if (guessed){
                     itemView.songTitle.text = song.title
                     itemView.songArtist.text = song.artist
-                    itemView.song_icon.setImageResource(R.drawable.ic_music_note_black_24dp)
-                    //itemView.song_icon.setColorFilter(dummyGuessed())
 
                 }
                 if (!guessed){
                     itemView.songTitle.text = "???"
                     itemView.songArtist.text = "???"
-                    itemView.song_icon.setImageResource(R.drawable.ic_lock_outline_black_24dp)
+
 
                 }
+                if (locked){
+                    itemView.song_icon.setImageResource(R.drawable.ic_lock_outline_black_24dp)
+                }
+                if (!locked){
+                    itemView.song_icon.setImageResource(R.drawable.ic_music_note_black_24dp)
+                }
+
                 Log.v("Song", song.toString())
                 Log.v("string to int", "${stringToInt(song.number)}")
 

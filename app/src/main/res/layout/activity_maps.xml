@@ -15,6 +15,14 @@
         android:layout_alignParentTop="true"
         />
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:max="100"
+        android:progress="0" />
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
@@ -74,14 +82,6 @@
         android:padding="@dimen/activity_horizontal_margin"
         android:tint="@color/colorPrimary"
         design:srcCompat="@drawable/ic_music_note_black_24dp" />
-
-    <Spinner
-        android:id="@+id/spinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-    </Spinner>
-
-
 
 
 </RelativeLayout>

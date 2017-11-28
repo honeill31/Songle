@@ -6,6 +6,7 @@ import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_review.*
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -13,6 +14,7 @@ import android.support.v4.app.NavUtils
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.MenuItem
 import android.widget.LinearLayout
 import android.widget.Toolbar
@@ -54,19 +56,21 @@ class ReviewActivity : AppCompatActivity() {
         startActivity(back)
     }
 
-    private fun initialise(){
+    private fun initialise(prefs: SharedPreferences, song: Int){
+
         val task = DownloadXMLTask()
         task.execute()
 
-        mapList.add(MapInfo(30,20,1, false))
-        mapList.add(MapInfo(46,4,2, false))
-        mapList.add(MapInfo(620,603,3, true))
-        mapList.add(MapInfo(173,20,4, true))
-        mapList.add(MapInfo(200,20,5, true))
+        for (i in 1..5){
+            val totalPlacemark = prefs.getInt("Song $song Map $i Placemarks", 0)
+            Log.v("totalplacemark", totalPlacemark.toString())
+            val collectedPlacemark = prefs.getInt("$song $i words collected", 0)
+            val locked = prefs.getBoolean("Song $song locked", true)
+            mapList.add(MapInfo(totalPlacemark,collectedPlacemark,song,i,locked))
+        }
+
         layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
         myAdapter = MapAdapter(mapList){
-            toast("${it.collectedPlacemark} Collected!")
-
 
         }
 
@@ -80,17 +84,43 @@ class ReviewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_review)
+        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+        val editor = pref.edit()
         val extras = intent.extras
         val title = extras.getString("title")
         val artist = extras.getString("artist")
+        val song = extras.getString("num").toInt()
         val url = extras.getString("url")
         review_bar.selectedItemId = R.id.menu_list
-        review_title.text = "???"
-        review_artist.text = "???"
-        initialise()
+        initialise(pref, song)
 
         review_bar.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-        playsong.setOnClickListener{startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))}
+        val guessed = pref.getBoolean("Song $song guessed", false)
+        if (guessed){
+            play_giveup.text = getString(R.string.playSong)
+            review_title.text = title
+            review_artist.text = artist
+        }
+        if (!guessed){
+            play_giveup.text = getString(R.string.giveUp)
+            review_title.text = getString(R.string.questionMarks)
+            review_artist.text = getString(R.string.questionMarks)
+        }
+
+        play_giveup.setOnClickListener{
+
+
+            if (!guessed){
+                editor.putBoolean("Song $song given up", true)
+                editor.putInt("Song $song score mode", 2)
+                editor.apply()
+                toast("You Have given up! Changing score mode.")
+            }
+            if (guessed){
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+            }
+
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -98,6 +128,11 @@ class ReviewActivity : AppCompatActivity() {
         startActivityForResult(song, 0)
         return super.onOptionsItemSelected(item)
 
+    }
+
+    override fun onStop() {
+        super.onStop()
+        finish()
     }
 
 

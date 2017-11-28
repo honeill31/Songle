@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import kotlinx.android.synthetic.main.map_layout.view.*
 import kotlinx.android.synthetic.main.songs_layout.view.*
 import java.util.*
+import org.jetbrains.anko.toast
 
 /**
  * Created by holly on 08/11/17.
@@ -51,11 +52,15 @@ class MapAdapter (val maps: List<MapInfo>, val itemClick : (MapInfo)->Unit ) : R
                     itemView.collected_placemarks_review.text = ""
 
                 }
-                if (map.locked==false){
+                if (!map.locked){
                     itemView.collected_placemarks_review.text = "$collected/$total"
                 }
 
-                itemView.setOnClickListener { mClick(this) }
+                itemView.setOnClickListener {mClick(this)}
+                itemView.setOnLongClickListener{
+                    mClick(this)
+                    true
+                }
             }
 
         }

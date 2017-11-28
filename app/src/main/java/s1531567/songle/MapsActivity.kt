@@ -179,39 +179,43 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     }
 
 
-    fun firstRun() { //= runBlocking {
-      // val job = launch {
-            val firstRun = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE).getBoolean("firstRun", true)
+    private fun firstRun() {
+        val firstRun = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE).getBoolean("firstRun", true)
+        if (firstRun) {
             val editor = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE).edit()
-            if (firstRun) {
-                for (i in 1..20) {
-                    var songTotal = 0
-                    for (j in 1..5) {
-                        Log.v("Got this far", "i:$i, j:$j")
-                        var mapTotal = 0
-                        var layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${intToString(i)}/map$j.kml")
-                        layer = layerTask.get()
-                        layer.addLayerToMap()
-                        doAsync {
-                            mapTotal = layer.containers.iterator().next().placemarks.count()
-                            editor.putInt("Song $i Map $j Placemarks", mapTotal)
-                            editor.apply()
-                            songTotal += mapTotal
-
-                        }
-                        layer.removeLayerFromMap()
-
+            val progress = findViewById<ProgressBar>(R.id.progressBar)
+            progress.progress = 0
+            val progressBarStep = 100/songs.size
+            progress.visibility = View.VISIBLE
+            for (i in 1..songs.size) {
+                var songTotal = 0
+                for (j in 1..5) {
+                    Log.v("Got this far", "i:$i, j:$j")
+                    var mapTotal = 0
+                    var layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${intToString(i)}/map$j.kml")
+                    layer = layerTask.get()
+                    layer.addLayerToMap()
+                    doAsync {
+                        mapTotal = layer.containers.iterator().next().placemarks.count()
+                        editor.putInt("Song $i Map $j Placemarks", mapTotal)
+                        editor.apply()
+                        songTotal += mapTotal
 
                     }
-                    editor.putInt("Song $i total Placemarks", songTotal)
+                    layer.removeLayerFromMap()
+
 
                 }
-                editor.putBoolean("firstRun", false)
-                editor.apply()
+                progress.progress += progressBarStep
+                editor.putInt("Song $i total Placemarks", songTotal)
 
             }
-      //  }
-     //   job.join()
+            progress.visibility = View.INVISIBLE
+            editor.putBoolean("firstRun", false)
+            editor.apply()
+
+        }
+
     }
 
 
@@ -387,7 +391,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
 
 
-        mediaplayer.start()
+        //mediaplayer.start()
 
         fab.setOnClickListener {
             val dialog = displayGuess()
@@ -430,7 +434,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     override fun onStop() {
         super.onStop()
-        mediaplayer.stop()
+       // mediaplayer.stop()
         if (mGoogleApiClient.isConnected) {
             mGoogleApiClient.disconnect()
         }
@@ -441,6 +445,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         editor.apply()
         val cur = current.getInt("Current Song", 1)
         println("hmmhmhmhm: ${cur}")
+        finish()
     }
 
     fun createLocationRequest() {
@@ -490,7 +495,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 val current = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
                 for (mark in layer.containers.iterator().next().placemarks) {
                     val markLoc: LatLng = mark.geometry.geometryObject as LatLng
-                    if (abs(markLoc.latitude - mLoc.latitude) < 0.05 && abs(markLoc.longitude - mLoc.longitude) < 0.05) {
+                    if (abs(markLoc.latitude - mLoc.latitude) < 0.0005 && abs(markLoc.longitude - mLoc.longitude) < 0.0005) {
                         if (mark !in closeBy) {
                             closeBy.add(mark)
                         }

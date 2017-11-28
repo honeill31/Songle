@@ -74,12 +74,14 @@ class SongList : AppCompatActivity() {
             if (guessed){
                 activ.putExtra("title", it.title)
                 activ.putExtra("artist", it.artist)
+                activ.putExtra("num", it.number)
                 activ.putExtra("url", it.url)
             }
 
             if (!guessed){
                 activ.putExtra("title", "???")
                 activ.putExtra("artist", "???")
+                activ.putExtra("num", it.number)
                 activ.putExtra("url", it.url)
 
             }
@@ -96,8 +98,11 @@ class SongList : AppCompatActivity() {
     }
     override fun onResume() {
         super.onResume()
+    }
 
-
+    override fun onStop() {
+        super.onStop()
+        finish()
     }
 
     inner class DividerItemDecoration(context: Context) : RecyclerView.ItemDecoration(){
