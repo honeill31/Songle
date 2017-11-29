@@ -42,7 +42,6 @@ class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (S
         val pref = context.getSharedPreferences(context.getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
 
         fun totalPlacemarks(songNum : Int) : String {
-            val rand = Random()
             var collected = 0
 
             for (i in 1..5){
@@ -80,8 +79,8 @@ class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (S
 
         fun bind(song:Song)  {
             with(song) {
-                val guessed = pref.getBoolean("Song ${song.number} guessed", false)
-                val locked = pref.getBoolean("Song ${song.number} locked", true)
+                val guessed = pref.getBoolean("Song ${stringToInt(song.number)} guessed", false)
+                val locked = pref.getBoolean("Song ${stringToInt(song.number)} locked", true)
                 if (guessed){
                     itemView.songTitle.text = song.title
                     itemView.songArtist.text = song.artist
@@ -95,15 +94,19 @@ class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (S
                 }
                 if (locked){
                     itemView.song_icon.setImageResource(R.drawable.ic_lock_outline_black_24dp)
+                    itemView.collected_placemarks.text = ""
                 }
                 if (!locked){
                     itemView.song_icon.setImageResource(R.drawable.ic_music_note_black_24dp)
+                    itemView.collected_placemarks.text = totalPlacemarks(stringToInt(song.number))
+
                 }
+                itemView.levelNumber.text = stringToInt(song.number).toString()
 
                 Log.v("Song", song.toString())
                 Log.v("string to int", "${stringToInt(song.number)}")
 
-                itemView.collected_placemarks.text = totalPlacemarks(stringToInt(song.number))
+
                 itemView.setOnClickListener{mClick(this)}
             }
 

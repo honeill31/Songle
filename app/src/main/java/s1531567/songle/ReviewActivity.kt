@@ -69,7 +69,7 @@ class ReviewActivity : AppCompatActivity() {
             val totalPlacemark = prefs.getInt("Song $song Map $i Placemarks", 0)
             Log.v("totalplacemark", totalPlacemark.toString())
             val collectedPlacemark = prefs.getInt("$song $i words collected", 0)
-            val locked = prefs.getBoolean("Song $song locked", true)
+            val locked = prefs.getBoolean("Song $song Map $i locked", true)
             mapList.add(MapInfo(totalPlacemark,collectedPlacemark,song,i,locked))
         }
 
@@ -101,14 +101,21 @@ class ReviewActivity : AppCompatActivity() {
                 total += pref.getInt("Song $songNum Map $i Placemarks", 0)
                 i++
             }
-            if (collected/total<2/3){
+            if ((collected/total)<(0.66)){
+                Log.v("Collectedfalse:", collected.toString())
+                Log.v("total false :", total.toString())
                 toast("Error, you have not collected enough placemarks to unlock the next map")
             }
 
-            if (collected/total>=2/3){
+            if ((collected/total)>=(0.66)){
+                Log.v("Collected true:", "$collected")
+                Log.v("total true:", "$total")
+                Log.v("ratio true:", "${(collected/total)}")
+                Log.v("2/3 ???? ", "${2/3}")
                 val editor = pref.edit()
-                editor.putBoolean("Song $songNum locked", false)
+                editor.putBoolean("Song $songNum Map $mapNum locked", false)
                 editor.apply()
+                toast("Map unlocked!")
             }
 
 
@@ -176,7 +183,7 @@ class ReviewActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        finish()
+
     }
 
 

@@ -39,6 +39,7 @@ import kotlinx.coroutines.experimental.runBlocking
 import org.jetbrains.anko.*
 import java.lang.Math.abs
 import java.net.InetAddress
+import java.util.*
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
@@ -74,13 +75,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         val editor = pref.edit()
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        bar.selectedItemId = R.id.menu_map
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-        val current = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-        currentSong = current.getInt("Current Song", 1)
-        currentMap = current.getInt("Current Map", 1)
+        currentSong = pref.getInt("Current Song", 1)
+        currentMap = pref.getInt("Current Map", 1)
 
         mGoogleApiClient = GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -167,7 +166,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         try {
             mMap.isMyLocationEnabled = true
         } catch (se: SecurityException) {
-            println("Security Exception Thrown [onMapReady]")
+            Log.v("SE [onMapReady]", se.toString())
         }
         mMap.uiSettings.isMyLocationButtonEnabled = true
         val layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/$song/map$currentMap.kml")
@@ -176,6 +175,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
 
 
+    }
+
+
+    //random number generator
+    fun rand(from: Int, to: Int) : Int {
+        val random = Random()
+        return random.nextInt(to - from) + from
     }
 
 
@@ -208,6 +214,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 }
                 progress.progress += progressBarStep
                 editor.putInt("Song $i total Placemarks", songTotal)
+
+            }
+            //unlocking 5 random songs
+            for (i in 1..5){
+                val r = rand(0, songs.size)
+                if (i==1){
+                    currentSong = r
+                    currentMap = 1
+                    editor.putInt("Current Song", r)
+                    editor.putInt("Current Map", 1)
+                    editor.apply()
+                }
+                editor.putBoolean("Song $r locked", false)
+                editor.putBoolean("Song $r Map 1 locked", false)
+                editor.apply()
 
             }
             progress.visibility = View.INVISIBLE
@@ -374,6 +395,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     override fun onResume() {
         super.onResume()
+        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+        val editor = pref.edit()
 
 
 
@@ -404,15 +427,26 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         fab.setOnLongClickListener {
             val menu = PopupMenu(this@MapsActivity, findViewById(R.id.fab))
             for (i in songs.indices) {
-                menu.menu.add(NONE,i+1,NONE,songs[i].title)
+                val locked = pref.getBoolean("Song ${i+1} locked", true)
+                val guessed = pref.getBoolean("Song ${i+1} guessed", false)
+
+                if (!locked && guessed){
+                    menu.menu.add(NONE,i+1,NONE,"${i+1}: ${songs[i].title}")
+                }
+                if (!locked && !guessed){
+                    menu.menu.add(NONE,i+1,NONE,"${i+1}: ???")
+                }
+
+
+
             }
             menu.setOnMenuItemClickListener {
                 Log.v("Song Before", currentSong.toString())
                 currentSong = it.itemId
                 Log.v("Song now:", currentSong.toString())
                 menu.dismiss()
-                onStop()
-                recreate()
+                val intent = Intent(this@MapsActivity, this@MapsActivity::class.java)
+                startActivity(intent)
                 true
 
             }
@@ -448,7 +482,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         editor.apply()
         val cur = current.getInt("Current Song", 1)
         println("hmmhmhmhm: ${cur}")
-        finish()
+
     }
 
     fun createLocationRequest() {

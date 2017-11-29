@@ -69,25 +69,32 @@ class SongList : AppCompatActivity() {
         layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
         myAdapter = SongAdapter(this, songList){
             val activ = Intent(this@SongList, ReviewActivity::class.java)
-            val guessed = pref.getBoolean("Song ${it.number} guessed", false)
+            val guessed = pref.getBoolean("Song ${it.number.toInt()} guessed", false)
+            val locked = pref.getBoolean("Song ${it.number.toInt()} locked", true)
 
-            if (guessed){
+            if (guessed && !locked){
                 activ.putExtra("title", it.title)
                 activ.putExtra("artist", it.artist)
                 activ.putExtra("num", it.number)
                 activ.putExtra("url", it.url)
+                startActivity(activ)
             }
 
-            if (!guessed){
+            if (!guessed && !locked){
                 activ.putExtra("title", "???")
                 activ.putExtra("artist", "???")
                 activ.putExtra("num", it.number)
                 activ.putExtra("url", it.url)
+                startActivity(activ)
 
             }
 
+            if (locked){
+                toast("You must unlock this song first!")
+            }
 
-            startActivity(activ)
+
+
 
         }
         val decor = DividerItemDecoration(this)
@@ -102,7 +109,6 @@ class SongList : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        finish()
     }
 
     inner class DividerItemDecoration(context: Context) : RecyclerView.ItemDecoration(){
