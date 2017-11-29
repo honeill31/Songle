@@ -172,6 +172,12 @@ class ReviewActivity : AppCompatActivity() {
             }
 
         }
+
+        lyrics.setOnClickListener {
+            val lyric = Intent(this@ReviewActivity, LyricsActivity::class.java)
+            lyric.putExtra("Song number", song)
+            startActivity(lyric)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

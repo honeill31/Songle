@@ -1,6 +1,7 @@
 package s1531567.songle
 
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Canvas
@@ -63,7 +64,7 @@ class SongList : AppCompatActivity() {
     private fun initialise(){
         val task = DownloadXMLTask()
         val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-        val editor = pref.edit()
+
         task.execute()
         songList = task.get()
         layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
@@ -90,7 +91,7 @@ class SongList : AppCompatActivity() {
             }
 
             if (locked){
-                toast("You must unlock this song first!")
+                unlockSongDialog(it.number.toInt()).show()
             }
 
 
@@ -110,6 +111,37 @@ class SongList : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
     }
+
+    fun unlockSongDialog(songNum: Int) : AlertDialog {
+        val b = android.app.AlertDialog.Builder(this)
+        b.setTitle("Unlock Song $songNum?")
+        b.setMessage("You must have at least 1 songle to do this.")
+        b.setPositiveButton("Unlock") { _, _ ->
+            val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+            val editor = pref.edit()
+            editor.putBoolean("Song $songNum locked", false)
+            toast("Song $songNum unlocked!")
+            var songles = pref.getInt("songles", 0)
+            if (songles > 0) {
+                songles--
+                editor.putInt("songles", songles)
+                editor.apply()
+            }
+            if (songles <=0){
+                toast("You don't have enough songles to purchase this!")
+            }
+
+        }
+        b.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        val dialog = b.create()
+        return dialog
+
+
+    }
+
 
     inner class DividerItemDecoration(context: Context) : RecyclerView.ItemDecoration(){
         private var divider: Drawable? = null

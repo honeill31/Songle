@@ -52,19 +52,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     private lateinit var mMap: GoogleMap
     private lateinit var mGoogleApiClient: GoogleApiClient
-    val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
-    var mLocationPermissionGranted = false
+    private val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
     private lateinit var mLastLocation: Location
-    val closeBy = mutableListOf<KmlPlacemark>()
-    lateinit var layer: KmlLayer
+    private val closeBy = mutableListOf<KmlPlacemark>()
+    private lateinit var layer: KmlLayer
     lateinit var mediaplayer: MediaPlayer
-    var currentSong: Int = 1
-    var currentMap: Int = 1
+    var currentSong = 0
+    var currentMap = 0
     private lateinit var songs: List<Song>
-    val sensorManager: SensorManager by lazy {
+    private val sensorManager: SensorManager by lazy {
         getSystemService(Context.SENSOR_SERVICE) as SensorManager
     }
-    val detect = StepDetector()
+    private val detect = StepDetector()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,13 +73,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
         val editor = pref.edit()
 
+        currentSong = pref.getInt("Current Song", 1)
+        currentMap = pref.getInt("Current Map", 1)
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-        currentSong = pref.getInt("Current Song", 1)
-        currentMap = pref.getInt("Current Map", 1)
-
         mGoogleApiClient = GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -219,6 +218,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             //unlocking 5 random songs
             for (i in 1..5){
                 val r = rand(0, songs.size)
+                //setting first song to be the first random song
                 if (i==1){
                     currentSong = r
                     currentMap = 1
@@ -261,11 +261,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         b.setPositiveButton("Submit") { dialog, whichButton ->
 
             dialog.dismiss()
+            val guessed = pref.getBoolean("Song $currentSong guessed", false)
             var userGuess = txt.text.toString()
             Log.v("User guess", userGuess)
             println("USEW GUESS!!!! $userGuess")
             println("current song: ${songs[currentSong-1].title}")
-            if (userGuess.trim().toLowerCase() == songs[currentSong].title.trim().toLowerCase()){
+            if (userGuess.trim().toLowerCase() == songs[currentSong-1].title.trim().toLowerCase() && !guessed ){
                 var currentSongles = pref.getInt("songles", 0)
                 currentSongles++
                 editor.putInt("songles", currentSongles)
@@ -274,7 +275,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
                 toast("${userGuess} is the correct song!")
             }
-            if (userGuess.toLowerCase() != songs[currentSong].title.toLowerCase()){
+            if (userGuess.trim().toLowerCase() != songs[currentSong-1].title.trim().toLowerCase()){
                 var tries = pref.getInt("Tries$currentSong", 3)
                 Log.v("Current tries", tries.toString())
                 tries--
@@ -339,6 +340,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
             dialog.dismiss()
             var userAmount = txt.text.toString().toInt()
+            //assert(userAmount%10==0)
 
             if (from == "points") {
                 cost = userAmount * 10
@@ -397,6 +399,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         super.onResume()
         val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
         val editor = pref.edit()
+        val guessed = pref.getBoolean("Song ${currentSong} guessed", false)
+        if (guessed){
+            currentSongTxt.text = "Current Song: ${songs[currentSong-1].title}"
+        }
+        if (!guessed) {
+            currentSongTxt.text = "Current Song: ${currentSong}"
+        }
+
+
+
 
 
 
@@ -443,6 +455,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             menu.setOnMenuItemClickListener {
                 Log.v("Song Before", currentSong.toString())
                 currentSong = it.itemId
+                editor.putInt("Current Song", currentSong)
+                editor.apply()
                 Log.v("Song now:", currentSong.toString())
                 menu.dismiss()
                 val intent = Intent(this@MapsActivity, this@MapsActivity::class.java)
@@ -559,7 +573,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 val lineWord = mark.getProperty("name").split(":")
                 val line = intToString(lineWord[0].toInt())
                 val w = intToString(lineWord[1].toInt())
-                val dl = DownloadLyricTask("${intToString(currentSong)}")
+                val dl = DownloadLyricTask(currentSong)
                 dl.execute()
                 val lyrics = dl.get()
                 val word = parser.findLyric(currentSong, currentMap, lyrics, mark)

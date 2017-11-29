@@ -198,4 +198,5 @@
     <string name="playSong">Play Song</string>
     <string name="giveUp">Give up</string>
     <string name="questionMarks">\???</string>
+    <string name="title_activity_lyrics">LyricsActivity</string>
 </resources>

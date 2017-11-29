@@ -10,14 +10,26 @@ import java.net.URL
 /**
  * Created by s1531567 on 03/11/17.
  */
-class DownloadLyricTask(val song : String) : AsyncTask<String, Int, String>(){
+class DownloadLyricTask(val song : Int) : AsyncTask<String, Int, String>(){
 
     override fun doInBackground(vararg p0: String?): String {
-        val url = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/$song/words.txt"
+        val url = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${intToString(song)}/words.txt"
         val stream = downloadUrl(url)
         val result = stream.bufferedReader().use { it.readText() }
         return result
 
+
+    }
+
+    fun intToString(num : Int) : String {
+        var str = ""
+        if (num <=9){
+            str = "0$num"
+        }
+        else {
+            str = "$num"
+        }
+        return str
 
     }
 

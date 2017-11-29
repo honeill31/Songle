@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:design="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
@@ -20,18 +22,28 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:layout_marginBottom="232dp"
+        android:layout_marginStart="168dp"
+        android:layout_marginTop="231dp"
         android:max="100"
-        android:progress="0" />
+        android:progress="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/map"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_alignParentEnd="true"
         android:layout_alignTop="@+id/collect"
-        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="16dp"
         android:tint="@color/colorPrimaryDark"
         app:background="@color/colorPrimary"
+        app:layout_constraintBottom_toTopOf="@+id/bar"
+        app:layout_constraintEnd_toEndOf="parent"
         app:rippleColor="@color/primaryDarkColor"
         app:srcCompat="@drawable/ic_audiotrack_black_24dp" />
 
@@ -58,9 +70,11 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/bar"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="11dp"
-        android:layout_marginStart="23dp"
-        android:text="Collect" />
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:text="Collect"
+        app:layout_constraintBottom_toTopOf="@+id/bar"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
         android:id="@+id/points"
@@ -71,6 +85,8 @@
         android:adjustViewBounds="false"
         android:padding="@dimen/activity_horizontal_margin"
         android:tint="@color/colorPrimary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/map"
         design:srcCompat="@drawable/ic_monetization_on_black_24dp" />
 
     <ImageView
@@ -81,10 +97,25 @@
         android:layout_toEndOf="@+id/points"
         android:padding="@dimen/activity_horizontal_margin"
         android:tint="@color/colorPrimary"
+        app:layout_constraintStart_toEndOf="@+id/points"
+        app:layout_constraintTop_toTopOf="@+id/map"
         design:srcCompat="@drawable/ic_music_note_black_24dp" />
 
+    <TextView
+        android:id="@+id/currentSongTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:text="TextView"
+        android:textAlignment="center"
+        app:layout_constraintStart_toEndOf="@+id/songles"
+        app:layout_constraintTop_toTopOf="@+id/map" />
 
-</RelativeLayout>
+
+</android.support.constraint.ConstraintLayout>
 
 
 

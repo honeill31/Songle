@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:design="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -20,11 +20,12 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/review_artist"
+        android:layout_marginEnd="8dp"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:text="@string/current_song"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/review_artist"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/review_artist" />
 
     <TextView
         android:id="@+id/review_artist"
@@ -32,13 +33,13 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignStart="@+id/play_giveup"
+        android:layout_marginEnd="8dp"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:text="@string/current_song"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/review_title" />
+        app:layout_constraintTop_toBottomOf="@+id/container" />
 
 
     <Button
@@ -48,10 +49,13 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/review_bar"
         android:layout_alignParentEnd="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
         android:padding="@dimen/activity_horizontal_margin"
         android:paddingLeft="16dp"
         android:text="Give Up"
-        app:layout_constraintBottom_toTopOf="@+id/review_bar" />
+        app:layout_constraintBottom_toTopOf="@+id/review_bar"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/lyrics"
@@ -59,10 +63,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/review_bar"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_toEndOf="@+id/imageView"
         android:padding="@dimen/activity_horizontal_margin"
         android:paddingRight="16dp"
-        android:text="View Lyrics" />
+        android:text="View Lyrics"
+        app:layout_constraintBottom_toTopOf="@+id/review_bar"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <RelativeLayout
         android:id="@+id/container"
@@ -74,14 +82,6 @@
         tools:context="s1531567.songle.ReviewActivity">
 
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/maplist"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:scrollbars="vertical" />
-
-
     </RelativeLayout>
 
     <android.support.design.widget.BottomNavigationView
@@ -90,9 +90,11 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_toEndOf="@+id/imageView"
+        app:layout_constraintBottom_toBottomOf="parent"
         design:itemBackground="@color/colorPrimary"
         design:itemIconTint="@color/colorPrimaryDark"
-        design:menu="@menu/bottom_nav_values" />
+        design:menu="@menu/bottom_nav_values"
+        tools:layout_editor_absoluteX="0dp" />
 
     <ImageView
         android:id="@+id/currency"
@@ -101,6 +103,8 @@
         android:layout_alignEnd="@+id/lyrics"
         android:layout_below="@+id/imageView"
         android:padding="@dimen/activity_horizontal_margin"
+        app:layout_constraintStart_toEndOf="@+id/walking"
+        app:layout_constraintTop_toBottomOf="@+id/container"
         design:srcCompat="@drawable/ic_music_note_black_24dp" />
 
     <ImageView
@@ -110,9 +114,26 @@
         android:layout_alignParentTop="true"
         android:layout_toStartOf="@+id/currency"
         android:padding="@dimen/activity_horizontal_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         design:srcCompat="@drawable/ic_monetization_on_black_24dp" />
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/maplist"
+        android:layout_width="368dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:scrollbars="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/lyrics"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/review_title" />
 
-</RelativeLayout>
+
+</android.support.constraint.ConstraintLayout>
 
 
