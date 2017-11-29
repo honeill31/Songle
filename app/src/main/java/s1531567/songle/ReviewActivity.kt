@@ -96,7 +96,7 @@ class ReviewActivity : AppCompatActivity() {
             var collected = 0
             var total = 0
             var i = 1
-            while (i <= mapNum){
+            while (i < mapNum){
                 collected += pref.getInt("$songNum $i words collected", 0)
                 total += pref.getInt("Song $songNum Map $i Placemarks", 0)
                 i++
@@ -114,6 +114,7 @@ class ReviewActivity : AppCompatActivity() {
                 Log.v("2/3 ???? ", "${2/3}")
                 val editor = pref.edit()
                 editor.putBoolean("Song $songNum Map $mapNum locked", false)
+                editor.putInt("Map Number", mapNum)
                 editor.apply()
                 toast("Map unlocked!")
             }
@@ -175,6 +176,7 @@ class ReviewActivity : AppCompatActivity() {
 
         lyrics.setOnClickListener {
             val lyric = Intent(this@ReviewActivity, LyricsActivity::class.java)
+            //val songLyrics = DownloadLyricTask(song).execute().get()
             lyric.putExtra("Song number", song)
             startActivity(lyric)
         }

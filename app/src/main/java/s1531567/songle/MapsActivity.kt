@@ -546,7 +546,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 val current = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
                 for (mark in layer.containers.iterator().next().placemarks) {
                     val markLoc: LatLng = mark.geometry.geometryObject as LatLng
-                    if (abs(markLoc.latitude - mLoc.latitude) < 0.0005 && abs(markLoc.longitude - mLoc.longitude) < 0.0005) {
+                    if (abs(markLoc.latitude - mLoc.latitude) < 0.05 && abs(markLoc.longitude - mLoc.longitude) < 0.05) {
                         if (mark !in closeBy) {
                             closeBy.add(mark)
                         }
@@ -565,9 +565,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         val editor = pref.edit()
         //parse kmlplacemarks to placemarks and add them to the collected number
         collect.setOnClickListener {
-            val songMap = "$currentSong $currentMap"
             val parser = LyricParser()
-            println(songMap)
+
             for (mark in closeBy) {
 
                 val lineWord = mark.getProperty("name").split(":")
@@ -578,14 +577,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 val lyrics = dl.get()
                 val word = parser.findLyric(currentSong, currentMap, lyrics, mark)
                 Log.v("Word?", word.toString())
-                val toWrite = "$songMap $line $w"
-                val collectedPrev = pref.getBoolean(toWrite, false)
+                val collectedPrev = pref.getBoolean("$currentSong $currentMap $line $word", false)
                 if (!collectedPrev){
-                    editor.putBoolean(toWrite, true)//setting this word to collected
-                    var collected = pref.getInt("$songMap words collected", 0)
-                    collected++
-                    editor.putInt("$songMap words collected", collected)
+                    editor.putBoolean("$currentSong $currentMap $line $w", true)//setting this word to collected
+                    Log.v("actual values", "$currentSong $currentMap $line $w")
                     editor.apply()
+                    var collected = pref.getInt("$currentSong $currentMap words collected", 0)
+                    collected++
+                    editor.putInt("$currentSong $currentMap words collected", collected)
+                    editor.apply()
+                    val didThisEvenWork = pref.getBoolean("$currentSong $currentMap $line $w", false)
+                    println("Did this even work? $didThisEvenWork")
                     toast("You collected the word '${word.word}'!")
 
                 }
