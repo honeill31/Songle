@@ -33,9 +33,10 @@ class DefaultPage : AppCompatActivity() {
 
 
         songref.setOnClickListener {
-            val lead = Intent(this@DefaultPage, LeaderboardActivity::class.java)
+            val lead = Intent(this@DefaultPage, SongList::class.java)
             startActivity(lead)
         }
+
 
         update.setOnClickListener {
             val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)

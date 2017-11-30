@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/map1"
+        android:titleCondensed="1"
+        android:icon="@drawable/ic_map_black_24dp"
+        android:title="Map 1" />
+    <item
+        android:id="@+id/map2"
+        android:titleCondensed="2"
+        android:icon="@drawable/ic_map_black_24dp"
+        android:title="Map 2"/>
+    <item
+        android:id="@+id/map3"
+        android:titleCondensed="3"
+        android:icon="@drawable/ic_map_black_24dp"
+        android:title="Map 3" />
+    <item
+        android:id="@+id/map4"
+        android:titleCondensed="4"
+        android:icon="@drawable/ic_map_black_24dp"
+        android:title="Map 4" />
+    <item
+        android:id="@+id/map5"
+        android:titleCondensed="5"
+        android:icon="@drawable/ic_map_black_24dp"
+        android:title="Map 5" />
+</menu>

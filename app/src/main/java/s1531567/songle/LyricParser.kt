@@ -64,57 +64,25 @@ class LyricParser() {
         editedLyrics = lyrics.replace(remove, "") //removing unnecessary punctuation
         val lines : List<String> = editedLyrics.split("\n") //splitting into string array)
         val l = lines.map { value -> value.trim() } //removing whitespace from beginning and end of line
-        var w = mutableListOf<Lyric>()
-        var length = 0
-        var result : String = ""
+        var result = ""
 
-
-     //   for (map in 1..5){
-            for (line in 0..lines.size-1){
-                var words = l[line].split(" ", "\t")
-                println("Line $line: ${lines[line]}")
-                for (word in 0..words.size-1){
-                    var collected = pref.getBoolean("$songNum $mapNum ${intToString(line+1)} ${intToString(word+1)}", false)
-                    println("collected? $collected + song $songNum + map $mapNum + line ${line+1} + word ${word+1}")
-                    if (collected){
-                        if (Lyric(line,word,words[word])!in w) {
-                            w.add(Lyric(line+1, word+1, words[word]))
-                            length++
-                        }
-                    }
-                    if (!collected){
-                        w.add(Lyric(line+1, word+1, "_"))
-                        length++
-                    }
-
-                }
-            }
-      //  }
-
-        //constructing string
         for (line in 0..lines.size-1){
-            var words = l[line].split(" ", "\t")
+            val words = l[line].split(" ", "\t")
+            println("Line $line: ${lines[line]}")
             for (word in 0..words.size-1){
-                var i = 0
-                while (i<words.size-1){
-                    result += "${words[word]} "
-                    i++
+                var collected = pref.getBoolean("$songNum $mapNum ${line+1} ${word+1}", false)
+                println("Key: $songNum $mapNum ${line + 1} ${word + 1}, collected? $collected")
+                if (collected){
+                    result += "${words[word+1]} "
                 }
+                if (!collected){
+                    result += "_"
 
+                }
             }
-            result + "\n"
+            result += "\n"
         }
-
-
-
-
-
         return result
-
-
-
     }
-
-
 
 }

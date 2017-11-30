@@ -75,7 +75,17 @@ class ReviewActivity : AppCompatActivity() {
 
         layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
         myAdapter = MapAdapter(mapList){
-            unlockMapDialog(it.mapNumber, it.songNumber).show()
+            if (it.locked) {
+                unlockMapDialog(it.mapNumber, it.songNumber).show()
+            }
+            if (!it.locked){
+                toast("Activating Map ${it.mapNumber}")
+                val editor = prefs.edit()
+                editor.putInt("Current Map", it.mapNumber)
+                startActivity(Intent(this@ReviewActivity, MapsActivity::class.java))
+                editor.apply()
+
+            }
 
         }
 
@@ -114,7 +124,7 @@ class ReviewActivity : AppCompatActivity() {
                 Log.v("2/3 ???? ", "${2/3}")
                 val editor = pref.edit()
                 editor.putBoolean("Song $songNum Map $mapNum locked", false)
-                editor.putInt("Map Number", mapNum)
+                editor.putInt("Current Map", mapNum)
                 editor.apply()
                 toast("Map unlocked!")
             }

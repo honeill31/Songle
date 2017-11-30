@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.MenuItem
+import io.github.yavski.fabspeeddial.FabSpeedDial
+import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter
 import kotlinx.android.synthetic.main.activity_lyrics.*
 import kotlinx.android.synthetic.main.content_lyrics.*
 
@@ -20,12 +23,18 @@ class LyricsActivity : AppCompatActivity() {
         var songLyrics = DownloadLyricTask(song).execute().get()
         val parser = LyricParser()
         val remove = parser.displayPlacemarkInLyrics(songLyrics, song, 1, pref)
-        Log.v("removw", remove)
         lyrics.text = remove
         setSupportActionBar(toolbar)
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-        }
+        val fab = findViewById<FabSpeedDial>(R.id.fab_speed)
+        fab.setMenuListener(object : SimpleMenuListenerAdapter(){
+            override fun onMenuItemSelected(menuItem: MenuItem?): Boolean {
+                val map = menuItem!!.titleCondensed
+                val id = map.toString().toInt()
+                lyrics.text = parser.displayPlacemarkInLyrics(songLyrics,song, id, pref)
+                return true
+            }
+        })
+
+
     }
 }

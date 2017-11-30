@@ -168,6 +168,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             Log.v("SE [onMapReady]", se.toString())
         }
         mMap.uiSettings.isMyLocationButtonEnabled = true
+        println("Adding layer! current map $currentMap")
         val layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/$song/map$currentMap.kml")
         layer = layerTask.get()
         layer.addLayerToMap() //displaying the kml tags
@@ -296,7 +297,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             }
 
         }
-        b.setNegativeButton("Cancel") { dialog, which ->
+        b.setNegativeButton("Cancel") { dialog, _ ->
             dialog.dismiss()
         }
 
@@ -398,6 +399,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     override fun onResume() {
         super.onResume()
         val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+        currentMap = pref.getInt("Current Map", 1)
         val editor = pref.edit()
         val guessed = pref.getBoolean("Song ${currentSong} guessed", false)
         if (guessed){
@@ -495,7 +497,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         editor.putInt("Current Map", currentMap)
         editor.apply()
         val cur = current.getInt("Current Song", 1)
-        println("hmmhmhmhm: ${cur}")
+        val map = current.getInt("Current Map", 1)
+        println("Current SOng: ${cur}")
+        println("Current Map: ${map}")
 
     }
 
@@ -570,14 +574,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             for (mark in closeBy) {
 
                 val lineWord = mark.getProperty("name").split(":")
-                val line = intToString(lineWord[0].toInt())
-                val w = intToString(lineWord[1].toInt())
+                val line = lineWord[0].toInt()
+                val w = lineWord[1].toInt()
                 val dl = DownloadLyricTask(currentSong)
                 dl.execute()
                 val lyrics = dl.get()
                 val word = parser.findLyric(currentSong, currentMap, lyrics, mark)
                 Log.v("Word?", word.toString())
-                val collectedPrev = pref.getBoolean("$currentSong $currentMap $line $word", false)
+                val collectedPrev = pref.getBoolean("$currentSong $currentMap $line $w", false)
                 if (!collectedPrev){
                     editor.putBoolean("$currentSong $currentMap $line $w", true)//setting this word to collected
                     Log.v("actual values", "$currentSong $currentMap $line $w")
