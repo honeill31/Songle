@@ -550,7 +550,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 val current = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
                 for (mark in layer.containers.iterator().next().placemarks) {
                     val markLoc: LatLng = mark.geometry.geometryObject as LatLng
-                    if (abs(markLoc.latitude - mLoc.latitude) < 0.05 && abs(markLoc.longitude - mLoc.longitude) < 0.05) {
+                    if (abs(markLoc.latitude - mLoc.latitude) < 0.0005 && abs(markLoc.longitude - mLoc.longitude) < 0.0005) {
                         if (mark !in closeBy) {
                             closeBy.add(mark)
                         }
