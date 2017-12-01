@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import kotlin.collections.filter
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.LocationRequest
@@ -31,6 +32,8 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.data.Feature
+import com.google.maps.android.data.Layer
 import com.google.maps.android.data.kml.KmlLayer
 import com.google.maps.android.data.kml.KmlPlacemark
 import kotlinx.android.synthetic.main.activity_maps.*
@@ -54,7 +57,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     private lateinit var mGoogleApiClient: GoogleApiClient
     private val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
     private lateinit var mLastLocation: Location
-    private val closeBy = mutableListOf<KmlPlacemark>()
+    private var closeBy = mutableListOf<KmlPlacemark>()
     private lateinit var layer: KmlLayer
     lateinit var mediaplayer: MediaPlayer
     var currentSong = 0
@@ -171,12 +174,73 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         println("Adding layer! current map $currentMap")
         val layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/$song/map$currentMap.kml")
         layer = layerTask.get()
+        var id = ""
         layer.addLayerToMap() //displaying the kml tags
+        layer.setOnFeatureClickListener (object: Layer.OnFeatureClickListener{
+
+            override fun onFeatureClick(feature: Feature) {
+                val lineWord = feature.getProperty("name").split(":")
+                Log.v("Feature style", feature.id)
+                purchaseLyricDialog(lineWord, feature as KmlPlacemark).show()
+            }
+        })
+    }
+
+    fun purchaseLyricDialog(lineWord: List<String>, mark : KmlPlacemark): AlertDialog {
+        val b = android.app.AlertDialog.Builder(this)
+        b.setTitle("Purchase this word?")
+        val types = arrayOf("unclassified", "boring", "notboring", "interesting", "veryinteresting")
+        var cost = 0
+        when (mark.styleId){
+            "#unclassified" -> cost = 10
+            "#boring" -> cost = 5
+            "#notboring" -> cost = 10
+            "#interesting" -> cost = 150
+            "#veryinteresting" -> cost = 200
+
+        }
+
+        b.setMessage("This will cost $cost points")
+        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+        val editor = pref.edit()
+        val parser = LyricParser()
+        val line = lineWord[0].toInt()
+        val w = lineWord[1].toInt()
+        val dl = DownloadLyricTask(currentSong)
+        dl.execute()
+        val lyrics = dl.get()
+        val word = parser.findLyric(currentSong, currentMap, lyrics, mark)
+        val collectedPrev = pref.getBoolean("$currentSong $currentMap $line $w", false)
+
+
+        b.setPositiveButton("Purchase"){_,_->
+            if (!collectedPrev){
+                var points = pref.getInt("points", 0)
+                if (points >=cost){
+                    editor.putBoolean("$currentSong $currentMap $line $w", true)//setting this word to collected
+                    editor.apply()
+                    var collected = pref.getInt("$currentSong $currentMap words collected", 0)
+                    collected++
+                    points -= cost
+                    editor.putInt("points", points)
+                    editor.putInt("$currentSong $currentMap words collected", collected)
+                    editor.apply()
+                    toast("You collected the word '${word.word}'!")
+                }
+                toast("You don't have enough points to purchase this word!")
+            }
+            toast("You already have this word!")
+
+        }
+
+        b.setNegativeButton("Cancel") {_,_ ->
+
+        }
+        return b.create()
 
 
 
     }
-
 
     //random number generator
     fun rand(from: Int, to: Int) : Int {
@@ -549,7 +613,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 val mLoc = LatLng(current.latitude, current.longitude)
                 val current = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
                 for (mark in layer.containers.iterator().next().placemarks) {
-                    val markLoc: LatLng = mark.geometry.geometryObject as LatLng
+                    var markLoc: LatLng = mark.geometry.geometryObject as LatLng
                     if (abs(markLoc.latitude - mLoc.latitude) < 0.0005 && abs(markLoc.longitude - mLoc.longitude) < 0.0005) {
                         if (mark !in closeBy) {
                             closeBy.add(mark)
@@ -574,6 +638,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             for (mark in closeBy) {
 
                 val lineWord = mark.getProperty("name").split(":")
+
                 val line = lineWord[0].toInt()
                 val w = lineWord[1].toInt()
                 val dl = DownloadLyricTask(currentSong)

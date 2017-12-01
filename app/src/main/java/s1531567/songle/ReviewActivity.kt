@@ -137,8 +137,7 @@ class ReviewActivity : AppCompatActivity() {
             dialog.dismiss()
         }
 
-        val dialog = b.create()
-        return dialog
+        return b.create()
 
 
     }
