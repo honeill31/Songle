@@ -31,7 +31,7 @@ class UserActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user)
         val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-        val userScore = pref.getInt("Current Score", 0).toString()
+        val userScore = pref.getInt("total score", 0).toString()
         score.text = "Current Score: $userScore"
         bar.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
     }

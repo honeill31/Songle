@@ -62,6 +62,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     lateinit var mediaplayer: MediaPlayer
     var currentSong = 0
     var currentMap = 0
+    var scoreMode = 0
+    var standardiser = 0
     private lateinit var songs: List<Song>
     private val sensorManager: SensorManager by lazy {
         getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -76,8 +78,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
         val editor = pref.edit()
 
+
         currentSong = pref.getInt("Current Song", 1)
         currentMap = pref.getInt("Current Map", 1)
+        scoreMode = pref.getInt("Song $currentSong score mode", 1)
+        val total = pref.getInt("Song $currentSong Map $currentMap Placemarks", 0)
+        standardiser = 1/total
+
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
@@ -189,7 +196,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     fun purchaseLyricDialog(lineWord: List<String>, mark : KmlPlacemark): AlertDialog {
         val b = android.app.AlertDialog.Builder(this)
         b.setTitle("Purchase this word?")
-        val types = arrayOf("unclassified", "boring", "notboring", "interesting", "veryinteresting")
         var cost = 0
         when (mark.styleId){
             "#unclassified" -> cost = 10
@@ -635,10 +641,38 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         collect.setOnClickListener {
             val parser = LyricParser()
 
+            /*iterates through every placemark and performs the following operations:
+            -Calculates the score depending on the score mode.
+            -Checks whether the placemark has been previously collected.
+            -Finds the word associated with the placemark
+            -Adds the placemark to the list of collected placemarks for this map and song.
+
+            */
+
             for (mark in closeBy) {
+                var collected = pref.getInt("$currentSong $currentMap words collected", 0)
+                val currentScore1 = scoreModify1(collected)
+                val currentScore2 = scoreModify2(collected)
+                val total = currentScore1.toInt()+currentScore2.toInt()
+
+                if (scoreMode == 1){
+                    editor.putInt("Song $currentSong score 1", currentScore1.toInt())
+                    editor.apply()
+
+
+                }
+                if (scoreMode == 2){
+                    editor.putInt("Song $currentSong score 2", currentScore2.toInt())
+                    editor.apply()
+                }
+
+                editor.putInt("Song $currentSong total score", total)
+                var userScore = pref.getInt("total score", 0)
+                userScore += total
+                editor.putInt("total score", userScore)
+                editor.apply()
 
                 val lineWord = mark.getProperty("name").split(":")
-
                 val line = lineWord[0].toInt()
                 val w = lineWord[1].toInt()
                 val dl = DownloadLyricTask(currentSong)
@@ -651,12 +685,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                     editor.putBoolean("$currentSong $currentMap $line $w", true)//setting this word to collected
                     Log.v("actual values", "$currentSong $currentMap $line $w")
                     editor.apply()
-                    var collected = pref.getInt("$currentSong $currentMap words collected", 0)
                     collected++
                     editor.putInt("$currentSong $currentMap words collected", collected)
                     editor.apply()
-                    val didThisEvenWork = pref.getBoolean("$currentSong $currentMap $line $w", false)
-                    println("Did this even work? $didThisEvenWork")
                     toast("You collected the word '${word.word}'!")
 
                 }
@@ -672,5 +703,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     override fun onConnectionFailed(result: ConnectionResult) {
         print(">>>>> Connection Failed")
+    }
+
+
+    private fun scoreModify1 (collected: Int) : Number {
+        var m = 0
+        when(currentMap){
+            1 -> m = 500
+            2 -> m = 400
+            3 -> m = 250
+            4 -> m = 200
+            5 -> m = 150
+        }
+        return m - (collected * standardiser * m)
+    }
+
+    private fun scoreModify2(collected : Int) : Number {
+        return collected * standardiser * 500
     }
 }
