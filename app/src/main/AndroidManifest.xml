@@ -79,7 +79,10 @@
         <activity
             android:name=".LyricsActivity"
             android:label="@string/title_activity_lyrics"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".UserActivity"
+            android:label="@string/title_activity_user"></activity>
     </application>
 
 </manifest>

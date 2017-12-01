@@ -37,6 +37,10 @@ class DefaultPage : AppCompatActivity() {
             startActivity(lead)
         }
 
+        userprofile.setOnClickListener {
+            startActivity(Intent(this@DefaultPage, UserActivity::class.java))
+        }
+
 
         update.setOnClickListener {
             val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -53,7 +57,6 @@ class DefaultPage : AppCompatActivity() {
                         arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
                         WRITE_EXTERNAL_STORAGE)
             }
-
 
         }
     }
