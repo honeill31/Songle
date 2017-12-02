@@ -25,6 +25,7 @@
     <string name="menu_map">Map</string>
     <string name="title_activity_song_list">Song List</string>
     <string name="PREFS_FILE"></string>
+    <string name="User_file"></string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
