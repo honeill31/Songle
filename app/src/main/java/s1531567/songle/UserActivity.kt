@@ -34,5 +34,8 @@ class UserActivity : AppCompatActivity() {
         val userScore = pref.getInt("total score", 0).toString()
         score.text = "Current Score: $userScore"
         bar.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+        achievement.setOnClickListener {
+            startActivity(Intent(this@UserActivity, AchievementActivity::class.java))
+        }
     }
 }
