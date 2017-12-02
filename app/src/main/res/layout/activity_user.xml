@@ -22,27 +22,28 @@
         design:layout_constraintBottom_toBottomOf="parent"
         design:layout_constraintEnd_toEndOf="parent"
         design:layout_constraintStart_toStartOf="parent"
-        design:menu="@menu/bottom_nav_values"></android.support.design.widget.BottomNavigationView>
+        design:menu="@menu/bottom_nav_values">
+    </android.support.design.widget.BottomNavigationView>
 
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:design="http://schemas.android.com/tools">
 
 
-
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <ImageView
                 android:id="@+id/header_cover_image"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:scaleType="centerCrop"
                 android:background="@color/colorPrimary"
+                android:scaleType="centerCrop"
                 android:src="@drawable/qm" />
 
             <ImageButton
@@ -148,8 +149,9 @@
                     android:background="#fff"
                     android:clickable="true"
                     android:elevation="4dp"
+                    android:focusable="true"
                     android:padding="20dp"
-                    android:text="Android Profile UI Design" />
+                    android:text="Song Progress" />
 
                 <TextView
                     android:layout_width="fill_parent"
@@ -160,18 +162,11 @@
                     android:background="#fff"
                     android:clickable="true"
                     android:elevation="4dp"
+                    android:focusable="true"
                     android:padding="20dp"
-                    android:text="Android Profile XMl UI Design" />
+                    android:text="Placeholder" />
 
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:background="#fff"
-                    android:clickable="true"
-                    android:elevation="4dp"
-                    android:padding="20dp"
-                    android:text="Android Profile UI Design" />
+
             </LinearLayout>
         </RelativeLayout>
     </ScrollView>
