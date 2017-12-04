@@ -46,41 +46,20 @@ class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (S
 
             for (i in 1..5){
                 //change to for in in 1 to unlocked
-                val songMap = "$songNum $i"
-                collected += prefs.sharedPrefs.getInt("$songMap words collected",0 )
+                collected += prefs.wordsCollected(songNum, i)
                 Log.v("collected and pos", collected.toString() + " " + i.toString())
 
             }
-
-
-            val total = prefs.sharedPrefs.getInt("Song $songNum total Placemarks", 0)
+            val total = prefs.getPlacemarkTotal(songNum)
             return "$collected/$total"
 
         }
 
-        fun stringToInt(num : String) : Int {
-//            var str = 0
-//            Log.v("num to int", num.toInt().toString())
-//            Log.v("num", num)
-//            if (num.toInt() > 9){
-//                str = num.toInt()
-//            }
-//            else {
-//                Log.v("num[0]", num[0].toString())
-//                Log.v("num[1]", num[1].toString())
-//                Log.v("str", str.toString())
-//
-//                str = num[1].toString().toInt()
-//            }
-//            return str
-            return num.toInt()
-
-        }
 
         fun bind(song:Song)  {
             with(song) {
-                val guessed = prefs.sharedPrefs.getBoolean("Song ${stringToInt(song.number)} guessed", false)
-                val locked = prefs.sharedPrefs.getBoolean("Song ${stringToInt(song.number)} locked", true)
+                val guessed = prefs.songGuessed(Helper().stringToInt(song.number))
+                val locked = prefs.songLocked(Helper().stringToInt(song.number))
                 if (guessed){
                     itemView.songTitle.text = song.title
                     itemView.songArtist.text = song.artist
@@ -98,13 +77,13 @@ class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (S
                 }
                 if (!locked){
                     itemView.song_icon.setImageResource(R.drawable.ic_music_note_black_24dp)
-                    itemView.collected_placemarks.text = totalPlacemarks(stringToInt(song.number))
+                    itemView.collected_placemarks.text = totalPlacemarks(Helper().stringToInt(song.number))
 
                 }
-                itemView.levelNumber.text = stringToInt(song.number).toString()
+                itemView.levelNumber.text = Helper().stringToInt(song.number).toString()
 
                 Log.v("Song", song.toString())
-                Log.v("string to int", "${stringToInt(song.number)}")
+                Log.v("string to int", "${Helper().stringToInt(song.number)}")
 
 
                 itemView.setOnClickListener{mClick(this)}

@@ -31,44 +31,57 @@ class Prefs(context: Context) {
         set(value) = sharedPrefs.edit().putInt("steps", value).apply()
 
     //function to check whether a word in a given song has been collected.
-    fun collectedPrev(line: Int, w : Int) : Boolean {
-        return sharedPrefs.getBoolean("$currentSong $currentMap $line $w", false)
+    fun collectedPrev(song: Int, map: Int, line: Int, w: Int) : Boolean {
+        return sharedPrefs.getBoolean("$song $map $line $w", false)
     }
 
-    fun setCollected (line: Int, w: Int) {
-        editor.putBoolean("$currentSong $currentMap $line $w", true)//setting this word to collected
+    fun setCollected (song: Int, map: Int, line: Int, w: Int) {
+        editor.putBoolean("$song $map $line $w", true)//setting this word to collected
         editor.apply()
     }
 
-    fun wordsCollected () : Int {
-        return sharedPrefs.getInt("$currentSong $currentMap words collected", 0)
+    fun wordsCollected (song: Int, map: Int) : Int {
+        return sharedPrefs.getInt("$song $map words collected", 0)
     }
 
-    fun setWordsCollected (value: Int) {
-        editor.putInt("$currentSong $currentMap words collected", value)
+    fun setWordsCollected (song: Int, map: Int, value: Int) {
+        editor.putInt("$song $map words collected", value)
         editor.apply()
     }
 
-    fun songGuessed () : Boolean {
-        return sharedPrefs.getBoolean("Song $currentSong guessed", false)
+    fun songGuessed (song: Int) : Boolean {
+        return sharedPrefs.getBoolean("Song $song guessed", false)
     }
 
-    fun songLocked () : Boolean {
-        return sharedPrefs!!.getBoolean("Song $currentSong locked", true)
+    fun songLocked (song: Int) : Boolean {
+        return sharedPrefs!!.getBoolean("Song $song locked", true)
     }
 
-    fun setSongGuessed () {
-        editor.putBoolean("Song $currentSong guessed", true)
+    fun setSongGuessed (song: Int) {
+        editor.putBoolean("Song $song guessed", true)
         editor.apply()
     }
 
-    fun getTries () : Int {
-        return sharedPrefs.getInt("Tries $currentSong", 3)
+    fun setSongUnlocked (song: Int){
+        editor.putBoolean("Song $song locked", false)
+        editor.apply()
     }
 
-    fun setTries (tries : Int ){
-        editor.putInt("Tries $currentSong", tries)
+    fun getTries (song : Int) : Int {
+        return sharedPrefs.getInt("Tries $song", 3)
+    }
+
+    fun setTries (song: Int, tries : Int){
+        editor.putInt("Tries $song", tries)
         editor.apply()
+    }
+
+    fun getScoreMode (song: Int) : Int {
+        return sharedPrefs.getInt("Song $song score mode", 1)
+    }
+
+    fun getPlacemarkTotal (song: Int) : Int {
+        return sharedPrefs.getInt("Song $song total Placemarks", 0)
     }
 
 

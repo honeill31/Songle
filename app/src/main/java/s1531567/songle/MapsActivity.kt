@@ -61,16 +61,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     private lateinit var mLastLocation: Location
     private var closeBy = mutableListOf<KmlPlacemark>()
     private lateinit var layer: KmlLayer
-    lateinit var mediaplayer: MediaPlayer
-    var currentSong = 0
-    var currentMap = 0
-    var scoreMode = 0
-    var standardiser = 0
+    private var currentSong = 0
+    private var currentMap = 0
+    private var scoreMode = 0
+    private var standardiser = 0
     private lateinit var songs: List<Song>
+    private val detect = StepDetector()
     private val sensorManager: SensorManager by lazy {
         getSystemService(Context.SENSOR_SERVICE) as SensorManager
     }
-    private val detect = StepDetector()
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,7 +90,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
         currentSong = prefs.currentSong
         currentMap = prefs.currentMap
-        scoreMode = prefs.sharedPrefs!!.getInt("Song $currentSong score mode", 1)
+        scoreMode = prefs.getScoreMode(currentSong)
 
 
 
@@ -116,7 +116,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
         }
 
-        mediaplayer = MediaPlayer.create(this@MapsActivity, R.raw.song)
         val task = DownloadXMLTask()
         task.execute()
         songs = task.get()
@@ -140,10 +139,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             val v = vibrator
             v.vibrate(100)
 
-            var points = prefs.sharedPrefs.getInt("points", 0)
+            var points = prefs.points
             points++
-            prefs.editor.putInt("points", points)
-            prefs.editor.apply()
+            prefs.points = points
             toast("You walked 1000 more steps! Point added.")
         }
 
@@ -160,7 +158,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
      * installed Google Play services and returned to the app.
      */
     override fun onMapReady(googleMap: GoogleMap) {
-        val song = intToString(currentSong)
+        val song = Helper().intToString(currentSong)
         mMap = googleMap
         firstRun()
 //        val total = pref.getInt("Song $currentSong Map $currentMap Placemarks", 0)
@@ -209,19 +207,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         dl.execute()
         val lyrics = dl.get()
         val word = parser.findLyric(currentSong, currentMap, lyrics, mark)
-        val collectedPrev = prefs.collectedPrev(line, w)
+        val collectedPrev = prefs.collectedPrev(currentSong, currentMap, line, w)
 
 
         b.setPositiveButton("Purchase"){_,_->
             if (!collectedPrev){
                 var points = prefs.points
                 if (points >=cost){
-                    prefs.setCollected(line, w)//setting this word to collected
-                    var collected = prefs.wordsCollected()
+                    prefs.setCollected(currentSong, currentMap, line, w)//setting this word to collected
+                    var collected = prefs.wordsCollected(currentSong, currentMap)
                     collected++
                     points -= cost
                     prefs.points = points
-                    prefs.setWordsCollected(collected)
+                    prefs.setWordsCollected(currentSong, currentMap, collected)
 
                     toast("You collected the word '${word.word}'!")
                 }
@@ -240,13 +238,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     }
 
-    //random number generator
-    fun rand(from: Int, to: Int) : Int {
-        val random = Random()
-        return random.nextInt(to - from) + from
-    }
-
-
     private fun firstRun() {
         val firstRun = prefs.sharedPrefs.getBoolean("firstRun", true)
         if (firstRun) {
@@ -259,7 +250,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 for (j in 1..5) {
                     Log.v("Got this far", "i:$i, j:$j")
                     var mapTotal = 0
-                    var layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${intToString(i)}/map$j.kml")
+                    var layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${Helper().intToString(i)}/map$j.kml")
                     val thisLayer = layerTask.get()
                     thisLayer.addLayerToMap()
                     doAsync {
@@ -279,7 +270,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             }
             //unlocking 5 random songs
             for (i in 1..5){
-                val r = rand(0, songs.size)
+                val r = Helper().rand(0, songs.size)
                 //setting first song to be the first random song
                 if (i==1){
                     currentSong = r
@@ -316,27 +307,27 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         val view = inf.inflate(R.layout.guess_dialog, null)
         b.setView(view)
 
-        var txt = view.findViewById<EditText>(R.id.user_guess) as EditText
+        val txt = view.findViewById<EditText>(R.id.user_guess) as EditText
 
         b.setPositiveButton("Submit") { dialog, whichButton ->
 
             dialog.dismiss()
-            val guessed = prefs.songGuessed()
+            val guessed = prefs.songGuessed(currentSong)
             var userGuess = txt.text.toString()
 
             if (userGuess.trim().toLowerCase() == songs[currentSong-1].title.trim().toLowerCase() && !guessed ){
                 var currentSongles = prefs.songles
                 currentSongles++
                 prefs.songles = currentSongles
-                prefs.setSongGuessed()
+                prefs.setSongGuessed(currentSong)
                 toast("${userGuess} is the correct song!")
             }
             if (userGuess.trim().toLowerCase() != songs[currentSong-1].title.trim().toLowerCase()){
-                var tries = prefs.getTries()
+                var tries = prefs.getTries(currentSong)
                 Log.v("Current tries", tries.toString())
                 tries--
                 if (tries >0) {
-                    prefs.setTries(tries)
+                    prefs.setTries(currentSong, tries)
                     toast("Incorrect song guess, $tries tries remaining.")
                 }
                 if (tries <=0){
@@ -433,30 +424,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     }
 
-    fun intToString(num : Int) : String {
-        var str = ""
-        if (num <=9){
-            str = "0$num"
-        }
-        else {
-            str = "$num"
-        }
-        return str
-
-    }
-
-
     override fun onResume() {
         super.onResume()
-        val guessed = prefs.songGuessed()
+        val guessed = prefs.songGuessed(currentSong)
         if (guessed) currentSongTxt.text = "Current Song: ${songs[currentSong-1].title}"
         if (!guessed) currentSongTxt.text = "Current Song: ${currentSong}"
-
-
-
-
-
-
 
         val connected = checkInternet()
         if (!connected){
@@ -644,13 +616,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 val lyrics = dl.get()
                 val word = parser.findLyric(currentSong, currentMap, lyrics, mark)
                 Log.v("Word?", word.toString())
-                val collectedPrev = prefs.sharedPrefs.getBoolean("$currentSong $currentMap $line $w", false)
+                val collectedPrev = prefs.collectedPrev(currentSong, currentMap, line, w)
                 if (!collectedPrev){
-                    prefs.editor.putBoolean("$currentSong $currentMap $line $w", true)//setting this word to collected
-                    prefs.editor.apply()
+                    prefs.setCollected(currentSong, currentMap, line, w)
                     collected++
-                    prefs.editor.putInt("$currentSong $currentMap words collected", collected)
-                    prefs.editor.apply()
+                    prefs.setWordsCollected(currentSong, currentMap, collected)
                     toast("You collected the word '${word.word}'!")
 
                 }

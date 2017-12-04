@@ -68,8 +68,8 @@ class SongList : AppCompatActivity() {
         layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
         myAdapter = SongAdapter(this, songList){
             val activ = Intent(this@SongList, ReviewActivity::class.java)
-            val guessed = prefs.sharedPrefs.getBoolean("Song ${it.number.toInt()} guessed", false)
-            val locked = prefs.sharedPrefs.getBoolean("Song ${it.number.toInt()} locked", true)
+            val guessed = prefs.songGuessed(it.number.toInt())
+            val locked = prefs.songLocked(it.number.toInt())
 
             if (guessed && !locked){
                 activ.putExtra("title", it.title)
@@ -102,20 +102,13 @@ class SongList : AppCompatActivity() {
         songlist.adapter = myAdapter
 
     }
-    override fun onResume() {
-        super.onResume()
-    }
-
-    override fun onStop() {
-        super.onStop()
-    }
 
     fun unlockSongDialog(songNum: Int) : AlertDialog {
         val b = android.app.AlertDialog.Builder(this)
         b.setTitle("Unlock Song $songNum?")
         b.setMessage("You must have at least 1 songle to do this.")
         b.setPositiveButton("Unlock") { _, _ ->
-            prefs.editor.putBoolean("Song $songNum locked", false)
+            prefs.setSongUnlocked(songNum)
             toast("Song $songNum unlocked!")
             var songles = prefs.sharedPrefs.getInt("songles", 0)
             if (songles > 0) {
