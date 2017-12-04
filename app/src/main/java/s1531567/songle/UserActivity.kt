@@ -1,6 +1,6 @@
 package s1531567.songle
 
-import android.content.Context
+
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
@@ -30,8 +30,7 @@ class UserActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user)
-        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-        val userScore = pref.getInt("total score", 0).toString()
+        val userScore = prefs.sharedPrefs.getInt("total score", 0).toString()
         score.text = "Current Score: $userScore"
         bar.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         achievement.setOnClickListener {

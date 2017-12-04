@@ -77,9 +77,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
 
-        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-        val editor = pref.edit()
-
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
@@ -91,9 +88,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 .addApi(LocationServices.API)
                 .build()
 
-        currentSong = pref.getInt("Current Song", 1)
-        currentMap = pref.getInt("Current Map", 1)
-        scoreMode = pref.getInt("Song $currentSong score mode", 1)
+        currentSong = prefs.currentSong
+        currentMap = prefs.currentMap
+        scoreMode = prefs.sharedPrefs!!.getInt("Song $currentSong score mode", 1)
 
 
 
@@ -135,22 +132,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     }
 
     override fun step(timeNs: Long) {
-        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-        var steps = pref.getInt("steps", 0)
+        var steps = prefs.steps
         steps++
-        val editor = pref.edit()
-        editor.putInt("steps", steps)
-        editor.apply()
-        toast("Steps: $steps")
+        prefs.steps = steps
         if (steps % 1000 == 0 && steps != 0) {
             //for user feedback while walking
             val v = vibrator
             v.vibrate(100)
 
-            var points = pref.getInt("points", 0)
+            var points = prefs.sharedPrefs.getInt("points", 0)
             points++
-            editor.putInt("points", points)
-            editor.apply()
+            prefs.editor.putInt("points", points)
+            prefs.editor.apply()
             toast("You walked 1000 more steps! Point added.")
         }
 
@@ -209,8 +202,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         }
 
         b.setMessage("This will cost $cost points")
-        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-        val editor = pref.edit()
         val parser = LyricParser()
         val line = lineWord[0].toInt()
         val w = lineWord[1].toInt()
@@ -218,21 +209,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         dl.execute()
         val lyrics = dl.get()
         val word = parser.findLyric(currentSong, currentMap, lyrics, mark)
-        val collectedPrev = pref.getBoolean("$currentSong $currentMap $line $w", false)
+        val collectedPrev = prefs.collectedPrev(line, w)
 
 
         b.setPositiveButton("Purchase"){_,_->
             if (!collectedPrev){
-                var points = pref.getInt("points", 0)
+                var points = prefs.points
                 if (points >=cost){
-                    editor.putBoolean("$currentSong $currentMap $line $w", true)//setting this word to collected
-                    editor.apply()
-                    var collected = pref.getInt("$currentSong $currentMap words collected", 0)
+                    prefs.setCollected(line, w)//setting this word to collected
+                    var collected = prefs.wordsCollected()
                     collected++
                     points -= cost
-                    editor.putInt("points", points)
-                    editor.putInt("$currentSong $currentMap words collected", collected)
-                    editor.apply()
+                    prefs.points = points
+                    prefs.setWordsCollected(collected)
+
                     toast("You collected the word '${word.word}'!")
                 }
                 toast("You don't have enough points to purchase this word!")
@@ -258,9 +248,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
 
     private fun firstRun() {
-        val firstRun = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE).getBoolean("firstRun", true)
+        val firstRun = prefs.sharedPrefs.getBoolean("firstRun", true)
         if (firstRun) {
-            val editor = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE).edit()
             val progress = findViewById<ProgressBar>(R.id.progressBar)
             progress.progress = 0
             val progressBarStep = 100/songs.size
@@ -275,8 +264,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                     thisLayer.addLayerToMap()
                     doAsync {
                         mapTotal = thisLayer.containers.iterator().next().placemarks.count()
-                        editor.putInt("Song $i Map $j Placemarks", mapTotal)
-                        editor.apply()
+                        prefs.editor.putInt("Song $i Map $j Placemarks", mapTotal)
+                        prefs.editor.apply()
                         songTotal += mapTotal
 
                     }
@@ -285,7 +274,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
                 }
                 progress.progress += progressBarStep
-                editor.putInt("Song $i total Placemarks", songTotal)
+                prefs.editor.putInt("Song $i total Placemarks", songTotal)
 
             }
             //unlocking 5 random songs
@@ -295,18 +284,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 if (i==1){
                     currentSong = r
                     currentMap = 1
-                    editor.putInt("Current Song", r)
-                    editor.putInt("Current Map", 1)
-                    editor.apply()
+                    prefs.editor.putInt("Current Song", r)
+                    prefs.editor.putInt("Current Map", 1)
+                    prefs.editor.apply()
                 }
-                editor.putBoolean("Song $r locked", false)
-                editor.putBoolean("Song $r Map 1 locked", false)
-                editor.apply()
+                prefs.editor.putBoolean("Song $r locked", false)
+                prefs.editor.putBoolean("Song $r Map 1 locked", false)
+                prefs.editor.apply()
 
             }
             progress.visibility = View.INVISIBLE
-            editor.putBoolean("firstRun", false)
-            editor.apply()
+            prefs.editor.putBoolean("firstRun", false)
+            prefs.editor.apply()
 
         }
 
@@ -326,44 +315,36 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         val inf = LayoutInflater.from(this)
         val view = inf.inflate(R.layout.guess_dialog, null)
         b.setView(view)
-        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-        val editor = pref.edit()
 
         var txt = view.findViewById<EditText>(R.id.user_guess) as EditText
 
         b.setPositiveButton("Submit") { dialog, whichButton ->
 
             dialog.dismiss()
-            val guessed = pref.getBoolean("Song $currentSong guessed", false)
+            val guessed = prefs.songGuessed()
             var userGuess = txt.text.toString()
-            Log.v("User guess", userGuess)
-            println("USEW GUESS!!!! $userGuess")
-            println("current song: ${songs[currentSong-1].title}")
-            if (userGuess.trim().toLowerCase() == songs[currentSong-1].title.trim().toLowerCase() && !guessed ){
-                var currentSongles = pref.getInt("songles", 0)
-                currentSongles++
-                editor.putInt("songles", currentSongles)
-                editor.putBoolean("Song $currentSong guessed", true)
-                editor.apply()
 
+            if (userGuess.trim().toLowerCase() == songs[currentSong-1].title.trim().toLowerCase() && !guessed ){
+                var currentSongles = prefs.songles
+                currentSongles++
+                prefs.songles = currentSongles
+                prefs.setSongGuessed()
                 toast("${userGuess} is the correct song!")
             }
             if (userGuess.trim().toLowerCase() != songs[currentSong-1].title.trim().toLowerCase()){
-                var tries = pref.getInt("Tries$currentSong", 3)
+                var tries = prefs.getTries()
                 Log.v("Current tries", tries.toString())
                 tries--
                 if (tries >0) {
+                    prefs.setTries(tries)
                     toast("Incorrect song guess, $tries tries remaining.")
-                    editor.putInt("Tries$currentSong", tries)
-                    editor.apply()
                 }
                 if (tries <=0){
                     //decrease score
                     toast("Incorrect song guess, points decreasing")
-                    var points = pref.getInt("points", 0)
+                    var points = prefs.points
                     points--
-                    editor.putInt("points", points)
-                    editor.apply()
+                    prefs.points = points
                 }
 
             }
@@ -387,20 +368,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         val inf = LayoutInflater.from(this)
         val view = inf.inflate(R.layout.convert_dialog, null)
         b.setView(view)
-        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-        val editor = pref.edit()
+
         var fromCurrency = 0
         var toCurrency = 0
         var cost = 0
 
         if (from == "points"){
-            fromCurrency = pref.getInt(from, 0)
-            toCurrency = pref.getInt(to, 0)
+            fromCurrency = prefs.points
+            toCurrency = prefs.songles
 
         }
         if (from == "songles"){
-            fromCurrency = pref.getInt(from, 0)
-            toCurrency = pref.getInt(to, 0)
+            fromCurrency = prefs.songles
+            toCurrency = prefs.points
         }
 
         val txt = view.findViewById<EditText>(R.id.convert) as EditText
@@ -426,9 +406,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             val toTotal = userAmount + toCurrency
 
             if (fromTotal>0){
-                editor.putInt(from, fromTotal)
-                editor.putInt(to,toTotal)
-                editor.apply()
+                prefs.editor.putInt(from, fromTotal)
+                prefs.editor.putInt(to,toTotal)
+                prefs.editor.apply()
                 toast("Conversion Successful")
             }
             if (fromTotal<=0){
@@ -468,10 +448,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     override fun onResume() {
         super.onResume()
-        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-        currentMap = pref.getInt("Current Map", 1)
-        val editor = pref.edit()
-        val guessed = pref.getBoolean("Song ${currentSong} guessed", false)
+        val guessed = prefs.songGuessed()
         if (guessed) currentSongTxt.text = "Current Song: ${songs[currentSong-1].title}"
         if (!guessed) currentSongTxt.text = "Current Song: ${currentSong}"
 
@@ -507,8 +484,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         fab.setOnLongClickListener {
             val menu = PopupMenu(this@MapsActivity, findViewById(R.id.fab))
             for (i in songs.indices) {
-                val locked = pref.getBoolean("Song ${i+1} locked", true)
-                val guessed = pref.getBoolean("Song ${i+1} guessed", false)
+                val locked = prefs.sharedPrefs!!.getBoolean("Song ${i+1} locked", true)
+                val guessed = prefs.sharedPrefs!!.getBoolean("Song ${i+1} guessed", false)
 
                 if (!locked && guessed){
                     menu.menu.add(NONE,i+1,NONE,"${i+1}: ${songs[i].title}")
@@ -523,8 +500,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             menu.setOnMenuItemClickListener {
                 Log.v("Song Before", currentSong.toString())
                 currentSong = it.itemId
-                editor.putInt("Current Song", currentSong)
-                editor.apply()
+                prefs.editor.putInt("Current Song", currentSong)
+                prefs.editor.apply()
                 Log.v("Song now:", currentSong.toString())
                 menu.dismiss()
                 val intent = Intent(this@MapsActivity, this@MapsActivity::class.java)
@@ -557,15 +534,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         if (mGoogleApiClient.isConnected) {
             mGoogleApiClient.disconnect()
         }
-        val current = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-        val editor = current.edit()
-        editor.putInt("Current Song", currentSong)
-        editor.putInt("Current Map", currentMap)
-        editor.apply()
-        val cur = current.getInt("Current Song", 1)
-        val map = current.getInt("Current Map", 1)
-        println("Current SOng: ${cur}")
-        println("Current Map: ${map}")
+        prefs.currentSong = currentSong
+        prefs.currentMap = currentMap
+
+
 
     }
 
@@ -613,7 +585,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 println("[onLocationChanged] Location unknown")
             } else {
                 val mLoc = LatLng(current.latitude, current.longitude)
-                val current = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
                 for (mark in layer.containers.iterator().next().placemarks) {
                     var markLoc: LatLng = mark.geometry.geometryObject as LatLng
                     if (abs(markLoc.latitude - mLoc.latitude) < 0.0005 && abs(markLoc.longitude - mLoc.longitude) < 0.0005) {
@@ -631,8 +602,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     override fun onLocationChanged(current: Location?) {
         checkCloseBy(current)
-        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-        val editor = pref.edit()
         //parse kmlplacemarks to placemarks and add them to the collected number
         collect.setOnClickListener {
             val parser = LyricParser()
@@ -642,31 +611,30 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             -Checks whether the placemark has been previously collected.
             -Finds the word associated with the placemark
             -Adds the placemark to the list of collected placemarks for this map and song.
-
             */
 
             for (mark in closeBy) {
-                var collected = pref.getInt("$currentSong $currentMap words collected", 0)
+                var collected = prefs.sharedPrefs!!.getInt("$currentSong $currentMap words collected", 0)
                 val currentScore1 = scoreModify1(collected)
                 val currentScore2 = scoreModify2(collected)
                 val total = currentScore1.toInt()+currentScore2.toInt()
 
                 if (scoreMode == 1){
-                    editor.putInt("Song $currentSong score 1", currentScore1.toInt())
-                    editor.apply()
+                    prefs.editor.putInt("Song $currentSong score 1", currentScore1.toInt())
+                    prefs.editor.apply()
 
 
                 }
                 if (scoreMode == 2){
-                    editor.putInt("Song $currentSong score 2", currentScore2.toInt())
-                    editor.apply()
+                    prefs.editor.putInt("Song $currentSong score 2", currentScore2.toInt())
+                    prefs.editor.apply()
                 }
 
-                editor.putInt("Song $currentSong total score", total)
-                var userScore = pref.getInt("total score", 0)
+                prefs.editor.putInt("Song $currentSong total score", total)
+                var userScore = prefs.sharedPrefs.getInt("total score", 0)
                 userScore += total
-                editor.putInt("total score", userScore)
-                editor.apply()
+                prefs.editor.putInt("total score", userScore)
+                prefs.editor.apply()
 
                 val lineWord = mark.getProperty("name").split(":")
                 val line = lineWord[0].toInt()
@@ -676,14 +644,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 val lyrics = dl.get()
                 val word = parser.findLyric(currentSong, currentMap, lyrics, mark)
                 Log.v("Word?", word.toString())
-                val collectedPrev = pref.getBoolean("$currentSong $currentMap $line $w", false)
+                val collectedPrev = prefs.sharedPrefs.getBoolean("$currentSong $currentMap $line $w", false)
                 if (!collectedPrev){
-                    editor.putBoolean("$currentSong $currentMap $line $w", true)//setting this word to collected
-                    Log.v("actual values", "$currentSong $currentMap $line $w")
-                    editor.apply()
+                    prefs.editor.putBoolean("$currentSong $currentMap $line $w", true)//setting this word to collected
+                    prefs.editor.apply()
                     collected++
-                    editor.putInt("$currentSong $currentMap words collected", collected)
-                    editor.apply()
+                    prefs.editor.putInt("$currentSong $currentMap words collected", collected)
+                    prefs.editor.apply()
                     toast("You collected the word '${word.word}'!")
 
                 }

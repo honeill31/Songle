@@ -16,13 +16,13 @@ class LyricsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_lyrics)
-        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+
         val extras = intent.extras
         val song = extras.getInt("Song number", 1)
         //val map = extras.getInt("Map number", 1)
         var songLyrics = DownloadLyricTask(song).execute().get()
         val parser = LyricParser()
-        val remove = parser.displayPlacemarkInLyrics(songLyrics, song, 1, pref)
+        val remove = parser.displayPlacemarkInLyrics(songLyrics, song, 1)
         lyrics.text = remove
         setSupportActionBar(toolbar)
         val fab = findViewById<FabSpeedDial>(R.id.fab_speed)
@@ -30,7 +30,7 @@ class LyricsActivity : AppCompatActivity() {
             override fun onMenuItemSelected(menuItem: MenuItem?): Boolean {
                 val map = menuItem!!.titleCondensed
                 val id = map.toString().toInt()
-                lyrics.text = parser.displayPlacemarkInLyrics(songLyrics,song, id, pref)
+                lyrics.text = parser.displayPlacemarkInLyrics(songLyrics,song, id)
                 return true
             }
         })

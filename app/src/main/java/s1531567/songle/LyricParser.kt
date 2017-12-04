@@ -57,7 +57,7 @@ class LyricParser() {
 
     }
 
-    fun displayPlacemarkInLyrics(lyrics: String, songNum : Int, mapNum: Int, pref: SharedPreferences) : String {
+    fun displayPlacemarkInLyrics(lyrics: String, songNum : Int, mapNum: Int) : String {
 
         var editedLyrics : String = lyrics
         val remove = "[,|?|!|(|)|.]".toRegex()
@@ -70,7 +70,7 @@ class LyricParser() {
             val words = l[line].split(" ", "\t")
             println("Line $line: ${lines[line]}")
             for (word in 0..words.size-1){
-                var collected = pref.getBoolean("$songNum $mapNum ${line+1} ${word+1}", false)
+                var collected = prefs.sharedPrefs.getBoolean("$songNum $mapNum ${line+1} ${word+1}", false)
                 println("Key: $songNum $mapNum ${line + 1} ${word + 1}, collected? $collected")
                 if (collected){
                     result += "${words[word+1]} "

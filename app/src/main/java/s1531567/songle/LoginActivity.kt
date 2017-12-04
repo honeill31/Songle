@@ -34,20 +34,20 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
     private var mAuthTask: UserLoginTask? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val pref = getSharedPreferences(getString(R.string.User_file), Context.MODE_PRIVATE)
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         // Set up the login form.
        // populateAutoComplete()
         password.setOnEditorActionListener(TextView.OnEditorActionListener { _, id, _ ->
             if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                attemptLogin(pref)
+                attemptLogin()
                 return@OnEditorActionListener true
             }
             false
         })
 
-        email_sign_in_button.setOnClickListener { attemptLogin(pref) }
+        email_sign_in_button.setOnClickListener { attemptLogin() }
     }
 
 
@@ -57,7 +57,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private fun attemptLogin(pref: SharedPreferences) {
+    private fun attemptLogin() {
         if (mAuthTask != null) {
             return
         }
@@ -99,7 +99,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true)
-            mAuthTask = UserLoginTask(emailStr, passwordStr, pref)
+            mAuthTask = UserLoginTask(emailStr, passwordStr)
             mAuthTask!!.execute(null as Void?)
         }
     }
@@ -201,11 +201,11 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    inner class UserLoginTask internal constructor(private val mEmail: String, private val mPassword: String, pref: SharedPreferences) : AsyncTask<Void, Void, Boolean>() {
-            val mPref = pref
+    inner class UserLoginTask internal constructor(private val mEmail: String, private val mPassword: String) : AsyncTask<Void, Void, Boolean>() {
+
 
         override fun doInBackground(vararg params: Void?): Boolean {
-            val credentials = mPref.getString("User info", "")
+            val credentials = prefs.sharedPrefs!!.getString("User info", "")
             val userCredentials = credentials.split(",")
             var success = false
 
@@ -221,9 +221,8 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
                     .firstOrNull { it[0] == mEmail }
 
             if (creds == null){ //user doesn't exist
-                val editor = mPref.edit()
-                editor.putString("User info", credentials.plus("$mEmail:$mPassword,"))
-                editor.apply()
+                prefs.editor.putString("User info", credentials.plus("$mEmail:$mPassword,"))
+                prefs.editor.apply()
                 success = true
             }
 

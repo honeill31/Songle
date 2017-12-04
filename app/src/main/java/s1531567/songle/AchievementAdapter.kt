@@ -41,7 +41,7 @@ class AchievementAdapter(val context: Context,val achievements: List<Achievement
 
     class AchievementHolder(context: Context,view: View, itemClick: (Achievement) -> Unit) : RecyclerView.ViewHolder(view) {
         private val mClick = itemClick
-        val pref = context.getSharedPreferences(context.getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+
 
         fun bind(achievement: Achievement)  {
             with(achievement) {

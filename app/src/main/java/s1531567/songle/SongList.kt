@@ -63,15 +63,13 @@ class SongList : AppCompatActivity() {
 
     private fun initialise(){
         val task = DownloadXMLTask()
-        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-
         task.execute()
         songList = task.get()
         layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
         myAdapter = SongAdapter(this, songList){
             val activ = Intent(this@SongList, ReviewActivity::class.java)
-            val guessed = pref.getBoolean("Song ${it.number.toInt()} guessed", false)
-            val locked = pref.getBoolean("Song ${it.number.toInt()} locked", true)
+            val guessed = prefs.sharedPrefs.getBoolean("Song ${it.number.toInt()} guessed", false)
+            val locked = prefs.sharedPrefs.getBoolean("Song ${it.number.toInt()} locked", true)
 
             if (guessed && !locked){
                 activ.putExtra("title", it.title)
@@ -117,15 +115,13 @@ class SongList : AppCompatActivity() {
         b.setTitle("Unlock Song $songNum?")
         b.setMessage("You must have at least 1 songle to do this.")
         b.setPositiveButton("Unlock") { _, _ ->
-            val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-            val editor = pref.edit()
-            editor.putBoolean("Song $songNum locked", false)
+            prefs.editor.putBoolean("Song $songNum locked", false)
             toast("Song $songNum unlocked!")
-            var songles = pref.getInt("songles", 0)
+            var songles = prefs.sharedPrefs.getInt("songles", 0)
             if (songles > 0) {
                 songles--
-                editor.putInt("songles", songles)
-                editor.apply()
+                prefs.editor.putInt("songles", songles)
+                prefs.editor.apply()
             }
             if (songles <=0){
                 toast("You don't have enough songles to purchase this!")

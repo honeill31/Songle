@@ -14,8 +14,8 @@ class NetworkReceiver () : BroadcastReceiver() {
 
     override fun onReceive(p0: Context?, p1: Intent?) {
 
-        var sharedPrefs = PreferenceManager.getDefaultSharedPreferences(p0)
-        val networkPref = sharedPrefs.getString("Data", "Wi-Fi")
+
+        val networkPref = prefs.sharedPrefs.getString("Data", "Wi-Fi")
 
         val connMgr =
                 p0?.getSystemService(Context.CONNECTIVITY_SERVICE)

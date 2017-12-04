@@ -39,7 +39,7 @@ class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (S
 
     class SongHolder(context: Context,view: View, itemClick: (Song) -> Unit) : RecyclerView.ViewHolder(view) {
         private val mClick = itemClick
-        val pref = context.getSharedPreferences(context.getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+
 
         fun totalPlacemarks(songNum : Int) : String {
             var collected = 0
@@ -47,13 +47,13 @@ class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (S
             for (i in 1..5){
                 //change to for in in 1 to unlocked
                 val songMap = "$songNum $i"
-                collected += pref.getInt("$songMap words collected",0 )
+                collected += prefs.sharedPrefs.getInt("$songMap words collected",0 )
                 Log.v("collected and pos", collected.toString() + " " + i.toString())
 
             }
 
 
-            val total = pref.getInt("Song $songNum total Placemarks", 0)
+            val total = prefs.sharedPrefs.getInt("Song $songNum total Placemarks", 0)
             return "$collected/$total"
 
         }
@@ -79,8 +79,8 @@ class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (S
 
         fun bind(song:Song)  {
             with(song) {
-                val guessed = pref.getBoolean("Song ${stringToInt(song.number)} guessed", false)
-                val locked = pref.getBoolean("Song ${stringToInt(song.number)} locked", true)
+                val guessed = prefs.sharedPrefs.getBoolean("Song ${stringToInt(song.number)} guessed", false)
+                val locked = prefs.sharedPrefs.getBoolean("Song ${stringToInt(song.number)} locked", true)
                 if (guessed){
                     itemView.songTitle.text = song.title
                     itemView.songArtist.text = song.artist

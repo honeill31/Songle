@@ -72,9 +72,7 @@ class DefaultPage : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        val pref = getSharedPreferences(getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-        val editor = pref.edit()
-        val steps = pref.getInt("steps", 0)
+        val steps = prefs.sharedPrefs.getInt("steps", 0)
         var txt = findViewById<TextView>(R.id.textView)
         txt.text = "Total number of steps walked: $steps"
     }
