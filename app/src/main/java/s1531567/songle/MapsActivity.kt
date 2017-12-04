@@ -13,6 +13,8 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.location.Location
 import android.media.MediaPlayer
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
@@ -79,13 +81,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         val editor = pref.edit()
 
 
-        currentSong = pref.getInt("Current Song", 1)
-        currentMap = pref.getInt("Current Map", 1)
-        scoreMode = pref.getInt("Song $currentSong score mode", 1)
-        val total = pref.getInt("Song $currentSong Map $currentMap Placemarks", 0)
-        standardiser = 1/total
-
-
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
@@ -95,6 +90,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build()
+
+        currentSong = pref.getInt("Current Song", 1)
+        currentMap = pref.getInt("Current Map", 1)
+        scoreMode = pref.getInt("Song $currentSong score mode", 1)
+
 
 
 
@@ -170,6 +170,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         val song = intToString(currentSong)
         mMap = googleMap
         firstRun()
+//        val total = pref.getInt("Song $currentSong Map $currentMap Placemarks", 0)
+    //    standardiser = 1/total
 
 
         try {
@@ -444,13 +446,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     }
 
     fun checkInternet(): Boolean {
-        try {
-            val address = InetAddress.getByName("google.com")
-            Log.v("Address:", address.toString())
-            return !address.equals("")
-        } catch (e: Exception) {
-            return false
-        }
+        var connected = (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).state == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).state == NetworkInfo.State.CONNECTED)
+
+       return connected
+
     }
 
     fun intToString(num : Int) : String {
@@ -472,12 +472,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         currentMap = pref.getInt("Current Map", 1)
         val editor = pref.edit()
         val guessed = pref.getBoolean("Song ${currentSong} guessed", false)
-        if (guessed){
-            currentSongTxt.text = "Current Song: ${songs[currentSong-1].title}"
-        }
-        if (!guessed) {
-            currentSongTxt.text = "Current Song: ${currentSong}"
-        }
+        if (guessed) currentSongTxt.text = "Current Song: ${songs[currentSong-1].title}"
+        if (!guessed) currentSongTxt.text = "Current Song: ${currentSong}"
 
 
 
@@ -486,8 +482,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
 
         val connected = checkInternet()
-        if (connected){
-            //display error
+        if (!connected){
+            toast("Not connected to the internet!")
             println("Not connected")
             val intent = Intent(this, DefaultPage::class.java)
             startActivity(intent)
