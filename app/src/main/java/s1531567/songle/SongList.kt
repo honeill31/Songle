@@ -106,18 +106,17 @@ class SongList : AppCompatActivity() {
     fun unlockSongDialog(songNum: Int) : AlertDialog {
         val b = android.app.AlertDialog.Builder(this)
         b.setTitle("Unlock Song $songNum?")
-        b.setMessage("You must have at least 1 songle to do this.")
+        b.setMessage("You must have at least 1 Songle to do this.")
         b.setPositiveButton("Unlock") { _, _ ->
-            prefs.setSongUnlocked(songNum)
-            toast("Song $songNum unlocked!")
-            var songles = prefs.sharedPrefs.getInt("songles", 0)
+            var songles = prefs.songles
             if (songles > 0) {
+                prefs.setSongUnlocked(songNum)
+                toast("Song $songNum unlocked!")
                 songles--
-                prefs.editor.putInt("songles", songles)
-                prefs.editor.apply()
+                prefs.songles = songles
             }
             if (songles <=0){
-                toast("You don't have enough songles to purchase this!")
+                toast("You don't have enough Songles to purchase this!")
             }
 
         }
@@ -125,8 +124,7 @@ class SongList : AppCompatActivity() {
             dialog.dismiss()
         }
 
-        val dialog = b.create()
-        return dialog
+        return b.create()
 
 
     }

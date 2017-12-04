@@ -26,6 +26,7 @@ import android.view.View
 import android.widget.*
 import kotlin.collections.filter
 import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
@@ -76,11 +77,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
-
-        if (!checkInternet()) {
-            toast("You Must connect to the internet to play Songle")
-            startActivity(Intent(this@MapsActivity, DefaultPage::class.java))
-        }
 
 
 
@@ -171,8 +167,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         val song = Helper().intToString(currentSong)
         mMap = googleMap
         firstRun()
-//        val total = pref.getInt("Song $currentSong Map $currentMap Placemarks", 0)
-    //    standardiser = 1/total
+        val total = prefs.getMapPlacemarkTotal(currentSong, currentMap)
+        standardiser = 1/total
 
 
         try {
@@ -263,13 +259,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                     var layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${Helper().intToString(i)}/map$j.kml")
                     val thisLayer = layerTask.get()
                     thisLayer.addLayerToMap()
-                    doAsync {
-                        mapTotal = thisLayer.containers.iterator().next().placemarks.count()
-                        prefs.editor.putInt("Song $i Map $j Placemarks", mapTotal)
-                        prefs.editor.apply()
-                        songTotal += mapTotal
+                    mapTotal = thisLayer.containers.iterator().next().placemarks.count()
+                    prefs.editor.putInt("Song $i Map $j Placemarks", mapTotal)
+                    prefs.editor.apply()
+                    songTotal += mapTotal
 
-                    }
+
                     thisLayer.removeLayerFromMap()
 
 
@@ -343,7 +338,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 }
                 if (tries <=0){
                     //decrease score
-                    toast("Incorrect song guess, points decreasing")
+                    toast("Incorrect song guess, Score decreasing")
                     var points = prefs.points
                     points--
                     prefs.points = points
@@ -427,28 +422,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     }
 
-    fun checkInternet(): Boolean {
-        var connected = (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).state == NetworkInfo.State.CONNECTED ||
-                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).state == NetworkInfo.State.CONNECTED)
 
-       return connected
-    }
+
 
     override fun onResume() {
         super.onResume()
         val guessed = prefs.songGuessed(currentSong)
         if (guessed) currentSongTxt.text = "Current Song: ${songs[currentSong-1].title}"
         if (!guessed) currentSongTxt.text = "Current Song: $currentSong"
-
-        val connected = checkInternet()
-        if (!connected){
-            toast("Not connected to the internet!")
-            println("Not connected")
-            val intent = Intent(this, DefaultPage::class.java)
-            startActivity(intent)
-        }
-
-
         val accel = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         detect.registerListener(this)
         sensorManager.registerListener(this@MapsActivity, accel, SensorManager.SENSOR_DELAY_FASTEST)
@@ -512,15 +493,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     override fun onStop() {
         super.onStop()
-       // mediaplayer.stop()
+        if (Helper().checkInternet(connectivityManager)) {
+            prefs.currentSong = currentSong
+            prefs.currentMap = currentMap
+        }
         if (mGoogleApiClient.isConnected) {
             mGoogleApiClient.disconnect()
-        }
-        prefs.currentSong = currentSong
-        prefs.currentMap = currentMap
-
-
-
+            }
+        sensorManager.unregisterListener(this@MapsActivity)
+        detect.unregisterListener(this)
     }
 
     fun createLocationRequest() {
@@ -596,27 +577,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             */
 
             for (mark in closeBy) {
-                var collected = prefs.sharedPrefs!!.getInt("$currentSong $currentMap words collected", 0)
+                var collected = prefs.wordsCollected(currentSong, currentMap)
                 val currentScore1 = scoreModify1(collected)
                 val currentScore2 = scoreModify2(collected)
                 val total = currentScore1.toInt()+currentScore2.toInt()
 
                 if (scoreMode == 1){
-                    prefs.editor.putInt("Song $currentSong score 1", currentScore1.toInt())
-                    prefs.editor.apply()
+                    prefs.score1Total(currentSong, currentScore1.toInt())
 
 
                 }
                 if (scoreMode == 2){
-                    prefs.editor.putInt("Song $currentSong score 2", currentScore2.toInt())
-                    prefs.editor.apply()
+                    prefs.score2Total(currentSong, currentScore2.toInt())
                 }
 
-                prefs.editor.putInt("Song $currentSong total score", total)
-                var userScore = prefs.sharedPrefs.getInt("total score", 0)
+                prefs.setSongScore(currentSong, total)
+                var userScore = prefs.totalScore
                 userScore += total
-                prefs.editor.putInt("total score", userScore)
-                prefs.editor.apply()
+                prefs.totalScore = userScore
 
                 val lineWord = mark.getProperty("name").split(":")
                 val line = lineWord[0].toInt()

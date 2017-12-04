@@ -13,6 +13,7 @@ import android.widget.TextView
 
 
 import kotlinx.android.synthetic.main.activity_default.*
+import org.jetbrains.anko.connectivityManager
 import org.jetbrains.anko.progressDialog
 import org.jetbrains.anko.toast
 import java.io.File
@@ -27,8 +28,12 @@ class DefaultPage : AppCompatActivity() {
 
 
         play.setOnClickListener {
-            val play = Intent(this, MapsActivity::class.java)
-            startActivity(play)
+            if (Helper().checkInternet(connectivityManager)){
+                val play = Intent(this, MapsActivity::class.java)
+                startActivity(play)
+            }
+            else toast("You must have an internet connection to play Songle")
+
         }
 
 

@@ -1,5 +1,8 @@
 package s1531567.songle
 
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
+import org.jetbrains.anko.connectivityManager
 import java.util.*
 
 /**
@@ -27,5 +30,11 @@ class Helper {
     fun stringToInt(num : String) : Int {
         return num.toInt()
 
+    }
+    fun checkInternet(connectivityManager: ConnectivityManager) : Boolean {
+        var connected = (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).state == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).state == NetworkInfo.State.CONNECTED)
+
+        return connected
     }
 }

@@ -30,6 +30,10 @@ class Prefs(context: Context) {
         get() = sharedPrefs.getInt("steps", 0)
         set(value) = sharedPrefs.edit().putInt("steps", value).apply()
 
+    var totalScore : Int
+        get() = sharedPrefs.getInt("total score", 0)
+        set(value) = sharedPrefs.edit().putInt("total score", value).apply()
+
     //function to check whether a word in a given song has been collected.
     fun collectedPrev(song: Int, map: Int, line: Int, w: Int) : Boolean {
         return sharedPrefs.getBoolean("$song $map $line $w", false)
@@ -89,12 +93,30 @@ class Prefs(context: Context) {
         return sharedPrefs.getInt("Song $song score mode", 1)
     }
 
+    fun score1Total (song: Int, value: Int) {
+        editor.putInt("Song $song score 1", value)
+        editor.apply()
+    }
+
+    fun score2Total (song: Int, value: Int) {
+        editor.putInt("Song $song score 2", value)
+        editor.apply()
+    }
+
+    fun songScore (song: Int) : Int {
+        return sharedPrefs.getInt("Song $song total score", 0)
+    }
+
+    fun setSongScore (song: Int, value: Int) {
+
+    }
+
     fun getPlacemarkTotal (song: Int) : Int {
         return sharedPrefs.getInt("Song $song total Placemarks", 0)
     }
 
     fun getMapPlacemarkTotal (song: Int, map: Int) : Int {
-        return sharedPrefs.getInt("Song $song Map $map Placemarks", 0)
+        return sharedPrefs.getInt("Song $song Map $map Placemarks", 1) //avoid division by 0
     }
 
     fun getMapCollected (song: Int, map: Int) : Int {

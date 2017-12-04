@@ -20,6 +20,10 @@ class StepDetector {
         this.listener = listener
     }
 
+    fun unregisterListener(listener: StepListener){
+        this.listener = null
+    }
+
 
     fun updateAccel(timeNs: Long, x: Float, y: Float, z: Float) {
         val currentAccel = FloatArray(3)
@@ -63,7 +67,7 @@ class StepDetector {
         private val ACCEL_RING_SIZE = 50
         private val VEL_RING_SIZE = 10
 
-        // change this threshold according to your sensitivity preferences
+
         private val STEP_THRESHOLD = 50f
 
         private val STEP_DELAY_NS = 250000000

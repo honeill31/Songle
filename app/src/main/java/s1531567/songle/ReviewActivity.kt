@@ -80,6 +80,7 @@ class ReviewActivity : AppCompatActivity() {
             }
             if (!it.locked){
                 toast("Activating Map ${it.mapNumber}")
+                prefs.currentSong = it.songNumber
                 prefs.currentMap = it.mapNumber
                 startActivity(Intent(this@ReviewActivity, MapsActivity::class.java))
 

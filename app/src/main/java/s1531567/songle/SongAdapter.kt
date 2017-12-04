@@ -55,6 +55,13 @@ class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (S
 
         }
 
+        fun isWhitespace(char: Char) : Char {
+            if (char == ' '){
+                return ' '
+            }
+            else return '?'
+        }
+
 
         fun bind(song:Song)  {
             with(song) {
@@ -66,8 +73,8 @@ class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (S
 
                 }
                 if (!guessed){
-                    itemView.songTitle.text = "???"
-                    itemView.songArtist.text = "???"
+                    itemView.songTitle.text = "???" //song.title.map { it -> isWhitespace(it) }.joinToString(" ")
+                    itemView.songArtist.text = "???"//song.artist.map { it -> isWhitespace(it) }.joinToString(" ")
 
 
                 }
