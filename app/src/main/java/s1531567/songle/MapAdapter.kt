@@ -32,20 +32,13 @@ class MapAdapter (val maps: List<MapInfo>, val itemClick : (MapInfo)->Unit ) : R
     class ViewHolder(view: View, itemClick: (MapInfo) -> Unit) : RecyclerView.ViewHolder(view) {
         private val mClick = itemClick
 
-        fun dummyPlacemarks(): String {
-            val rand = Random()
-            val collected = rand.nextInt(100 - 0) + 0
-            val total = rand.nextInt(500)
-            return "$collected/$total"
-
-        }
 
         fun bind(map: MapInfo) {
             with(map) {
                 val mapnum = map.mapNumber
                 val collected = map.collectedPlacemark
                 val total = map.totalPlacemark
-                itemView.map_number.text = "Map ${mapnum}"
+                itemView.map_number.text = "Map $mapnum"
 
                 if (map.locked){
                     itemView.locked.setImageResource(R.drawable.ic_lock_outline_black_24dp)

@@ -87,7 +87,8 @@
         android:tint="@color/colorPrimary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/map"
-        design:srcCompat="@drawable/ic_monetization_on_black_24dp" />
+        design:srcCompat="@drawable/ic_monetization_on_black_24dp"
+        tools:ignore="ContentDescription" />
 
     <ImageView
         android:id="@+id/songles"
@@ -99,7 +100,8 @@
         android:tint="@color/colorPrimary"
         app:layout_constraintStart_toEndOf="@+id/points"
         app:layout_constraintTop_toTopOf="@+id/map"
-        design:srcCompat="@drawable/ic_music_note_black_24dp" />
+        design:srcCompat="@drawable/ic_music_note_black_24dp"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/currentSongTxt"

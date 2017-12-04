@@ -77,6 +77,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
 
+        if (!checkInternet()) {
+            toast("You Must connect to the internet to play Songle")
+            startActivity(Intent(this@MapsActivity, DefaultPage::class.java))
+        }
+
+
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
@@ -143,6 +149,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             points++
             prefs.points = points
             toast("You walked 1000 more steps! Point added.")
+        }
+        val stepListener = Achievements(this).stepListener(steps)
+        if (stepListener != null){
+            toast("Achievement ${stepListener.title} unlocked!")
         }
 
     }
@@ -249,7 +259,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 var songTotal = 0
                 for (j in 1..5) {
                     Log.v("Got this far", "i:$i, j:$j")
-                    var mapTotal = 0
+                    var mapTotal : Int
                     var layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${Helper().intToString(i)}/map$j.kml")
                     val thisLayer = layerTask.get()
                     thisLayer.addLayerToMap()
@@ -320,7 +330,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 currentSongles++
                 prefs.songles = currentSongles
                 prefs.setSongGuessed(currentSong)
-                toast("${userGuess} is the correct song!")
+                prefs.changeScoreMode(currentSong)
+                toast("$userGuess is the correct song!")
             }
             if (userGuess.trim().toLowerCase() != songs[currentSong-1].title.trim().toLowerCase()){
                 var tries = prefs.getTries(currentSong)
@@ -383,7 +394,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         b.setPositiveButton("Convert") { dialog, whichButton ->
 
             dialog.dismiss()
-            var userAmount = txt.text.toString().toInt()
+            val userAmount = txt.text.toString().toInt()
             //assert(userAmount%10==0)
 
             if (from == "points") {
@@ -421,14 +432,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).state == NetworkInfo.State.CONNECTED)
 
        return connected
-
     }
 
     override fun onResume() {
         super.onResume()
         val guessed = prefs.songGuessed(currentSong)
         if (guessed) currentSongTxt.text = "Current Song: ${songs[currentSong-1].title}"
-        if (!guessed) currentSongTxt.text = "Current Song: ${currentSong}"
+        if (!guessed) currentSongTxt.text = "Current Song: $currentSong"
 
         val connected = checkInternet()
         if (!connected){
@@ -456,8 +466,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         fab.setOnLongClickListener {
             val menu = PopupMenu(this@MapsActivity, findViewById(R.id.fab))
             for (i in songs.indices) {
-                val locked = prefs.sharedPrefs!!.getBoolean("Song ${i+1} locked", true)
-                val guessed = prefs.sharedPrefs!!.getBoolean("Song ${i+1} guessed", false)
+                val locked = prefs.songLocked(i+1)
+                val guessed = prefs.songGuessed(i+1)
 
                 if (!locked && guessed){
                     menu.menu.add(NONE,i+1,NONE,"${i+1}: ${songs[i].title}")
@@ -532,7 +542,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     override fun onConnected(connectionHint: Bundle?) {
         try {
-            createLocationRequest();
+            createLocationRequest()
         } catch (ise: IllegalStateException) {
             println("IllegalStateException thrown [onConnected]")
         }
@@ -544,7 +554,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                     LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient)
         } else {
             ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
-                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
         }
     }
 

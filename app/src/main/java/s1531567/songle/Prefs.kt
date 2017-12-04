@@ -53,17 +53,26 @@ class Prefs(context: Context) {
         return sharedPrefs.getBoolean("Song $song guessed", false)
     }
 
-    fun songLocked (song: Int) : Boolean {
-        return sharedPrefs!!.getBoolean("Song $song locked", true)
-    }
-
     fun setSongGuessed (song: Int) {
         editor.putBoolean("Song $song guessed", true)
         editor.apply()
     }
 
+    fun songLocked (song: Int) : Boolean {
+        return sharedPrefs.getBoolean("Song $song locked", true)
+    }
+
     fun setSongUnlocked (song: Int){
         editor.putBoolean("Song $song locked", false)
+        editor.apply()
+    }
+
+    fun mapLocked (song: Int, map: Int) : Boolean {
+        return sharedPrefs.getBoolean("Song $song Map $map locked", true)
+    }
+
+    fun setMapUnlocked (song : Int, map: Int){
+        editor.putBoolean("Song $song Map $map locked", false)
         editor.apply()
     }
 
@@ -82,6 +91,34 @@ class Prefs(context: Context) {
 
     fun getPlacemarkTotal (song: Int) : Int {
         return sharedPrefs.getInt("Song $song total Placemarks", 0)
+    }
+
+    fun getMapPlacemarkTotal (song: Int, map: Int) : Int {
+        return sharedPrefs.getInt("Song $song Map $map Placemarks", 0)
+    }
+
+    fun getMapCollected (song: Int, map: Int) : Int {
+        return sharedPrefs.getInt("$song $map words collected", 0)
+    }
+
+    fun changeScoreMode (song: Int) {
+        editor.putBoolean("Song $song given up", true)
+        editor.putInt("Song $song score mode", 2)
+        editor.apply()
+    }
+
+
+
+
+    /* ----------------- Achievements ------------------ */
+
+    fun checkAchievement (id : Int) : Boolean {
+        return sharedPrefs.getBoolean("Achievement $id locked", true)
+    }
+
+    fun setAchievementUnlocked (id: Int) {
+        editor.putBoolean("Achievement $id locked", false)
+        editor.apply()
     }
 
 

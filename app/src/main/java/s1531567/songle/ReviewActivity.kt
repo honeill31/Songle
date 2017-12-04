@@ -66,10 +66,10 @@ class ReviewActivity : AppCompatActivity() {
         task.execute()
 
         for (i in 1..5){
-            val totalPlacemark = prefs.sharedPrefs.getInt("Song $song Map $i Placemarks", 0)
+            val totalPlacemark = prefs.getMapPlacemarkTotal(song, i)
             Log.v("totalplacemark", totalPlacemark.toString())
-            val collectedPlacemark = prefs.sharedPrefs.getInt("$song $i words collected", 0)
-            val locked = prefs.sharedPrefs.getBoolean("Song $song Map $i locked", true)
+            val collectedPlacemark = prefs.getMapCollected(song, i)
+            val locked = prefs.mapLocked(song, i)
             mapList.add(MapInfo(totalPlacemark,collectedPlacemark,song,i,locked))
         }
 
@@ -80,9 +80,9 @@ class ReviewActivity : AppCompatActivity() {
             }
             if (!it.locked){
                 toast("Activating Map ${it.mapNumber}")
-                prefs.editor.putInt("Current Map", it.mapNumber)
+                prefs.currentMap = it.mapNumber
                 startActivity(Intent(this@ReviewActivity, MapsActivity::class.java))
-                prefs.editor.apply()
+
 
             }
 
@@ -100,13 +100,12 @@ class ReviewActivity : AppCompatActivity() {
         b.setTitle("Unlock Map $mapNum?")
         b.setMessage("If you unlock before guessing, your score will change.")
         b.setPositiveButton("Unlock") { dialog, whichButton ->
-            val guessed = prefs.sharedPrefs.getBoolean("Song $songNum guessed", false)
             var collected = 0
             var total = 0
             var i = 1
             while (i < mapNum){
-                collected += prefs.sharedPrefs.getInt("$songNum $i words collected", 0)
-                total += prefs.sharedPrefs.getInt("Song $songNum Map $i Placemarks", 0)
+                collected += prefs.getMapCollected(songNum, i)
+                total += prefs.getMapPlacemarkTotal(songNum, i)
                 i++
             }
             if ((collected/total)<(0.66)){
@@ -120,9 +119,8 @@ class ReviewActivity : AppCompatActivity() {
                 Log.v("total true:", "$total")
                 Log.v("ratio true:", "${(collected/total)}")
                 Log.v("2/3 ???? ", "${2/3}")
-                prefs.editor.putBoolean("Song $songNum Map $mapNum locked", false)
-                prefs.editor.putInt("Current Map", mapNum)
-                prefs.editor.apply()
+                prefs.setMapUnlocked(songNum, mapNum)
+                prefs.currentMap = mapNum
                 toast("Map unlocked!")
             }
 
@@ -151,7 +149,7 @@ class ReviewActivity : AppCompatActivity() {
         initialise(song)
 
         review_bar.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-        val guessed = prefs.sharedPrefs.getBoolean("Song $song guessed", false)
+        val guessed = prefs.songGuessed(song)
         if (guessed){
             play_giveup.text = getString(R.string.playSong)
             review_title.text = title
@@ -167,9 +165,7 @@ class ReviewActivity : AppCompatActivity() {
 
 
             if (!guessed){
-                prefs.editor.putBoolean("Song $song given up", true)
-                prefs.editor.putInt("Song $song score mode", 2)
-                prefs.editor.apply()
+                prefs.changeScoreMode(song)
                 toast("You Have given up! Changing score mode.")
             }
             if (guessed){
@@ -180,7 +176,6 @@ class ReviewActivity : AppCompatActivity() {
 
         lyrics.setOnClickListener {
             val lyric = Intent(this@ReviewActivity, LyricsActivity::class.java)
-            //val songLyrics = DownloadLyricTask(song).execute().get()
             lyric.putExtra("Song number", song)
             startActivity(lyric)
         }
@@ -192,14 +187,6 @@ class ReviewActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
 
     }
-
-    override fun onStop() {
-        super.onStop()
-
-    }
-
-
-
 
 
     inner class DividerItemDecoration(context: Context) : RecyclerView.ItemDecoration(){

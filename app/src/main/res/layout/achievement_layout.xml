@@ -17,7 +17,7 @@
         android:id="@+id/achievement_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Map"
+        android:text="@string/map"
         android:textColor="@color/title"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -29,7 +29,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
-        android:layout_marginEnd="10dp" />
+        android:layout_marginEnd="10dp"
+        tools:ignore="ContentDescription" />
 
 
     <TextView
@@ -37,7 +38,6 @@
         android:layout_width="wrap_content"
         android:layout_gravity="right"
         android:layout_height="wrap_content"
-        android:text="100"
         />
 
 

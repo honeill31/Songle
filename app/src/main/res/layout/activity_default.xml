@@ -18,7 +18,8 @@
         android:background="@color/colorPrimary"
         android:cropToPadding="false"
         android:scaleType="centerCrop"
-        android:src="@drawable/bg" />
+        android:src="@drawable/bg"
+        tools:ignore="ContentDescription" />
 
 
     <Button
@@ -28,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/songref"
         android:layout_centerHorizontal="true"
-        android:text="Play" />
+        android:text="@string/play" />
 
     <Button
         android:id="@+id/songref"
@@ -37,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/update"
         android:layout_centerHorizontal="true"
-        android:text="View Song List" />
+        android:text="@string/view_song_list" />
 
     <Button
         android:id="@+id/userprofile"
@@ -47,7 +48,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignStart="@+id/update"
         android:layout_marginBottom="54dp"
-        android:text="User Profile" />
+        android:text="@string/user_profile" />
 
     <Button
         android:id="@+id/update"
@@ -56,7 +57,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/userprofile"
         android:layout_centerHorizontal="true"
-        android:text="Check for Updates" />
+        android:text="@string/check_for_updates" />
 
 
     <ImageView
@@ -74,14 +75,14 @@
         android:paddingStart="32dp"
         android:paddingTop="8dp"
         android:scaleType="centerCrop"
-        app:srcCompat="@drawable/ic_logo" />
+        app:srcCompat="@drawable/ic_logo"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:text="TextView"
         android:textAlignment="center"
         android:textColor="@color/colorPrimary"
         tools:text="default" />

@@ -201,4 +201,9 @@
     <string name="questionMarks">\???</string>
     <string name="title_activity_lyrics">LyricsActivity</string>
     <string name="title_activity_user">UserActivity</string>
+    <string name="map">Map</string>
+    <string name="play">Play</string>
+    <string name="view_song_list">View Song List</string>
+    <string name="user_profile">User Profile</string>
+    <string name="check_for_updates">Check for Updates</string>
 </resources>

@@ -11,7 +11,8 @@
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        tools:ignore="ContentDescription" />
 
 
     <TextView
@@ -105,7 +106,8 @@
         android:padding="@dimen/activity_horizontal_margin"
         app:layout_constraintStart_toEndOf="@+id/walking"
         app:layout_constraintTop_toBottomOf="@+id/container"
-        design:srcCompat="@drawable/ic_music_note_black_24dp" />
+        design:srcCompat="@drawable/ic_music_note_black_24dp"
+        tools:ignore="ContentDescription" />
 
     <ImageView
         android:id="@+id/walking"
@@ -116,7 +118,8 @@
         android:padding="@dimen/activity_horizontal_margin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        design:srcCompat="@drawable/ic_monetization_on_black_24dp" />
+        design:srcCompat="@drawable/ic_monetization_on_black_24dp"
+        tools:ignore="ContentDescription" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/maplist"

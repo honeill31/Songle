@@ -44,7 +44,8 @@
                 android:layout_height="200dp"
                 android:background="@color/colorPrimary"
                 android:scaleType="centerCrop"
-                android:src="@drawable/qm" />
+                android:src="@drawable/qm"
+                design:ignore="ContentDescription" />
 
             <ImageButton
                 android:id="@+id/user_profile_photo"
@@ -57,7 +58,8 @@
                 android:elevation="5dp"
                 android:padding="20dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/qm" />
+                android:src="@drawable/qm"
+                design:ignore="ContentDescription" />
 
             <RelativeLayout
                 android:id="@+id/profile_layout"
@@ -76,7 +78,8 @@
                     android:layout_marginLeft="16dp"
                     android:layout_marginTop="16dp"
                     android:layout_toLeftOf="@+id/drop_down_option_menu"
-                    app:srcCompat="@drawable/ic_favorite_black" />
+                    app:srcCompat="@drawable/ic_favorite_black"
+                    design:ignore="ContentDescription" />
 
                 <ImageView
                     android:id="@+id/drop_down_option_menu"
@@ -85,7 +88,8 @@
                     android:layout_alignParentRight="true"
                     android:layout_marginLeft="16dp"
                     android:layout_marginTop="16dp"
-                    app:srcCompat="@drawable/ic_audiotrack_black_24dp" />
+                    app:srcCompat="@drawable/ic_audiotrack_black_24dp"
+                    design:ignore="ContentDescription" />
 
                 <TextView
                     android:id="@+id/user_profile_name"
@@ -127,7 +131,8 @@
                     android:clickable="true"
                     android:elevation="4dp"
                     android:padding="20dp"
-                    android:text="Achievements" />
+                    android:text="Achievements"
+                    android:focusable="true" />
 
                 <TextView
                     android:id="@+id/score"
@@ -140,7 +145,8 @@
                     android:clickable="true"
                     android:elevation="4dp"
                     android:padding="20dp"
-                    android:text="Score" />
+                    android:text="Score"
+                    android:focusable="true" />
 
                 <TextView
 

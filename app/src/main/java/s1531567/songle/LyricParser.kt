@@ -39,24 +39,6 @@ class LyricParser() {
         return result
     }
 
-    fun editedLyrics(lyrics: String) : List<String>{
-        val editedLyrics = lyrics.split("\n") //splitting into string array)
-        val l = editedLyrics.map { value -> value.trim() } //removing whitespace from beginning and end
-        return l
-    }
-
-    fun intToString(num : Int) : String {
-        var str = ""
-        if (num <=9){
-            str = "0$num"
-        }
-        else {
-            str = "$num"
-        }
-        return str
-
-    }
-
     fun displayPlacemarkInLyrics(lyrics: String, songNum : Int, mapNum: Int) : String {
 
         var editedLyrics : String = lyrics
@@ -70,8 +52,7 @@ class LyricParser() {
             val words = l[line].split(" ", "\t")
             println("Line $line: ${lines[line]}")
             for (word in 0..words.size-1){
-                var collected = prefs.sharedPrefs.getBoolean("$songNum $mapNum ${line+1} ${word+1}", false)
-                println("Key: $songNum $mapNum ${line + 1} ${word + 1}, collected? $collected")
+                var collected = prefs.collectedPrev(songNum, mapNum, (line+1), (word+1))
                 if (collected){
                     result += "${words[word+1]} "
                 }

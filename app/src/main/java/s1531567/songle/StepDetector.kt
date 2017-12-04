@@ -38,13 +38,13 @@ class StepDetector {
         worldZ[1] = SensorFilter.sum(accelRingY) / Math.min(accelRingCounter, ACCEL_RING_SIZE)
         worldZ[2] = SensorFilter.sum(accelRingZ) / Math.min(accelRingCounter, ACCEL_RING_SIZE)
 
-        val normalization_factor = SensorFilter.norm(worldZ)
+        val normalisationFactor = SensorFilter.norm(worldZ)
 
-        worldZ[0] = worldZ[0] / normalization_factor
-        worldZ[1] = worldZ[1] / normalization_factor
-        worldZ[2] = worldZ[2] / normalization_factor
+        worldZ[0] = worldZ[0] / normalisationFactor
+        worldZ[1] = worldZ[1] / normalisationFactor
+        worldZ[2] = worldZ[2] / normalisationFactor
 
-        val currentZ = SensorFilter.dot(worldZ, currentAccel) - normalization_factor
+        val currentZ = SensorFilter.dot(worldZ, currentAccel) - normalisationFactor
         velRingCounter++
         velRing[velRingCounter % VEL_RING_SIZE] = currentZ
 
