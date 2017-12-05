@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.AlertDialog
 import android.app.usage.UsageEvents.Event.NONE
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.hardware.Sensor
@@ -12,21 +11,15 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.location.Location
-import android.media.MediaPlayer
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import kotlin.collections.filter
 import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
@@ -34,7 +27,9 @@ import com.google.android.gms.location.LocationListener
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.android.data.Feature
 import com.google.maps.android.data.Layer
 import com.google.maps.android.data.kml.KmlLayer
@@ -44,8 +39,6 @@ import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
 import org.jetbrains.anko.*
 import java.lang.Math.abs
-import java.net.InetAddress
-import java.util.*
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
@@ -60,8 +53,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     private lateinit var mGoogleApiClient: GoogleApiClient
     private val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
     private lateinit var mLastLocation: Location
-    private var closeBy = mutableListOf<KmlPlacemark>()
-    private lateinit var layer: KmlLayer
+    private var closeBy = mutableListOf<Placemark>()
+    private lateinit var layer: List<Placemark>
     private var currentSong = 0
     private var currentMap = 0
     private var scoreMode = 0
@@ -77,6 +70,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
+        firstRun()
 
 
 
@@ -117,10 +111,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
 
         }
-
-        val task = DownloadXMLTask()
-        task.execute()
-        songs = task.get()
+        songs = DownloadXMLTask().execute().get()
 
     }
 
@@ -166,7 +157,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     override fun onMapReady(googleMap: GoogleMap) {
         val song = Helper().intToString(currentSong)
         mMap = googleMap
-        firstRun()
+        //firstRun()
         val total = prefs.getMapPlacemarkTotal(currentSong, currentMap)
         standardiser = 1/total
 
@@ -178,8 +169,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         }
         mMap.uiSettings.isMyLocationButtonEnabled = true
         println("Adding layer! current map $currentMap")
-        val layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/$song/map$currentMap.kml")
-        layer = layerTask.get()
+        val layerTask = KMLtask(currentSong, currentMap).execute()
+        val layer = layerTask.get()
+        Log.v("Pms", layer.toString())
+        for (mark in layer){
+            mMap.addMarker(MarkerOptions()
+                    .position(LatLng(mark.Long, mark.Lat))
+                    .title(mark.name)
+                    //.icon(BitmapDescriptorFactory.fr)
+
+            )
+        }
+/*        layer = layerTask.get()
         var id = ""
         layer.addLayerToMap() //displaying the kml tags
         layer.setOnFeatureClickListener (object: Layer.OnFeatureClickListener{
@@ -189,14 +190,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 Log.v("Feature style", feature.id)
                 purchaseLyricDialog(lineWord, feature as KmlPlacemark).show()
             }
-        })
+        })*/
     }
 
-    fun purchaseLyricDialog(lineWord: List<String>, mark : KmlPlacemark): AlertDialog {
+    fun purchaseLyricDialog(lineWord: List<String>, mark : Placemark): AlertDialog {
         val b = android.app.AlertDialog.Builder(this)
         b.setTitle("Purchase this word?")
         var cost = 0
-        when (mark.styleId){
+        when (mark.styleURL){
             "#unclassified" -> cost = 10
             "#boring" -> cost = 5
             "#notboring" -> cost = 10
@@ -256,18 +257,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 for (j in 1..5) {
                     Log.v("Got this far", "i:$i, j:$j")
                     var mapTotal : Int
-                    var layerTask = KMLLayertask(mMap, applicationContext).execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${Helper().intToString(i)}/map$j.kml")
+                    var layerTask = KMLtask(i, j).execute()
                     val thisLayer = layerTask.get()
-                    thisLayer.addLayerToMap()
-                    mapTotal = thisLayer.containers.iterator().next().placemarks.count()
+                    mapTotal = thisLayer.size
                     prefs.editor.putInt("Song $i Map $j Placemarks", mapTotal)
                     prefs.editor.apply()
                     songTotal += mapTotal
-
-
-                    thisLayer.removeLayerFromMap()
-
-
                 }
                 progress.progress += progressBarStep
                 prefs.editor.putInt("Song $i total Placemarks", songTotal)
@@ -548,8 +543,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 println("[onLocationChanged] Location unknown")
             } else {
                 val mLoc = LatLng(current.latitude, current.longitude)
-                for (mark in layer.containers.iterator().next().placemarks) {
-                    var markLoc: LatLng = mark.geometry.geometryObject as LatLng
+                for (mark in layer) {
+                    var markLoc = LatLng(mark.Long, mark.Lat)
                     if (abs(markLoc.latitude - mLoc.latitude) < 0.0005 && abs(markLoc.longitude - mLoc.longitude) < 0.0005) {
                         if (mark !in closeBy) {
                             closeBy.add(mark)
@@ -596,7 +591,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 userScore += total
                 prefs.totalScore = userScore
 
-                val lineWord = mark.getProperty("name").split(":")
+                val lineWord = mark.name.split(":")
                 val line = lineWord[0].toInt()
                 val w = lineWord[1].toInt()
                 val dl = DownloadLyricTask(currentSong)

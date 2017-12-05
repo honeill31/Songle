@@ -50,12 +50,11 @@ class DefaultPage : AppCompatActivity() {
         update.setOnClickListener {
             val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
             if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-                val dialog = progressDialog("Please be patient", "Getting funky" )
-                val task = DownloadXMLTask()
+                val task = KMLtask(1,1)
                 task.execute()
                 val songs = task.get()
                 //File("Songs.txt").bufferedWriter().use { out -> out.write(songs)}
-                Log.v("SONG", songs.toString())
+                Log.v("Placemarks", songs.toString())
             } else {
                 ActivityCompat.requestPermissions(
                         this@DefaultPage,

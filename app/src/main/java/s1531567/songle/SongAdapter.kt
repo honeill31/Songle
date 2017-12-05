@@ -25,7 +25,7 @@ class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (S
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) : SongAdapter.SongHolder {
         val layoutInflator = LayoutInflater.from(parent.context)
-        return SongHolder(context, layoutInflator.inflate(R.layout.songs_layout, parent, false), itemClick)
+        return SongHolder(layoutInflator.inflate(R.layout.songs_layout, parent, false), itemClick)
     }
 
     override fun getItemCount(): Int {
@@ -37,7 +37,7 @@ class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (S
     }
 
 
-    class SongHolder(context: Context,view: View, itemClick: (Song) -> Unit) : RecyclerView.ViewHolder(view) {
+    class SongHolder(view: View, itemClick: (Song) -> Unit) : RecyclerView.ViewHolder(view) {
         private val mClick = itemClick
 
 

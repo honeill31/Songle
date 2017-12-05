@@ -151,21 +151,25 @@ class ReviewActivity : AppCompatActivity() {
 
         review_bar.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         val guessed = prefs.songGuessed(song)
-        if (guessed){
+        val givenUp = prefs.givenUp(song)
+
+        if (guessed || givenUp){
             play_giveup.text = getString(R.string.playSong)
             review_title.text = title
             review_artist.text = artist
         }
-        if (!guessed){
+        if (!guessed && !givenUp){
             play_giveup.text = getString(R.string.giveUp)
             review_title.text = getString(R.string.questionMarks)
             review_artist.text = getString(R.string.questionMarks)
         }
 
+
+
         play_giveup.setOnClickListener{
 
 
-            if (!guessed){
+            if (!guessed && !givenUp){
                 prefs.changeScoreMode(song)
                 toast("You Have given up! Changing score mode.")
             }

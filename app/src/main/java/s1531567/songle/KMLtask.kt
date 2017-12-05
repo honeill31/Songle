@@ -2,6 +2,7 @@ package s1531567.songle
 
 import android.content.Context
 import android.os.AsyncTask
+import android.util.Log
 import com.google.maps.android.data.kml.KmlLayer
 import java.io.IOException
 import java.io.InputStream
@@ -12,13 +13,22 @@ import com.google.android.gms.maps.GoogleMap
 /**
  * Created by holly on 24/10/17.
  */
-class KMLLayertask(map: GoogleMap, context : Context) : AsyncTask<String,Int,KmlLayer>() {
-    private val mMap = map
-    private  val mContext = context
+class KMLtask(songNum : Int, mapNum : Int) : AsyncTask<String,Int,List<Placemark>>() {
+    val mSongNum = songNum
+    val mMapNum = mapNum
 
-    override fun doInBackground(vararg params: String): KmlLayer {
-        val stream =  downloadUrl(params[0])
-        return KmlLayer(mMap, stream,mContext )
+    override fun doInBackground(vararg params: String): List<Placemark> {
+        val u = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${Helper().intToString(mSongNum)}/map$mMapNum.txt"
+        Log.v("doInBG Value", u)
+        return loadKMLFromNetwork(u)
+    }
+
+    private fun loadKMLFromNetwork(urlString: String): List<Placemark> {
+        val parser = KmlParser()
+        val stream = downloadUrl(urlString)
+        Log.v("stream", stream.toString())
+        return  parser.parse(stream)
+
     }
 
 
@@ -36,7 +46,7 @@ class KMLLayertask(map: GoogleMap, context : Context) : AsyncTask<String,Int,Kml
         return conn.inputStream
     }
 
-    override fun onPostExecute(result: KmlLayer) {
+    override fun onPostExecute(result: List<Placemark>) {
         super.onPostExecute(result)
     }
 }

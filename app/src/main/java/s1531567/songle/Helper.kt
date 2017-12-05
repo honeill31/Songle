@@ -2,6 +2,7 @@ package s1531567.songle
 
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
+import android.view.View
 import org.jetbrains.anko.connectivityManager
 import java.util.*
 
@@ -36,5 +37,10 @@ class Helper {
                 connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).state == NetworkInfo.State.CONNECTED)
 
         return connected
+    }
+
+    fun refreshView(view : View){
+        view.visibility = View.GONE
+        view.visibility = View.VISIBLE
     }
 }

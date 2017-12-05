@@ -13,30 +13,13 @@ import java.net.URL
 class DownloadLyricTask(val song : Int) : AsyncTask<String, Int, String>(){
 
     override fun doInBackground(vararg p0: String?): String {
-        val url = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${intToString(song)}/words.txt"
-        val stream = downloadUrl(url)
-        val result = stream.bufferedReader().use { it.readText() }
-        return result
+        val url = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${Helper().intToString(song)}/words.txt"
+        return downloadUrl(url).bufferedReader().use { it.readText() }
 
 
-    }
-
-    fun intToString(num : Int) : String {
-        var str = ""
-        if (num <=9){
-            str = "0$num"
-        }
-        else {
-            str = "$num"
-        }
-        return str
 
     }
 
-    override fun onPostExecute(result: String?) {
-        super.onPostExecute(result)
-
-    }
 
     @Throws(IOException::class)
     private fun downloadUrl(urlString: String): InputStream {

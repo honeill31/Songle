@@ -129,6 +129,10 @@ class Prefs(context: Context) {
         editor.apply()
     }
 
+    fun givenUp (song: Int) : Boolean {
+        return sharedPrefs.getBoolean("Song $song given up", false)
+    }
+
 
 
 
