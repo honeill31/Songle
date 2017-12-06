@@ -50,7 +50,7 @@ class DefaultPage : AppCompatActivity() {
         update.setOnClickListener {
             val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
             if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-                val task = KMLtask(1,1)
+                val task = DownloadStyleTask(1,1)
                 task.execute()
                 val songs = task.get()
                 //File("Songs.txt").bufferedWriter().use { out -> out.write(songs)}

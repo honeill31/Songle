@@ -1,5 +1,7 @@
 package s1531567.songle
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import android.util.Log
 import android.util.Xml
@@ -15,6 +17,8 @@ import java.net.URL
 class DownloadStyleTask(songNum: Int, mapNum: Int) : AsyncTask<String, Int, List<Style>>() {
     val mSongNum = songNum
     val mMapNum = mapNum
+    var url = mutableListOf<String>()
+
 
     override fun doInBackground(vararg params: String): List<Style> {
         val u = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${Helper().intToString(mSongNum)}/map$mMapNum.txt"
@@ -27,8 +31,8 @@ class DownloadStyleTask(songNum: Int, mapNum: Int) : AsyncTask<String, Int, List
         val stream = downloadUrl(urlString)
         Log.v("stream", stream.toString())
         return  parser.parse(stream)
-
     }
+
 
     @Throws(IOException::class)
     private fun downloadUrl(urlString: String): InputStream {
@@ -90,55 +94,48 @@ class DownloadStyleTask(songNum: Int, mapNum: Int) : AsyncTask<String, Int, List
         private fun readStyle(parser: XmlPullParser): Style
         {
             parser.require(XmlPullParser.START_TAG, ns, "Style")
-            var id = ""
-            var scale = 0.0
+            var id = parser.getAttributeValue(null, "id") ?: "noop"
             var iconURL = ""
 
-            while (parser.next() != XmlPullParser.END_TAG)
-            {
+            while (parser.next() != XmlPullParser.END_TAG){
+                //Log.v("Parser ns", parser.namespace ?: "")
                 if (parser.eventType != XmlPullParser.START_TAG)
                     continue
-                when(parser.name)
-                {
-                    "Style" -> id = readID(parser)
-                    "scale" -> scale = readScale(parser)
-                    "href" -> iconURL = readUrl(parser)
+
+                when(parser.name){
+                    "IconStyle" -> iconURL = readUrl(parser)
                     else ->  skip(parser)
                 }
             }
             //Log.v("Placemark", Placemark(name, description, styleURL, point[0].toDouble(), point[1].toDouble()).toString())
-            return Style(id, scale, iconURL)
+            val url = URL(iconURL)
+            val btmp = BitmapFactory.decodeStream(url.openConnection().getInputStream())
+            return Style(id, btmp)
         }
 
         @Throws(IOException::class, XmlPullParserException::class)
-        private fun readID(parser: XmlPullParser): String
-        {
-            parser.require(XmlPullParser.START_TAG, ns, "Style")
-            val name = parser.namespace
-            parser.require(XmlPullParser.END_TAG, ns, "Style")
-            Log.v("name", name)
-            return name
-        }
+        private fun readUrl(parser: XmlPullParser): String {
+            //Log.v("is this even " ,"being activated")
+            var scale = ""
 
-        @Throws(IOException::class, XmlPullParserException::class)
-        private fun readScale(parser: XmlPullParser): Double
-        {
+            parser.require(XmlPullParser.START_TAG, ns, "IconStyle")
+            parser.nextTag()
             parser.require(XmlPullParser.START_TAG, ns, "scale")
-            val desc = readText(parser)
+            scale = readText(parser)
             parser.require(XmlPullParser.END_TAG, ns, "scale")
-            Log.v("desc", desc)
-            return desc.toDouble()
-        }
-
-        @Throws(IOException::class, XmlPullParserException::class)
-        private fun readUrl(parser: XmlPullParser): String
-        {
+            parser.nextTag()
+            parser.require(XmlPullParser.START_TAG, ns, "Icon")
+            parser.nextTag()
             parser.require(XmlPullParser.START_TAG, ns, "href")
-            val style = readText(parser)
+            val url = readText(parser)
             parser.require(XmlPullParser.END_TAG, ns, "href")
-            Log.v("style", style)
-            Log.v("is style empty", (style != "").toString())
-            return style
+            parser.nextTag()
+            parser.require(XmlPullParser.END_TAG, ns, "Icon")
+            parser.nextTag()
+            parser.require(XmlPullParser.END_TAG, ns, "IconStyle")
+
+
+            return url
         }
 
 

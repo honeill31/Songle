@@ -66,12 +66,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     }
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
+        songs = DownloadXMLTask().execute().get()
         firstRun()
-
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -111,7 +110,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
 
         }
-        songs = DownloadXMLTask().execute().get()
+
 
     }
 
@@ -138,7 +137,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             toast("You walked 1000 more steps! Point added.")
         }
         val stepListener = Achievements(this).stepListener(steps)
-        if (stepListener != null){
+        if (stepListener != null) {
             toast("Achievement ${stepListener.title} unlocked!")
         }
 
@@ -159,7 +158,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         mMap = googleMap
         //firstRun()
         val total = prefs.getMapPlacemarkTotal(currentSong, currentMap)
-        standardiser = 1/total
+        standardiser = 1 / total
 
 
         try {
@@ -170,50 +169,83 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         mMap.uiSettings.isMyLocationButtonEnabled = true
         println("Adding layer! current map $currentMap")
         val layerTask = KMLtask(currentSong, currentMap).execute()
-        val layer = layerTask.get()
+        layer = layerTask.get()
+        val styles = DownloadStyleTask(currentSong, currentMap).execute().get()
         Log.v("Pms", layer.toString())
-        for (mark in layer){
-            mMap.addMarker(MarkerOptions()
-                    .position(LatLng(mark.Long, mark.Lat))
-                    .title(mark.name)
-                    //.icon(BitmapDescriptorFactory.fr)
+        for (mark in layer) {
+            val currentStyle = styles.firstOrNull { it.id == mark.description }
+            val collected = prefs.collectedPrev(currentSong,
+                    currentMap,
+                    mark.name.split(":")[0].toInt(),
+                    mark.name.split(":")[1].toInt())
+            Log.v("collected", collected.toString())
+            if (!collected) {
+                mMap.addMarker(MarkerOptions()
+                        .position(LatLng(mark.Long, mark.Lat))
+                        .title(mark.name)
+                        .icon(BitmapDescriptorFactory.fromBitmap(currentStyle!!.icon))
 
-            )
-        }
-/*        layer = layerTask.get()
-        var id = ""
-        layer.addLayerToMap() //displaying the kml tags
-        layer.setOnFeatureClickListener (object: Layer.OnFeatureClickListener{
-
-            override fun onFeatureClick(feature: Feature) {
-                val lineWord = feature.getProperty("name").split(":")
-                Log.v("Feature style", feature.id)
-                purchaseLyricDialog(lineWord, feature as KmlPlacemark).show()
+                )
             }
-        })*/
+            if (collected) {
+                val lyrics = DownloadLyricTask(currentSong).execute().get()
+                Log.v("lyrics", lyrics.toString())
+                val tit = LyricParser().findLyric(currentSong, currentMap, lyrics, mark)
+                Log.v("word", tit.word)
+                mMap.addMarker(MarkerOptions()
+                        .position(LatLng(mark.Long, mark.Lat))
+                        .title(tit.word)
+                        .icon(BitmapDescriptorFactory.fromBitmap(currentStyle!!.icon))
+
+                )
+            }
+        }
+        mMap.setOnMarkerClickListener {
+            it.showInfoWindow()
+            val contains = it.title.contains(":")
+            if (contains) {
+                val collected = (prefs.collectedPrev(currentSong,
+                        currentMap,
+                        it.title.split(":")[0].toInt(),
+                        it.title.split(":")[1].toInt()))
+                if (!collected) {
+                    purchaseLyricDialog(it.title).show()
+                }
+            }
+
+            toast("you clicked the map")
+            true
+
+        }
     }
 
-    fun purchaseLyricDialog(lineWord: List<String>, mark : Placemark): AlertDialog {
+
+
+
+
+    fun purchaseLyricDialog(lineWord: String): AlertDialog {
         val b = android.app.AlertDialog.Builder(this)
         b.setTitle("Purchase this word?")
+        val marker = layer.firstOrNull { it.name == lineWord }
+        println(marker.toString())
         var cost = 0
-        when (mark.styleURL){
+        when (marker!!.styleURL){
             "#unclassified" -> cost = 10
             "#boring" -> cost = 5
             "#notboring" -> cost = 10
             "#interesting" -> cost = 150
             "#veryinteresting" -> cost = 200
-
         }
 
         b.setMessage("This will cost $cost points")
         val parser = LyricParser()
-        val line = lineWord[0].toInt()
-        val w = lineWord[1].toInt()
+        val split = lineWord.split(":")
+        val line = split[0].toInt()
+        val w = split[1].toInt()
         val dl = DownloadLyricTask(currentSong)
         dl.execute()
         val lyrics = dl.get()
-        val word = parser.findLyric(currentSong, currentMap, lyrics, mark)
+        val word = parser.findLyric(currentSong, currentMap, lyrics, marker)
         val collectedPrev = prefs.collectedPrev(currentSong, currentMap, line, w)
 
 
@@ -248,10 +280,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     private fun firstRun() {
         val firstRun = prefs.sharedPrefs.getBoolean("firstRun", true)
         if (firstRun) {
-            val progress = findViewById<ProgressBar>(R.id.progressBar)
-            progress.progress = 0
-            val progressBarStep = 100/songs.size
-            progress.visibility = View.VISIBLE
             for (i in 1..songs.size) {
                 var songTotal = 0
                 for (j in 1..5) {
@@ -264,7 +292,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                     prefs.editor.apply()
                     songTotal += mapTotal
                 }
-                progress.progress += progressBarStep
                 prefs.editor.putInt("Song $i total Placemarks", songTotal)
 
             }
@@ -284,7 +311,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 prefs.editor.apply()
 
             }
-            progress.visibility = View.INVISIBLE
             prefs.editor.putBoolean("firstRun", false)
             prefs.editor.apply()
 
@@ -494,7 +520,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         }
         if (mGoogleApiClient.isConnected) {
             mGoogleApiClient.disconnect()
-            }
+        }
         sensorManager.unregisterListener(this@MapsActivity)
         detect.unregisterListener(this)
     }
@@ -535,9 +561,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     }
 
 
-    fun checkCloseBy(current: Location?) = runBlocking {
+    fun checkCloseBy(current: Location?)  = runBlocking {
         val job = launch {
-
 
             if (current == null) {
                 println("[onLocationChanged] Location unknown")
@@ -545,7 +570,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 val mLoc = LatLng(current.latitude, current.longitude)
                 for (mark in layer) {
                     var markLoc = LatLng(mark.Long, mark.Lat)
-                    if (abs(markLoc.latitude - mLoc.latitude) < 0.0005 && abs(markLoc.longitude - mLoc.longitude) < 0.0005) {
+                    if (abs(markLoc.latitude - mLoc.latitude) < 0.05 && abs(markLoc.longitude - mLoc.longitude) < 0.05) {
                         if (mark !in closeBy) {
                             closeBy.add(mark)
                         }
