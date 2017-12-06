@@ -21,6 +21,11 @@ import java.io.File
 
 class DefaultPage : AppCompatActivity() {
         val WRITE_EXTERNAL_STORAGE = 1
+    companion object : DownloadCompleteListener{
+        override fun downloadComplete(result: Any) {
+
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,19 +53,19 @@ class DefaultPage : AppCompatActivity() {
 
 
         update.setOnClickListener {
-            val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-                val task = DownloadStyleTask(1,1)
-                task.execute()
-                val songs = task.get()
-                //File("Songs.txt").bufferedWriter().use { out -> out.write(songs)}
-                Log.v("Placemarks", songs.toString())
-            } else {
-                ActivityCompat.requestPermissions(
-                        this@DefaultPage,
-                        arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                        WRITE_EXTERNAL_STORAGE)
+            val stamp = Helper().DownloadXMLTask(DefaultPage.Companion)
+                        .execute()
+                        .get()
+            Log.v("timestamp", stamp)
+            if (stamp != prefs.timeStamp){
+                val songs = DownloadXMLTask(DefaultPage.Companion).execute().get()
+                prefs.songTotal = songs.size
+                prefs.timeStamp = stamp
+                Log.v("songs size", songs.size.toString())
             }
+
+
+
 
         }
     }

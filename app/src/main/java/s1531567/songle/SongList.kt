@@ -23,6 +23,12 @@ import s1531567.songle.R.string.current_song
 import s1531567.songle.R.string.menu_list
 
 class SongList : AppCompatActivity() {
+    companion object : DownloadCompleteListener{
+        override fun downloadComplete(result: Any) {
+
+        }
+
+    }
 
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
@@ -62,7 +68,7 @@ class SongList : AppCompatActivity() {
         }
 
     private fun initialise(){
-        val task = DownloadXMLTask()
+        val task = DownloadXMLTask(SongList.Companion)
         task.execute()
         songList = task.get()
         layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)

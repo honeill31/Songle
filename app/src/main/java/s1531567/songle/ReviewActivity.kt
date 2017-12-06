@@ -29,6 +29,13 @@ import org.jetbrains.anko.toolbar
 import android.app.AlertDialog
 
 class ReviewActivity : AppCompatActivity() {
+    companion object : DownloadCompleteListener{
+
+        override fun downloadComplete(result: Any) {
+
+        }
+
+    }
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -62,7 +69,7 @@ class ReviewActivity : AppCompatActivity() {
 
     private fun initialise(song: Int){
 
-        val task = DownloadXMLTask()
+        val task = DownloadXMLTask(ReviewActivity.Companion)
         task.execute()
 
         for (i in 1..5){

@@ -17,7 +17,6 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.*
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
@@ -30,10 +29,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.maps.android.data.Feature
-import com.google.maps.android.data.Layer
-import com.google.maps.android.data.kml.KmlLayer
-import com.google.maps.android.data.kml.KmlPlacemark
 import kotlinx.android.synthetic.main.activity_maps.*
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
@@ -41,7 +36,8 @@ import org.jetbrains.anko.*
 import java.lang.Math.abs
 
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
+class MapsActivity : AppCompatActivity(),
+        OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener,
@@ -64,13 +60,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     private val sensorManager: SensorManager by lazy {
         getSystemService(Context.SENSOR_SERVICE) as SensorManager
     }
+    companion object : DownloadCompleteListener {
+        override fun downloadComplete(result: Any) {
+
+        }
+
+    }
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
-        songs = DownloadXMLTask().execute().get()
-        firstRun()
+        songs = DownloadXMLTask(MapsActivity.Companion).execute().get()
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -154,9 +156,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
      * installed Google Play services and returned to the app.
      */
     override fun onMapReady(googleMap: GoogleMap) {
+        firstRun()
         val song = Helper().intToString(currentSong)
         mMap = googleMap
-        //firstRun()
+
         val total = prefs.getMapPlacemarkTotal(currentSong, currentMap)
         standardiser = 1 / total
 
@@ -168,7 +171,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         }
         mMap.uiSettings.isMyLocationButtonEnabled = true
         println("Adding layer! current map $currentMap")
-        val layerTask = KMLtask(currentSong, currentMap).execute()
+        val layerTask = DownloadKMLTask(currentSong, currentMap, MapsActivity.Companion).execute()
         layer = layerTask.get()
         val styles = DownloadStyleTask(currentSong, currentMap).execute().get()
         Log.v("Pms", layer.toString())
@@ -190,7 +193,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             if (collected) {
                 val lyrics = DownloadLyricTask(currentSong).execute().get()
                 Log.v("lyrics", lyrics.toString())
-                val tit = LyricParser().findLyric(currentSong, currentMap, lyrics, mark)
+                val tit = LyricParser().findLyric( lyrics, mark)
                 Log.v("word", tit.word)
                 mMap.addMarker(MarkerOptions()
                         .position(LatLng(mark.Long, mark.Lat))
@@ -223,7 +226,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
 
 
-    fun purchaseLyricDialog(lineWord: String): AlertDialog {
+    private fun purchaseLyricDialog(lineWord: String): AlertDialog {
         val b = android.app.AlertDialog.Builder(this)
         b.setTitle("Purchase this word?")
         val marker = layer.firstOrNull { it.name == lineWord }
@@ -245,7 +248,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         val dl = DownloadLyricTask(currentSong)
         dl.execute()
         val lyrics = dl.get()
-        val word = parser.findLyric(currentSong, currentMap, lyrics, marker)
+        val word = parser.findLyric(lyrics, marker)
         val collectedPrev = prefs.collectedPrev(currentSong, currentMap, line, w)
 
 
@@ -280,12 +283,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     private fun firstRun() {
         val firstRun = prefs.sharedPrefs.getBoolean("firstRun", true)
         if (firstRun) {
+            prefs.timeStamp = Helper().DownloadXMLTask(MapsActivity.Companion).execute().get()
             for (i in 1..songs.size) {
                 var songTotal = 0
                 for (j in 1..5) {
                     Log.v("Got this far", "i:$i, j:$j")
                     var mapTotal : Int
-                    var layerTask = KMLtask(i, j).execute()
+                    var layerTask = DownloadKMLTask(i, j, MapsActivity.Companion).execute()
                     val thisLayer = layerTask.get()
                     mapTotal = thisLayer.size
                     prefs.editor.putInt("Song $i Map $j Placemarks", mapTotal)
@@ -326,7 +330,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     }
 
-    fun displayGuess() : AlertDialog {
+    private fun displayGuess() : AlertDialog {
 
         val b = AlertDialog.Builder(this)
         val inf = LayoutInflater.from(this)
@@ -335,7 +339,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
         val txt = view.findViewById<EditText>(R.id.user_guess) as EditText
 
-        b.setPositiveButton("Submit") { dialog, whichButton ->
+        b.setPositiveButton("Submit") { dialog, _ ->
 
             dialog.dismiss()
             val guessed = prefs.songGuessed(currentSong)
@@ -371,16 +375,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         b.setNegativeButton("Cancel") { dialog, _ ->
             dialog.dismiss()
         }
-
-        val dialog = b.create()
-        return dialog
-
-
-
+        return b.create()
     }
 
     //Function to convert from one currency to another.
-    fun convertCurrency(from: String, to: String) : AlertDialog {
+    private fun convertCurrency(from: String, to: String) : AlertDialog {
 
         val b = AlertDialog.Builder(this)
         val inf = LayoutInflater.from(this)
@@ -407,17 +406,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         before.text = "Current $from: $fromCurrency"
         after.text = "Current $to: $toCurrency"
 
-        b.setPositiveButton("Convert") { dialog, whichButton ->
+        b.setPositiveButton("Convert") { _, _ ->
 
-            dialog.dismiss()
             val userAmount = txt.text.toString().toInt()
-            //assert(userAmount%10==0)
-
-            if (from == "points") {
-                cost = userAmount * 10
-            }
-            if (from == "songles") {
-                cost = userAmount / 10
+            when(from){
+                "points" -> cost = userAmount * 10
+                "songles" -> userAmount / 10
             }
 
             val fromTotal = fromCurrency-cost
@@ -434,12 +428,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             }
 
         }
-        b.setNegativeButton("Cancel") { dialog, which ->
+        b.setNegativeButton("Cancel") { dialog, _ ->
             dialog.dismiss()
         }
 
-        val dialog = b.create()
-        return dialog
+        return b.create()
 
     }
 
@@ -455,9 +448,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         detect.registerListener(this)
         sensorManager.registerListener(this@MapsActivity, accel, SensorManager.SENSOR_DELAY_FASTEST)
 
-
-
-        //mediaplayer.start()
 
         fab.setOnClickListener {
             val dialog = displayGuess()
@@ -484,8 +474,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             menu.setOnMenuItemClickListener {
                 Log.v("Song Before", currentSong.toString())
                 currentSong = it.itemId
-                prefs.editor.putInt("Current Song", currentSong)
-                prefs.editor.apply()
+                prefs.currentSong = currentSong
+                prefs.currentMap = 1 //prevents opening unlocked maps
                 Log.v("Song now:", currentSong.toString())
                 menu.dismiss()
                 val intent = Intent(this@MapsActivity, this@MapsActivity::class.java)
@@ -525,7 +515,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         detect.unregisterListener(this)
     }
 
-    fun createLocationRequest() {
+    private fun createLocationRequest() {
         val mLocationRequest = LocationRequest()
         mLocationRequest.interval = 5000
         mLocationRequest.fastestInterval = 1000
@@ -561,7 +551,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     }
 
 
-    fun checkCloseBy(current: Location?)  = runBlocking {
+    private fun checkCloseBy(current: Location?)  = runBlocking {
         val job = launch {
 
             if (current == null) {
@@ -622,7 +612,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
                 val dl = DownloadLyricTask(currentSong)
                 dl.execute()
                 val lyrics = dl.get()
-                val word = parser.findLyric(currentSong, currentMap, lyrics, mark)
+                val word = parser.findLyric(lyrics, mark)
                 Log.v("Word?", word.toString())
                 val collectedPrev = prefs.collectedPrev(currentSong, currentMap, line, w)
                 if (!collectedPrev){

@@ -13,7 +13,7 @@ import com.google.android.gms.maps.GoogleMap
 /**
  * Created by holly on 24/10/17.
  */
-class KMLtask(songNum : Int, mapNum : Int) : AsyncTask<String,Int,List<Placemark>>() {
+class DownloadKMLTask(songNum : Int, mapNum : Int, private val caller: DownloadCompleteListener) : AsyncTask<String,Int,List<Placemark>>() {
     val mSongNum = songNum
     val mMapNum = mapNum
 
@@ -48,5 +48,6 @@ class KMLtask(songNum : Int, mapNum : Int) : AsyncTask<String,Int,List<Placemark
 
     override fun onPostExecute(result: List<Placemark>) {
         super.onPostExecute(result)
+        caller.downloadComplete(result)
     }
 }

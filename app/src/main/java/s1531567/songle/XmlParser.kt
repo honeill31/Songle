@@ -26,6 +26,20 @@ class XmlParser {
     }
 
     @Throws(XmlPullParserException::class, IOException::class)
+    fun getStamp (input: InputStream) : String {
+        input.use {
+            val parser = Xml.newPullParser()
+            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES,
+                    false)
+            parser.setInput(input, null)
+            parser.nextTag()
+            parser.require(XmlPullParser.START_TAG, ns, "Songs")
+            return parser.getAttributeValue(ns, "timestamp")
+        }
+
+    }
+
+    @Throws(XmlPullParserException::class, IOException::class)
     private fun readSongs(parser: XmlPullParser): List<Song>
     {
         val entries = ArrayList<Song>()

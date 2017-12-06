@@ -11,7 +11,7 @@ import java.net.URL
 /**
  * Created by s1531567 on 17/10/17.
  */
-class DownloadXMLTask () : AsyncTask<String, Int, List<Song>>() {
+class DownloadXMLTask (private val caller: DownloadCompleteListener) : AsyncTask<String, Int, List<Song>>() {
 
         override fun doInBackground(vararg urls: String): List<Song> {
             val u = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml"
@@ -21,11 +21,8 @@ class DownloadXMLTask () : AsyncTask<String, Int, List<Song>>() {
         }
 
         private fun loadXMLFromNetwork(urlString: String): List<Song> {
-            val parser = XmlParser()
-            val stream = downloadUrl(urlString)
-            val result = parser.parse(stream)
+            return XmlParser().parse(downloadUrl(urlString))
 
-            return result
         }
 
         @Throws(IOException::class)
@@ -46,6 +43,7 @@ class DownloadXMLTask () : AsyncTask<String, Int, List<Song>>() {
 
         override fun onPostExecute(result: List<Song>) {
             super.onPostExecute(result)
+            caller.downloadComplete(result)
 
 
         }

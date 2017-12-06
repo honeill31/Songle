@@ -7,6 +7,9 @@ import android.content.SharedPreferences
  * Created by holly on 04/12/17.
  */
 class Prefs(context: Context) {
+
+    /*----------------- Variables to be passed between activities ------------------ */
+
     val sharedPrefs: SharedPreferences = context.getSharedPreferences(context.getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
     val editor = sharedPrefs.edit()
 
@@ -34,7 +37,17 @@ class Prefs(context: Context) {
         get() = sharedPrefs.getInt("total score", 0)
         set(value) = sharedPrefs.edit().putInt("total score", value).apply()
 
-    //function to check whether a word in a given song has been collected.
+    var timeStamp : String
+        get() = sharedPrefs.getString("timestamp", "")
+        set(value) = sharedPrefs.edit().putString("timestamp", value).apply()
+
+    var songTotal : Int
+        get() = sharedPrefs.getInt("Song Count", 1)
+        set(value) = sharedPrefs.edit().putInt("Song Count", value).apply()
+
+
+/* ------------------------- Song Functions --------------------------- */
+
     fun collectedPrev(song: Int, map: Int, line: Int, w: Int) : Boolean {
         return sharedPrefs.getBoolean("$song $map $line $w", false)
     }
