@@ -1,22 +1,15 @@
 package s1531567.songle
 
-import android.Manifest
-import android.content.Context
 import android.util.Log
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.widget.TextView
 
 
 import kotlinx.android.synthetic.main.activity_default.*
 import org.jetbrains.anko.connectivityManager
-import org.jetbrains.anko.progressDialog
 import org.jetbrains.anko.toast
-import java.io.File
 
 
 class DefaultPage : AppCompatActivity() {
@@ -61,6 +54,7 @@ class DefaultPage : AppCompatActivity() {
                 val songs = DownloadXMLTask(DefaultPage.Companion).execute().get()
                 prefs.songTotal = songs.size
                 prefs.timeStamp = stamp
+                prefs.update = true
                 Log.v("songs size", songs.size.toString())
             }
 
@@ -81,7 +75,7 @@ class DefaultPage : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        val steps = prefs.sharedPrefs.getInt("steps", 0)
+        val steps = prefs.userPrefs.getInt("steps", 0)
         var txt = findViewById<TextView>(R.id.textView)
         txt.text = "Total number of steps walked: $steps"
     }

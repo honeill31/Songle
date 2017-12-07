@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
-import android.preference.PreferenceManager
 
 /**
  * Created by s1531567 on 17/10/17.
@@ -15,7 +14,7 @@ class NetworkReceiver () : BroadcastReceiver() {
     override fun onReceive(p0: Context?, p1: Intent?) {
 
 
-        val networkPref = prefs.sharedPrefs.getString("Data", "Wi-Fi")
+        val networkPref = prefs.userPrefs.getString("Data", "Wi-Fi")
 
         val connMgr =
                 p0?.getSystemService(Context.CONNECTIVITY_SERVICE)

@@ -3,8 +3,6 @@ package s1531567.songle
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.TargetApi
-import android.content.pm.PackageManager
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.app.LoaderManager.LoaderCallbacks
 import android.database.Cursor
@@ -19,10 +17,11 @@ import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import java.util.ArrayList
-import android.Manifest.permission.READ_CONTACTS
 import android.content.*
+import android.util.Log
 
 import kotlinx.android.synthetic.main.activity_login.*
+import org.jetbrains.anko.toast
 
 /**
  * A login screen that offers login via email/password.
@@ -202,16 +201,17 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
      * the user.
      */
     inner class UserLoginTask internal constructor(private val mEmail: String, private val mPassword: String) : AsyncTask<Void, Void, Boolean>() {
-
+        var newaccount = false
 
         override fun doInBackground(vararg params: Void?): Boolean {
-            val credentials = prefs.sharedPrefs!!.getString("User info", "")
+            val credentials = prefs.users
             val userCredentials = credentials.split(",")
             var success = false
 
+
             try {
                 // Simulate network access.
-                Thread.sleep(2000)
+                Thread.sleep(1000)
             } catch (e: InterruptedException) {
                 return false
             }
@@ -221,23 +221,34 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
                     .firstOrNull { it[0] == mEmail }
 
             if (creds == null){ //user doesn't exist
-                prefs.editor.putString("User info", credentials.plus("$mEmail:$mPassword,"))
-                prefs.editor.apply()
+                prefs.users = credentials.plus("$mEmail:$mPassword")
+                Log.v("user email", mEmail)
+                prefs.currentUser = mEmail
+                newaccount = true
                 success = true
             }
 
             if (creds != null) {
                 if (creds[1] == mPassword) {
+                    prefs.currentUser = mEmail
                     success = true
                 }
             }
 
             return success
+
+
         }
 
         override fun onPostExecute(success: Boolean?) {
             mAuthTask = null
             showProgress(false)
+
+            when (newaccount){
+                true -> toast("New account created")
+                false -> toast("Logging into your account")
+            }
+
 
             if (success!!) {
                 startActivity(Intent(this@LoginActivity, DefaultPage::class.java))

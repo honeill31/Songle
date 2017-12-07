@@ -10,46 +10,62 @@ class Prefs(context: Context) {
 
     /*----------------- Variables to be passed between activities ------------------ */
 
-    val sharedPrefs: SharedPreferences = context.getSharedPreferences(context.getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
-    val editor = sharedPrefs.edit()
+    val gamePrefs : SharedPreferences = context.getSharedPreferences(context.getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
+
+    var users : String
+        get() = gamePrefs.getString("User info","")
+        set(value) = gamePrefs.edit().putString("User info", value).apply()
+
+    var currentUser : String
+        get() = gamePrefs.getString("current user", "")
+        set(value) = gamePrefs.edit().putString("current user", value).apply()
+
+
+    val userPrefs: SharedPreferences = context.getSharedPreferences(currentUser, Context.MODE_PRIVATE)
+    val editor = userPrefs.edit()
+
+
+    var update : Boolean
+        get() = userPrefs.getBoolean("update", true)
+        set(value) = userPrefs.edit().putBoolean("update", false).apply()
 
     var currentSong : Int
-        get() = sharedPrefs.getInt("Current Song", 1)
-        set(value) = sharedPrefs.edit().putInt("Current Song", value).apply()
+        get() = userPrefs.getInt("Current Song", 1)
+        set(value) = userPrefs.edit().putInt("Current Song", value).apply()
 
     var currentMap : Int
-        get() = sharedPrefs.getInt("Current Map", 1)
-        set(value) = sharedPrefs.edit().putInt("Current Map", value).apply()
+        get() = userPrefs.getInt("Current Map", 1)
+        set(value) = userPrefs.edit().putInt("Current Map", value).apply()
 
     var songles : Int
-        get() = sharedPrefs.getInt("songles",0)
-        set(value) = sharedPrefs.edit().putInt("songles", value).apply()
+        get() = userPrefs.getInt("songles",0)
+        set(value) = userPrefs.edit().putInt("songles", value).apply()
 
     var points : Int
-        get() = sharedPrefs.getInt("points",0)
-        set(value) = sharedPrefs.edit().putInt("points", value).apply()
+        get() = userPrefs.getInt("points",0)
+        set(value) = userPrefs.edit().putInt("points", value).apply()
 
     var steps : Int
-        get() = sharedPrefs.getInt("steps", 0)
-        set(value) = sharedPrefs.edit().putInt("steps", value).apply()
+        get() = userPrefs.getInt("steps", 0)
+        set(value) = userPrefs.edit().putInt("steps", value).apply()
 
     var totalScore : Int
-        get() = sharedPrefs.getInt("total score", 0)
-        set(value) = sharedPrefs.edit().putInt("total score", value).apply()
+        get() = userPrefs.getInt("total score", 0)
+        set(value) = userPrefs.edit().putInt("total score", value).apply()
 
     var timeStamp : String
-        get() = sharedPrefs.getString("timestamp", "")
-        set(value) = sharedPrefs.edit().putString("timestamp", value).apply()
+        get() = userPrefs.getString("timestamp", "")
+        set(value) = userPrefs.edit().putString("timestamp", value).apply()
 
     var songTotal : Int
-        get() = sharedPrefs.getInt("Song Count", 1)
-        set(value) = sharedPrefs.edit().putInt("Song Count", value).apply()
+        get() = userPrefs.getInt("Song Count", 1)
+        set(value) = userPrefs.edit().putInt("Song Count", value).apply()
 
 
 /* ------------------------- Song Functions --------------------------- */
 
     fun collectedPrev(song: Int, map: Int, line: Int, w: Int) : Boolean {
-        return sharedPrefs.getBoolean("$song $map $line $w", false)
+        return userPrefs.getBoolean("$song $map $line $w", false)
     }
 
     fun setCollected (song: Int, map: Int, line: Int, w: Int) {
@@ -58,7 +74,7 @@ class Prefs(context: Context) {
     }
 
     fun wordsCollected (song: Int, map: Int) : Int {
-        return sharedPrefs.getInt("$song $map words collected", 0)
+        return userPrefs.getInt("$song $map words collected", 0)
     }
 
     fun setWordsCollected (song: Int, map: Int, value: Int) {
@@ -67,7 +83,7 @@ class Prefs(context: Context) {
     }
 
     fun songGuessed (song: Int) : Boolean {
-        return sharedPrefs.getBoolean("Song $song guessed", false)
+        return userPrefs.getBoolean("Song $song guessed", false)
     }
 
     fun setSongGuessed (song: Int) {
@@ -76,7 +92,7 @@ class Prefs(context: Context) {
     }
 
     fun songLocked (song: Int) : Boolean {
-        return sharedPrefs.getBoolean("Song $song locked", true)
+        return userPrefs.getBoolean("Song $song locked", true)
     }
 
     fun setSongUnlocked (song: Int){
@@ -85,7 +101,7 @@ class Prefs(context: Context) {
     }
 
     fun mapLocked (song: Int, map: Int) : Boolean {
-        return sharedPrefs.getBoolean("Song $song Map $map locked", true)
+        return userPrefs.getBoolean("Song $song Map $map locked", true)
     }
 
     fun setMapUnlocked (song : Int, map: Int){
@@ -94,7 +110,7 @@ class Prefs(context: Context) {
     }
 
     fun getTries (song : Int) : Int {
-        return sharedPrefs.getInt("Tries $song", 3)
+        return userPrefs.getInt("Tries $song", 3)
     }
 
     fun setTries (song: Int, tries : Int){
@@ -103,7 +119,7 @@ class Prefs(context: Context) {
     }
 
     fun getScoreMode (song: Int) : Int {
-        return sharedPrefs.getInt("Song $song score mode", 1)
+        return userPrefs.getInt("Song $song score mode", 1)
     }
 
     fun score1Total (song: Int, value: Int) {
@@ -117,7 +133,7 @@ class Prefs(context: Context) {
     }
 
     fun songScore (song: Int) : Int {
-        return sharedPrefs.getInt("Song $song total score", 0)
+        return userPrefs.getInt("Song $song total score", 0)
     }
 
     fun setSongScore (song: Int, value: Int) {
@@ -125,15 +141,15 @@ class Prefs(context: Context) {
     }
 
     fun getPlacemarkTotal (song: Int) : Int {
-        return sharedPrefs.getInt("Song $song total Placemarks", 0)
+        return userPrefs.getInt("Song $song total Placemarks", 0)
     }
 
     fun getMapPlacemarkTotal (song: Int, map: Int) : Int {
-        return sharedPrefs.getInt("Song $song Map $map Placemarks", 1) //avoid division by 0
+        return userPrefs.getInt("Song $song Map $map Placemarks", 1) //avoid division by 0
     }
 
     fun getMapCollected (song: Int, map: Int) : Int {
-        return sharedPrefs.getInt("$song $map words collected", 0)
+        return userPrefs.getInt("$song $map words collected", 0)
     }
 
     fun changeScoreMode (song: Int) {
@@ -143,7 +159,7 @@ class Prefs(context: Context) {
     }
 
     fun givenUp (song: Int) : Boolean {
-        return sharedPrefs.getBoolean("Song $song given up", false)
+        return userPrefs.getBoolean("Song $song given up", false)
     }
 
 
@@ -152,7 +168,7 @@ class Prefs(context: Context) {
     /* ----------------- Achievements ------------------ */
 
     fun checkAchievement (id : Int) : Boolean {
-        return sharedPrefs.getBoolean("Achievement $id locked", true)
+        return userPrefs.getBoolean("Achievement $id locked", true)
     }
 
     fun setAchievementUnlocked (id: Int) {

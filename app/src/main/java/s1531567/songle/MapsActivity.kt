@@ -156,7 +156,7 @@ class MapsActivity : AppCompatActivity(),
      * installed Google Play services and returned to the app.
      */
     override fun onMapReady(googleMap: GoogleMap) {
-        firstRun()
+        update()
         val song = Helper().intToString(currentSong)
         mMap = googleMap
 
@@ -280,9 +280,9 @@ class MapsActivity : AppCompatActivity(),
 
     }
 
-    private fun firstRun() {
-        val firstRun = prefs.sharedPrefs.getBoolean("firstRun", true)
-        if (firstRun) {
+    private fun update() {
+        val needsUpdate = prefs.update
+        if (needsUpdate) {
             prefs.timeStamp = Helper().DownloadXMLTask(MapsActivity.Companion).execute().get()
             for (i in 1..songs.size) {
                 var songTotal = 0
@@ -315,7 +315,7 @@ class MapsActivity : AppCompatActivity(),
                 prefs.editor.apply()
 
             }
-            prefs.editor.putBoolean("firstRun", false)
+            prefs.editor.putBoolean("update", false)
             prefs.editor.apply()
 
         }

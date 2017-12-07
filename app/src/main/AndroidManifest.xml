@@ -29,20 +29,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".DefaultPage">
+        <activity android:name=".LoginActivity"
+            android:screenOrientation="portrait"
+            >
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".LoginActivity"
-            android:label="@string/title_activity_login" />
+        <activity android:name=".DefaultPage"
+                  android:label="@string/title_activity_default_page"/>
+
         <activity android:name=".LeaderboardActivity" />
         <activity
             android:name=".MapsActivity"
             android:label="Map"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -58,15 +62,18 @@
 
         <activity
             android:name=".MainActivity"
-            android:label="Main" />
+            android:label="Main"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".SongList"
             android:label="@string/title_activity_song_list"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"/>
         <activity android:name=".Favourites" />
         <activity
             android:name=".ReviewActivity"
             android:label="@string/title_activity_review"
+            android:screenOrientation="portrait"
             android:parentActivityName=".DefaultPage">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -74,20 +81,25 @@
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings" />
+            android:label="@string/title_activity_settings"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".AchievementActivity"
-            android:label="@string/title_activity_achievement" />
+            android:label="@string/title_activity_achievement"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".LyricsActivity"
             android:label="@string/title_activity_lyrics"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".UserActivity"
-            android:label="@string/title_activity_user" />
+            android:label="@string/title_activity_user"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".FaqActivity"
-            android:label="@string/title_activity_faq"></activity>
+            android:label="@string/title_activity_faq"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>
