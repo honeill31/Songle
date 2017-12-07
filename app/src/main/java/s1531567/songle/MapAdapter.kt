@@ -47,6 +47,7 @@ class MapAdapter (val maps: List<MapInfo>, val itemClick : (MapInfo)->Unit ) : R
                 }
                 if (!map.locked){
                     itemView.collected_placemarks_review.text = "$collected/$total"
+                    itemView.locked.visibility = View.INVISIBLE
                 }
 
                 itemView.setOnClickListener {mClick(this)}

@@ -43,7 +43,7 @@ class DefaultPage : AppCompatActivity() {
 
 
         songref.setOnClickListener {
-            val lead = Intent(this@DefaultPage, SongList::class.java)
+            val lead = Intent(this@DefaultPage, FaqActivity::class.java)
             startActivity(lead)
         }
 

@@ -128,7 +128,10 @@ class ReviewActivity : AppCompatActivity() {
                 Log.v("ratio true:", "${(collected/total)}")
                 Log.v("2/3 ???? ", "${2/3}")
                 prefs.setMapUnlocked(songNum, mapNum)
+                mapList[mapNum-1].locked = false
                 prefs.currentMap = mapNum
+                //myAdapter!!.notifyItemChanged(mapNum)
+                myAdapter!!.notifyDataSetChanged()
                 toast("Map unlocked!")
             }
 

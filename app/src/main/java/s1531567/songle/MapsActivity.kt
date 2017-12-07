@@ -619,7 +619,7 @@ class MapsActivity : AppCompatActivity(),
                     prefs.setCollected(currentSong, currentMap, line, w)
                     collected++
                     prefs.setWordsCollected(currentSong, currentMap, collected)
-                    toast("You collected the word '${word.word}'!")
+                    //toast("You collected the word '${word.word}'!")
 
                 }
 

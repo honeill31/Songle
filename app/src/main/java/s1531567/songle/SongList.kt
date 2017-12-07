@@ -115,15 +115,19 @@ class SongList : AppCompatActivity() {
         b.setMessage("You must have at least 1 Songle to do this.")
         b.setPositiveButton("Unlock") { _, _ ->
             var songles = prefs.songles
+            if (songles <=0){
+                toast("You don't have enough Songles to purchase this!")
+            }
+
             if (songles > 0) {
                 prefs.setSongUnlocked(songNum)
+                prefs.setMapUnlocked(songNum, 1)
+                myAdapter!!.notifyDataSetChanged()
                 toast("Song $songNum unlocked!")
                 songles--
                 prefs.songles = songles
             }
-            if (songles <=0){
-                toast("You don't have enough Songles to purchase this!")
-            }
+
 
         }
         b.setNegativeButton("Cancel") { dialog, _ ->

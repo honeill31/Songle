@@ -48,7 +48,7 @@ class KmlParser {
                 skip(parser)
             }
         }
-        Log.v("entries", entries.toString())
+        //Log.v("entries", entries.toString())
         return entries
     }
 
@@ -75,7 +75,7 @@ class KmlParser {
                 else ->  skip(parser)
             }
         }
-        Log.v("Placemark", Placemark(name, description, styleURL, point[0].toDouble(), point[1].toDouble()).toString())
+        //Log.v("Placemark", Placemark(name, description, styleURL, point[0].toDouble(), point[1].toDouble()).toString())
         return Placemark(name, description, styleURL, point[0].toDouble(), point[1].toDouble())
     }
 
@@ -85,7 +85,7 @@ class KmlParser {
         parser.require(XmlPullParser.START_TAG, ns, "name")
         val name = readText(parser)
         parser.require(XmlPullParser.END_TAG, ns, "name")
-        Log.v("name", name)
+        //Log.v("name", name)
         return name
     }
 
@@ -95,7 +95,7 @@ class KmlParser {
         parser.require(XmlPullParser.START_TAG, ns, "description")
         val desc = readText(parser)
         parser.require(XmlPullParser.END_TAG, ns, "description")
-        Log.v("desc", desc)
+        //Log.v("desc", desc)
         return desc
     }
 
@@ -112,7 +112,7 @@ class KmlParser {
 
     @Throws(IOException::class, XmlPullParserException::class)
     private fun readLatLong(parser: XmlPullParser): MutableList<Double> {
-        Log.v("Am i getting here?", "??")
+        //Log.v("Am i getting here?", "??")
         var doubles = mutableListOf<Double>()
         parser.require(XmlPullParser.START_TAG, ns, "Point")
         parser.nextTag()
@@ -126,7 +126,7 @@ class KmlParser {
         doubles.add(float[0])
         doubles.add(float[1])
         //doubles.add(float[2])
-        Log.v("doubles", doubles.toString())
+        //Log.v("doubles", doubles.toString())
         return doubles
     }
 
