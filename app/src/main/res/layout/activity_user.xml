@@ -97,7 +97,6 @@
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="76dp"
-                    android:text="Holly O'Neill"
                     android:textColor="#fff"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -149,7 +148,7 @@
                     android:focusable="true" />
 
                 <TextView
-
+                    android:id="@+id/logout"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
@@ -158,7 +157,7 @@
                     android:elevation="4dp"
                     android:focusable="true"
                     android:padding="20dp"
-                    android:text="Song Progress" />
+                    android:text="Logout" />
 
                 <TextView
                     android:layout_width="fill_parent"

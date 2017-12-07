@@ -123,10 +123,10 @@ class ReviewActivity : AppCompatActivity() {
             }
 
             if ((collected/total)>=(0.66)){
-                Log.v("Collected true:", "$collected")
-                Log.v("total true:", "$total")
-                Log.v("ratio true:", "${(collected/total)}")
-                Log.v("2/3 ???? ", "${2/3}")
+                //Log.v("Collected true:", "$collected")
+                //Log.v("total true:", "$total")
+                //Log.v("ratio true:", "${(collected/total)}")
+                //Log.v("2/3 ???? ", "${2/3}")
                 prefs.setMapUnlocked(songNum, mapNum)
                 mapList[mapNum-1].locked = false
                 prefs.currentMap = mapNum

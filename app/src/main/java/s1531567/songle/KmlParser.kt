@@ -105,8 +105,8 @@ class KmlParser {
         parser.require(XmlPullParser.START_TAG, ns, "styleUrl")
         val style = readText(parser)
         parser.require(XmlPullParser.END_TAG, ns, "styleUrl")
-        Log.v("style", style)
-        Log.v("is style empty", (style != "").toString())
+        //Log.v("style", style)
+        //Log.v("is style empty", (style != "").toString())
         return style
     }
 

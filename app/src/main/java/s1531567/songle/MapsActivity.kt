@@ -73,6 +73,8 @@ class MapsActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
         songs = DownloadXMLTask(MapsActivity.Companion).execute().get()
+        Log.v("current user", prefs.currentUser)
+
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -128,7 +130,7 @@ class MapsActivity : AppCompatActivity(),
         var steps = prefs.steps
         steps++
         prefs.steps = steps
-        if (steps % 1000 == 0 && steps != 0) {
+        if (steps % 10 == 0 && steps != 0) {
             //for user feedback while walking
             val v = vibrator
             v.vibrate(100)
@@ -174,14 +176,14 @@ class MapsActivity : AppCompatActivity(),
         val layerTask = DownloadKMLTask(currentSong, currentMap, MapsActivity.Companion).execute()
         layer = layerTask.get()
         val styles = DownloadStyleTask(currentSong, currentMap).execute().get()
-        Log.v("Pms", layer.toString())
+        //Log.v("Pms", layer.toString())
         for (mark in layer) {
             val currentStyle = styles.firstOrNull { it.id == mark.description }
             val collected = prefs.collectedPrev(currentSong,
                     currentMap,
                     mark.name.split(":")[0].toInt(),
                     mark.name.split(":")[1].toInt())
-            Log.v("collected", collected.toString())
+            //Log.v("collected", collected.toString())
             if (!collected) {
                 mMap.addMarker(MarkerOptions()
                         .position(LatLng(mark.Long, mark.Lat))
@@ -192,9 +194,9 @@ class MapsActivity : AppCompatActivity(),
             }
             if (collected) {
                 val lyrics = DownloadLyricTask(currentSong).execute().get()
-                Log.v("lyrics", lyrics.toString())
+                //Log.v("lyrics", lyrics.toString())
                 val tit = LyricParser().findLyric( lyrics, mark)
-                Log.v("word", tit.word)
+                //Log.v("word", tit.word)
                 mMap.addMarker(MarkerOptions()
                         .position(LatLng(mark.Long, mark.Lat))
                         .title(tit.word)
@@ -283,7 +285,7 @@ class MapsActivity : AppCompatActivity(),
     private fun update() {
         val needsUpdate = prefs.update
         if (needsUpdate) {
-            prefs.timeStamp = Helper().DownloadXMLTask(MapsActivity.Companion).execute().get()
+            prefs.timeStamp = Helper().DownloadStampTask(MapsActivity.Companion).execute().get()
             for (i in 1..songs.size) {
                 var songTotal = 0
                 for (j in 1..5) {
@@ -292,11 +294,11 @@ class MapsActivity : AppCompatActivity(),
                     var layerTask = DownloadKMLTask(i, j, MapsActivity.Companion).execute()
                     val thisLayer = layerTask.get()
                     mapTotal = thisLayer.size
-                    prefs.editor.putInt("Song $i Map $j Placemarks", mapTotal)
-                    prefs.editor.apply()
+                    prefs.gameEditor.putInt("Song $i Map $j Placemarks", mapTotal)
+                    prefs.gameEditor.apply()
                     songTotal += mapTotal
                 }
-                prefs.editor.putInt("Song $i total Placemarks", songTotal)
+                prefs.gameEditor.putInt("Song $i total Placemarks", songTotal)
 
             }
             //unlocking 5 random songs
@@ -306,17 +308,17 @@ class MapsActivity : AppCompatActivity(),
                 if (i==1){
                     currentSong = r
                     currentMap = 1
-                    prefs.editor.putInt("Current Song", r)
-                    prefs.editor.putInt("Current Map", 1)
-                    prefs.editor.apply()
+                    prefs.userEditor.putInt("Current Song", r)
+                    prefs.userEditor.putInt("Current Map", 1)
+                    prefs.userEditor.apply()
                 }
-                prefs.editor.putBoolean("Song $r locked", false)
-                prefs.editor.putBoolean("Song $r Map 1 locked", false)
-                prefs.editor.apply()
+                prefs.userEditor.putBoolean("Song $r locked", false)
+                prefs.userEditor.putBoolean("Song $r Map 1 locked", false)
+                prefs.userEditor.apply()
 
             }
-            prefs.editor.putBoolean("update", false)
-            prefs.editor.apply()
+            prefs.gameEditor.putBoolean("update", false)
+            prefs.gameEditor.apply()
 
         }
 
@@ -418,9 +420,9 @@ class MapsActivity : AppCompatActivity(),
             val toTotal = userAmount + toCurrency
 
             if (fromTotal>0){
-                prefs.editor.putInt(from, fromTotal)
-                prefs.editor.putInt(to,toTotal)
-                prefs.editor.apply()
+                prefs.userEditor.putInt(from, fromTotal)
+                prefs.userEditor.putInt(to,toTotal)
+                prefs.userEditor.apply()
                 toast("Conversion Successful")
             }
             if (fromTotal<=0){

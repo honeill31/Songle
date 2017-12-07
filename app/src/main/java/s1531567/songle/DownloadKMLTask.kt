@@ -19,14 +19,14 @@ class DownloadKMLTask(songNum : Int, mapNum : Int, private val caller: DownloadC
 
     override fun doInBackground(vararg params: String): List<Placemark> {
         val u = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${Helper().intToString(mSongNum)}/map$mMapNum.txt"
-        Log.v("doInBG Value", u)
+        //Log.v("doInBG Value", u)
         return loadKMLFromNetwork(u)
     }
 
     private fun loadKMLFromNetwork(urlString: String): List<Placemark> {
         val parser = KmlParser()
         val stream = downloadUrl(urlString)
-        Log.v("stream", stream.toString())
+        //Log.v("stream", stream.toString())
         return  parser.parse(stream)
 
     }

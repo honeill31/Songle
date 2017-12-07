@@ -89,8 +89,8 @@ class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (S
                 }
                 itemView.levelNumber.text = Helper().stringToInt(song.number).toString()
 
-                Log.v("Song", song.toString())
-                Log.v("string to int", "${Helper().stringToInt(song.number)}")
+                //Log.v("Song", song.toString())
+                //Log.v("string to int", "${Helper().stringToInt(song.number)}")
 
 
                 itemView.setOnClickListener{mClick(this)}

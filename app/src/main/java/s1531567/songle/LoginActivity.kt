@@ -206,6 +206,9 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         override fun doInBackground(vararg params: Void?): Boolean {
             val credentials = prefs.users
             val userCredentials = credentials.split(",")
+            Log.v("user creds", credentials)
+            userCredentials.map { println(it) }
+
             var success = false
 
 
@@ -220,17 +223,25 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
                     .map{it.split(":")}
                     .firstOrNull { it[0] == mEmail }
 
+            println("creds $creds")
+
             if (creds == null){ //user doesn't exist
-                prefs.users = credentials.plus("$mEmail:$mPassword")
+                prefs.users = credentials.plus("$mEmail:$mPassword,")
+                Log.v("previous user", prefs.currentUser)
                 Log.v("user email", mEmail)
                 prefs.currentUser = mEmail
+                Log.v("New user", prefs.currentUser)
+                prefs.userName = mEmail
                 newaccount = true
                 success = true
             }
 
             if (creds != null) {
                 if (creds[1] == mPassword) {
+                    Log.v("previous user", prefs.currentUser)
                     prefs.currentUser = mEmail
+                    Log.v("New user", prefs.currentUser)
+                    prefs.userPrefs.edit().putString("current user", prefs.currentUser).apply()
                     success = true
                 }
             }

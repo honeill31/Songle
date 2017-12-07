@@ -86,7 +86,7 @@ class DownloadStyleTask(songNum: Int, mapNum: Int) : AsyncTask<String, Int, List
                     skip(parser)
                 }
             }
-            Log.v("entries", entries.toString())
+            //Log.v("entries", entries.toString())
             return entries
         }
 

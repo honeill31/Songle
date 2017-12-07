@@ -23,6 +23,10 @@ class DefaultPage : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_default)
+        prefs.userPrefs.all.entries.map { println("userPrefs + $it") }
+        prefs.gamePrefs.all.entries.map { println("gamePrefs + $it") }
+        println(prefs.userPrefs.all.entries == prefs.gamePrefs.all.entries)
+
 
 
         play.setOnClickListener {
@@ -46,7 +50,7 @@ class DefaultPage : AppCompatActivity() {
 
 
         update.setOnClickListener {
-            val stamp = Helper().DownloadXMLTask(DefaultPage.Companion)
+            val stamp = Helper().DownloadStampTask(DefaultPage.Companion)
                         .execute()
                         .get()
             Log.v("timestamp", stamp)

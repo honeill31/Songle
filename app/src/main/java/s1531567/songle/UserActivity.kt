@@ -7,6 +7,7 @@ import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_user.*
 
+
 class UserActivity : AppCompatActivity() {
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
@@ -31,10 +32,15 @@ class UserActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user)
         val userScore = prefs.userPrefs.getInt("total score", 0).toString()
+        user_profile_name.text = prefs.currentUser
         score.text = "Current Score: $userScore"
         bar.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         achievement.setOnClickListener {
             startActivity(Intent(this@UserActivity, AchievementActivity::class.java))
+        }
+        logout.setOnClickListener {
+            startActivity(Intent(this@UserActivity, LoginActivity::class.java))
+            prefs.currentUser = ""
         }
     }
 }

@@ -49,7 +49,7 @@ class Helper {
         view.visibility = View.VISIBLE
     }
 
-    inner class DownloadXMLTask (private val caller: DownloadCompleteListener) : AsyncTask<String, Int, String>() {
+    inner class DownloadStampTask(private val caller: DownloadCompleteListener) : AsyncTask<String, Int, String>() {
 
         override fun doInBackground(vararg urls: String): String {
             val u = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml"
