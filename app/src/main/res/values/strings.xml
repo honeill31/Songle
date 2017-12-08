@@ -239,4 +239,5 @@
     <string name="check_for_updates">Check for Updates</string>
     <string name="title_activity_faq">FaqActivity</string>
     <string name="proximity">Proximity Notifications</string>
+    <string name="how_to_play">How to play</string>
 </resources>

@@ -279,6 +279,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
             if (success!!) {
                 val currentTime = System.currentTimeMillis()
+                prefs.loggedIn = true
                 prefs.lastLogin = currentTime.toString()
                 startActivity(Intent(this@LoginActivity, DefaultPage::class.java))
 

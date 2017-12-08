@@ -137,7 +137,7 @@ class MapsActivity : AppCompatActivity(),
         var steps = prefs.steps
         steps++
         prefs.steps = steps
-        if (steps % 10 == 0 && steps != 0) {
+        if (steps % 500 == 0 && steps != 0) {
             // For user feedback while walking.
             val v = vibrator
             val soundPref = prefs.sharedPrefs.getBoolean("sounds", true)
@@ -148,7 +148,7 @@ class MapsActivity : AppCompatActivity(),
             var points = prefs.points
             points++
             prefs.points = points
-            toast("You walked 1000 more steps! Point added.")
+            toast("You walked 500 more steps! Point added.")
         }
         val stepListener = Achievements(this).stepListener(steps)
         if (stepListener != null) {
@@ -250,7 +250,7 @@ class MapsActivity : AppCompatActivity(),
         println(marker.toString())
         var cost = 0
         when (marker!!.styleURL){
-            "#unclassified" -> cost = 10
+            "#unclassified" -> cost = 1
             "#boring" -> cost = 5
             "#notboring" -> cost = 10
             "#interesting" -> cost = 150

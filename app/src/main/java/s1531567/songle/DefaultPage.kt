@@ -26,6 +26,9 @@ class DefaultPage : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_default)
+        if (!prefs.loggedIn){
+            startActivity(Intent(this, LoginActivity::class.java))
+        }
         val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
 
 
@@ -48,7 +51,7 @@ class DefaultPage : AppCompatActivity() {
 
 
         songref.setOnClickListener {
-            val lead = Intent(this@DefaultPage, FaqActivity::class.java)
+            val lead = Intent(this@DefaultPage, SongList::class.java)
             startActivity(lead)
         }
 
@@ -69,10 +72,10 @@ class DefaultPage : AppCompatActivity() {
                 prefs.update = true
                 Log.v("songs size", songs.size.toString())
             }
+        }
 
-
-
-
+        help.setOnClickListener {
+            startActivity(Intent(this, FaqActivity::class.java))
         }
     }
 

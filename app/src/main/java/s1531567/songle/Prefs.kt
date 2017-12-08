@@ -23,6 +23,10 @@ class Prefs(context: Context) {
         get() = gamePrefs.getString("$currentUser last login", "")
         set(value) = gamePrefs.edit().putString("$currentUser last login", value).apply()
 
+    var loggedIn : Boolean
+        get() = gamePrefs.getBoolean("logged in", false)
+        set(value) = gamePrefs.edit().putBoolean("logged in", value).apply()
+
     var users : String
         get() = gamePrefs.getString("User info","")
         set(value) = gamePrefs.edit().putString("User info", value).apply()
@@ -47,9 +51,6 @@ class Prefs(context: Context) {
     var firstRun : Boolean
         get() = gamePrefs.getBoolean("$currentUser first run", true)
         set(value) = gamePrefs.edit().putBoolean("$currentUser first run", value).apply()
-
-
-
 
 
     var currentSong : Int
@@ -188,7 +189,7 @@ class Prefs(context: Context) {
 
     /* ----------------- Achievements ------------------ */
 
-    fun checkAchievement (id : Int) : Boolean {
+    fun checkAchievement ( id : Int) : Boolean {
         return gamePrefs.getBoolean("$currentUser Achievement $id locked", true)
     }
 

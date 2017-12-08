@@ -65,6 +65,7 @@ class UserActivity : AppCompatActivity() {
         logout.setOnClickListener {
             startActivity(Intent(this@UserActivity, LoginActivity::class.java))
             prefs.currentUser = ""
+            prefs.loggedIn = false
         }
 
         user_profile_photo.setOnClickListener {
