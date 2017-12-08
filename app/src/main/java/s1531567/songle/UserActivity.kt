@@ -31,7 +31,7 @@ class UserActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user)
-        val userScore = prefs.userPrefs.getInt("total score", 0).toString()
+        val userScore = prefs.gamePrefs.getInt("total score", 0).toString()
         user_profile_name.text = prefs.currentUser
         score.text = "Current Score: $userScore"
         bar.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)

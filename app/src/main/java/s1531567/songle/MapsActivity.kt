@@ -53,6 +53,7 @@ class MapsActivity : AppCompatActivity(),
     private lateinit var layer: List<Placemark>
     private var currentSong = 0
     private var currentMap = 0
+    private var currentUser = ""
     private var scoreMode = 0
     private var standardiser = 0
     private lateinit var songs: List<Song>
@@ -72,8 +73,10 @@ class MapsActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
+        currentUser = prefs.currentUser
         songs = DownloadXMLTask(MapsActivity.Companion).execute().get()
-        Log.v("current user", prefs.currentUser)
+        update()
+
 
 
 
@@ -158,7 +161,6 @@ class MapsActivity : AppCompatActivity(),
      * installed Google Play services and returned to the app.
      */
     override fun onMapReady(googleMap: GoogleMap) {
-        update()
         val song = Helper().intToString(currentSong)
         mMap = googleMap
 
@@ -308,17 +310,17 @@ class MapsActivity : AppCompatActivity(),
                 if (i==1){
                     currentSong = r
                     currentMap = 1
-                    prefs.userEditor.putInt("Current Song", r)
-                    prefs.userEditor.putInt("Current Map", 1)
-                    prefs.userEditor.apply()
+                    prefs.gameEditor.putInt("$currentUser Current Song", r)
+                    prefs.gameEditor.putInt("$currentUser Current Map", 1)
+                    prefs.gameEditor.apply()
                 }
-                prefs.userEditor.putBoolean("Song $r locked", false)
-                prefs.userEditor.putBoolean("Song $r Map 1 locked", false)
-                prefs.userEditor.apply()
+                prefs.gameEditor.putBoolean("$currentUser Song $r locked", false)
+                prefs.gameEditor.putBoolean("$currentUser Song $r Map 1 locked", false)
+                prefs.gameEditor.apply()
 
             }
-            prefs.gameEditor.putBoolean("update", false)
-            prefs.gameEditor.apply()
+            Log.v("prefs update", prefs.update.toString())
+            prefs.update = false
 
         }
 
@@ -420,9 +422,9 @@ class MapsActivity : AppCompatActivity(),
             val toTotal = userAmount + toCurrency
 
             if (fromTotal>0){
-                prefs.userEditor.putInt(from, fromTotal)
-                prefs.userEditor.putInt(to,toTotal)
-                prefs.userEditor.apply()
+                prefs.gameEditor.putInt(from, fromTotal)
+                prefs.gameEditor.putInt(to,toTotal)
+                prefs.gameEditor.apply()
                 toast("Conversion Successful")
             }
             if (fromTotal<=0){
@@ -509,6 +511,7 @@ class MapsActivity : AppCompatActivity(),
         if (Helper().checkInternet(connectivityManager)) {
             prefs.currentSong = currentSong
             prefs.currentMap = currentMap
+            prefs.currentUser = currentUser
         }
         if (mGoogleApiClient.isConnected) {
             mGoogleApiClient.disconnect()

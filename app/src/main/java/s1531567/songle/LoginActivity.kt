@@ -22,6 +22,8 @@ import android.util.Log
 
 import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.toast
+import java.security.MessageDigest
+import java.security.SecureRandom
 
 /**
  * A login screen that offers login via email/password.
@@ -225,8 +227,16 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
             println("creds $creds")
 
-            if (creds == null){ //user doesn't exist
-                prefs.users = credentials.plus("$mEmail:$mPassword,")
+
+
+            //user doesn't exist
+            if (creds == null){
+                val salt = SecureRandom().generateSeed(20)
+                val newPword : String = (salt.toString() + mPassword)
+                Log.v("newPword", newPword)
+                val hashed = HashUtils.sha256(newPword)
+                Log.v("Hashed", hashed.toString())
+                prefs.users = credentials.plus("$mEmail:$hashed:$salt,")
                 Log.v("previous user", prefs.currentUser)
                 Log.v("user email", mEmail)
                 prefs.currentUser = mEmail
@@ -237,11 +247,16 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             }
 
             if (creds != null) {
-                if (creds[1] == mPassword) {
+                newaccount = false
+                val salt = creds[2]
+                Log.v("getSalt", salt)
+                val test : String = salt + mPassword
+                val hashed = HashUtils.sha256(test)
+                Log.v("getHashed", hashed.toString())
+                if (creds[1] == hashed) {
                     Log.v("previous user", prefs.currentUser)
                     prefs.currentUser = mEmail
                     Log.v("New user", prefs.currentUser)
-                    prefs.userPrefs.edit().putString("current user", prefs.currentUser).apply()
                     success = true
                 }
             }
@@ -272,6 +287,28 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         override fun onCancelled() {
             mAuthTask = null
             showProgress(false)
+        }
+    }
+
+    object HashUtils {
+
+        fun sha256(input: String) = hashString("SHA-256", input)
+
+
+        private fun hashString(type: String, input: String): String {
+            val HEX_CHARS = "0123456789ABCDEF"
+            val bytes = MessageDigest
+                    .getInstance(type)
+                    .digest(input.toByteArray())
+            val result = StringBuilder(bytes.size * 2)
+
+            bytes.forEach {
+                val i = it.toInt()
+                result.append(HEX_CHARS[i shr 4 and 0x0f])
+                result.append(HEX_CHARS[i and 0x0f])
+            }
+
+            return result.toString()
         }
     }
 
