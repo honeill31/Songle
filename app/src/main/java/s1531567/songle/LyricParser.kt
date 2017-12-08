@@ -1,9 +1,5 @@
 package s1531567.songle
 
-import android.content.SharedPreferences
-import android.util.Log
-import com.google.maps.android.data.kml.KmlPlacemark
-
 /**
  * Created by s1531567 on 03/11/17.
  */

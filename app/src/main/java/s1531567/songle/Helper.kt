@@ -4,7 +4,6 @@ import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.os.AsyncTask
 import android.view.View
-import org.jetbrains.anko.connectivityManager
 import java.io.IOException
 import java.io.InputStream
 import java.net.HttpURLConnection

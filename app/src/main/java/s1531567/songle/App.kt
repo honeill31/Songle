@@ -1,7 +1,6 @@
 package s1531567.songle
 import android.app.Application
 import android.util.Log
-import org.jetbrains.anko.toast
 
 /**
  * Created by holly on 04/12/17.

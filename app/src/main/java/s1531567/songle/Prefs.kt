@@ -2,6 +2,7 @@ package s1531567.songle
 
 import android.content.Context
 import android.content.SharedPreferences
+import org.jetbrains.anko.defaultSharedPreferences
 
 /**
  * Created by holly on 04/12/17.
@@ -14,6 +15,13 @@ class Prefs(context: Context) {
     //stores state of game across players
     val gamePrefs : SharedPreferences = context.getSharedPreferences(context.getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
     val gameEditor = gamePrefs.edit()
+
+    val sharedPrefs : SharedPreferences = context.defaultSharedPreferences
+    val sharedEditor = sharedPrefs.edit()
+
+    var lastLogin : String
+        get() = gamePrefs.getString("$currentUser last login", "")
+        set(value) = gamePrefs.edit().putString("$currentUser last login", value).apply()
 
     var users : String
         get() = gamePrefs.getString("User info","")
@@ -35,6 +43,10 @@ class Prefs(context: Context) {
     var update : Boolean
         get() = gamePrefs.getBoolean("$currentUser update", true)
         set(value) = gamePrefs.edit().putBoolean("$currentUser update", value).apply()
+
+    var firstRun : Boolean
+        get() = gamePrefs.getBoolean("$currentUser first run", true)
+        set(value) = gamePrefs.edit().putBoolean("$currentUser first run", value).apply()
 
 
 

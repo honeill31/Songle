@@ -2,8 +2,8 @@ package s1531567.songle
 
 
 import android.os.AsyncTask
-import org.xmlpull.v1.XmlPullParserException
-import java.io.*
+import java.io.IOException
+import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 

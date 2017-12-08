@@ -3,27 +3,28 @@ package s1531567.songle
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.TargetApi
-import android.support.v7.app.AppCompatActivity
 import android.app.LoaderManager.LoaderCallbacks
+import android.content.CursorLoader
+import android.content.Intent
+import android.content.Loader
 import android.database.Cursor
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.TextView
-import java.util.ArrayList
-import android.content.*
-import android.util.Log
-
 import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.toast
 import java.security.MessageDigest
 import java.security.SecureRandom
+import java.util.*
 
 /**
  * A login screen that offers login via email/password.
@@ -39,7 +40,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         // Set up the login form.
-       // populateAutoComplete()
+        // populateAutoComplete()
         password.setOnEditorActionListener(TextView.OnEditorActionListener { _, id, _ ->
             if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
                 attemptLogin()
@@ -203,7 +204,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
      * the user.
      */
     inner class UserLoginTask internal constructor(private val mEmail: String, private val mPassword: String) : AsyncTask<Void, Void, Boolean>() {
-        var newaccount = false
+        private var newaccount = false
 
         override fun doInBackground(vararg params: Void?): Boolean {
             val credentials = prefs.users
@@ -234,7 +235,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
                 val salt = SecureRandom().generateSeed(20)
                 val newPword : String = (salt.toString() + mPassword)
                 Log.v("newPword", newPword)
-                val hashed = HashUtils.sha256(newPword)
+                val hashed = hashString256(newPword)
                 Log.v("Hashed", hashed.toString())
                 prefs.users = credentials.plus("$mEmail:$hashed:$salt,")
                 Log.v("previous user", prefs.currentUser)
@@ -251,7 +252,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
                 val salt = creds[2]
                 Log.v("getSalt", salt)
                 val test : String = salt + mPassword
-                val hashed = HashUtils.sha256(test)
+                val hashed = hashString256(test)
                 Log.v("getHashed", hashed.toString())
                 if (creds[1] == hashed) {
                     Log.v("previous user", prefs.currentUser)
@@ -277,7 +278,10 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
 
             if (success!!) {
+                val currentTime = System.currentTimeMillis()
+                prefs.lastLogin = currentTime.toString()
                 startActivity(Intent(this@LoginActivity, DefaultPage::class.java))
+
             } else {
                 password.error = getString(R.string.error_incorrect_password)
                 password.requestFocus()
@@ -290,27 +294,22 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         }
     }
 
-    object HashUtils {
+    //uses SHA-256 algorithm for hashing
+    private fun hashString256(input: String): String {
+        val chars = "0123456789ABCDEF"
+        val bytes = MessageDigest.getInstance("SHA-256")
+                .digest(input.toByteArray())
+        val result = StringBuilder(bytes.size * 2)
 
-        fun sha256(input: String) = hashString("SHA-256", input)
-
-
-        private fun hashString(type: String, input: String): String {
-            val HEX_CHARS = "0123456789ABCDEF"
-            val bytes = MessageDigest
-                    .getInstance(type)
-                    .digest(input.toByteArray())
-            val result = StringBuilder(bytes.size * 2)
-
-            bytes.forEach {
-                val i = it.toInt()
-                result.append(HEX_CHARS[i shr 4 and 0x0f])
-                result.append(HEX_CHARS[i and 0x0f])
-            }
-
-            return result.toString()
+        bytes.forEach {
+            val i = it.toInt()
+            result.append(chars[i shr 4 and 0x0f])
+            result.append(chars[i and 0x0f])
         }
+
+        return result.toString()
     }
+
 
 
 }

@@ -11,12 +11,13 @@ import java.io.IOException
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
+
 /**
  * Created by holly on 05/12/17.
  */
 class DownloadStyleTask(songNum: Int, mapNum: Int) : AsyncTask<String, Int, List<Style>>() {
-    val mSongNum = songNum
-    val mMapNum = mapNum
+    private val mSongNum = songNum
+    private val mMapNum = mapNum
     var url = mutableListOf<String>()
 
 
@@ -94,7 +95,7 @@ class DownloadStyleTask(songNum: Int, mapNum: Int) : AsyncTask<String, Int, List
         private fun readStyle(parser: XmlPullParser): Style
         {
             parser.require(XmlPullParser.START_TAG, ns, "Style")
-            var id = parser.getAttributeValue(null, "id") ?: "noop"
+            var id = parser.getAttributeValue(null, "id") ?: ""
             var iconURL = ""
 
             while (parser.next() != XmlPullParser.END_TAG){
@@ -110,7 +111,8 @@ class DownloadStyleTask(songNum: Int, mapNum: Int) : AsyncTask<String, Int, List
             //Log.v("Placemark", Placemark(name, description, styleURL, point[0].toDouble(), point[1].toDouble()).toString())
             val url = URL(iconURL)
             val btmp = BitmapFactory.decodeStream(url.openConnection().getInputStream())
-            return Style(id, btmp)
+            val newBtMp = Bitmap.createScaledBitmap(btmp, 100, 100, true)
+            return Style(id, newBtMp)
         }
 
         @Throws(IOException::class, XmlPullParserException::class)

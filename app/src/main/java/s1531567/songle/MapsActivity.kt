@@ -2,27 +2,35 @@ package s1531567.songle
 
 import android.Manifest
 import android.app.AlertDialog
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.usage.UsageEvents.Event.NONE
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.location.Location
-import android.support.v7.app.AppCompatActivity
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.NotificationCompat
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.LayoutInflater
-import android.widget.*
+import android.widget.EditText
+import android.widget.PopupMenu
+import android.widget.TextView
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.location.LocationListener
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.LocationListener
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -32,8 +40,9 @@ import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.activity_maps.*
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
-import org.jetbrains.anko.*
-import java.lang.Math.abs
+import org.jetbrains.anko.connectivityManager
+import org.jetbrains.anko.toast
+import org.jetbrains.anko.vibrator
 
 
 class MapsActivity : AppCompatActivity(),
@@ -50,12 +59,15 @@ class MapsActivity : AppCompatActivity(),
     private val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
     private lateinit var mLastLocation: Location
     private var closeBy = mutableListOf<Placemark>()
+    private var markers = mutableListOf<MarkerOptions>()
     private lateinit var layer: List<Placemark>
     private var currentSong = 0
     private var currentMap = 0
     private var currentUser = ""
     private var scoreMode = 0
     private var standardiser = 0
+    private val loginNotification = NotificationCompat.Builder(this)
+    private lateinit var mPlayer : MediaPlayer
     private lateinit var songs: List<Song>
     private val detect = StepDetector()
     private val sensorManager: SensorManager by lazy {
@@ -68,17 +80,15 @@ class MapsActivity : AppCompatActivity(),
 
     }
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        loginNotification.setAutoCancel(true)
         setContentView(R.layout.activity_maps)
         currentUser = prefs.currentUser
         songs = DownloadXMLTask(MapsActivity.Companion).execute().get()
+
+        // Check whether a new version of Songle exists on the game server.
         update()
-
-
-
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
@@ -94,7 +104,7 @@ class MapsActivity : AppCompatActivity(),
         currentMap = prefs.currentMap
         scoreMode = prefs.getScoreMode(currentSong)
 
-
+        mPlayer = MediaPlayer.create(this, R.raw.collect)
 
 
         bar.setOnNavigationItemSelectedListener { item ->
@@ -108,18 +118,12 @@ class MapsActivity : AppCompatActivity(),
                     startActivity(list)
                 }
                 R.id.menu_map -> {
-
-
                 }
-
             }
             true
-
-
         }
-
-
     }
+
 
     override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
 
@@ -134,9 +138,12 @@ class MapsActivity : AppCompatActivity(),
         steps++
         prefs.steps = steps
         if (steps % 10 == 0 && steps != 0) {
-            //for user feedback while walking
+            // For user feedback while walking.
             val v = vibrator
-            v.vibrate(100)
+            val soundPref = prefs.sharedPrefs.getBoolean("sounds", true)
+            if (soundPref){
+                v.vibrate(1000)
+            }
 
             var points = prefs.points
             points++
@@ -151,15 +158,7 @@ class MapsActivity : AppCompatActivity(),
     }
 
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
+
     override fun onMapReady(googleMap: GoogleMap) {
         val song = Helper().intToString(currentSong)
         mMap = googleMap
@@ -179,34 +178,11 @@ class MapsActivity : AppCompatActivity(),
         layer = layerTask.get()
         val styles = DownloadStyleTask(currentSong, currentMap).execute().get()
         //Log.v("Pms", layer.toString())
-        for (mark in layer) {
-            val currentStyle = styles.firstOrNull { it.id == mark.description }
-            val collected = prefs.collectedPrev(currentSong,
-                    currentMap,
-                    mark.name.split(":")[0].toInt(),
-                    mark.name.split(":")[1].toInt())
-            //Log.v("collected", collected.toString())
-            if (!collected) {
-                mMap.addMarker(MarkerOptions()
-                        .position(LatLng(mark.Long, mark.Lat))
-                        .title(mark.name)
-                        .icon(BitmapDescriptorFactory.fromBitmap(currentStyle!!.icon))
-
-                )
-            }
-            if (collected) {
-                val lyrics = DownloadLyricTask(currentSong).execute().get()
-                //Log.v("lyrics", lyrics.toString())
-                val tit = LyricParser().findLyric( lyrics, mark)
-                //Log.v("word", tit.word)
-                mMap.addMarker(MarkerOptions()
-                        .position(LatLng(mark.Long, mark.Lat))
-                        .title(tit.word)
-                        .icon(BitmapDescriptorFactory.fromBitmap(currentStyle!!.icon))
-
-                )
-            }
+        addMarkers(styles)
+        for (mark in markers){
+            mMap.addMarker(mark)
         }
+
         mMap.setOnMarkerClickListener {
             it.showInfoWindow()
             val contains = it.title.contains(":")
@@ -219,16 +195,53 @@ class MapsActivity : AppCompatActivity(),
                     purchaseLyricDialog(it.title).show()
                 }
             }
-
-            toast("you clicked the map")
             true
 
         }
     }
 
+    private fun addMarkers(styles : List<Style>) = runBlocking {
+        val job = launch {
+            var bitmap = BitmapFactory.decodeResource(resources, R.drawable.grn_stars)
+            val new = Bitmap.createScaledBitmap(bitmap, 100, 100, true)
+
+                for (mark in layer) {
+                    val currentStyle = styles.firstOrNull { it.id == mark.description }
+                    val collected = prefs.collectedPrev(currentSong,
+                            currentMap,
+                            mark.name.split(":")[0].toInt(),
+                            mark.name.split(":")[1].toInt())
+                    //Log.v("collected", collected.toString())
+                    if (!collected) {
+                        markers.add(MarkerOptions()
+                                .position(LatLng(mark.Lat, mark.Long))
+                                .title(mark.name)
+                                .icon(BitmapDescriptorFactory.fromBitmap(currentStyle!!.icon))
+
+                        )
+                    }
+                    if (collected) {
+                        val lyrics = DownloadLyricTask(currentSong).execute().get()
+                        val title = LyricParser().findLyric(lyrics, mark)
+                        var bitmap = BitmapFactory.decodeResource(resources, R.drawable.grn_stars)
+
+                        markers.add(MarkerOptions()
+                                .position(LatLng(mark.Lat, mark.Long))
+                                .title(title.word)
+                                .icon(BitmapDescriptorFactory.fromBitmap(new))
+
+                        )
+                    }
+                }
+        }
+        job.join()
+    }
 
 
 
+
+
+/* Function to allow users to purchase a placemark in exchange for their in-game currency */
 
     private fun purchaseLyricDialog(lineWord: String): AlertDialog {
         val b = android.app.AlertDialog.Builder(this)
@@ -284,14 +297,20 @@ class MapsActivity : AppCompatActivity(),
 
     }
 
+    /**  Function to check for updates from the game server (inf.ed.ac.uk).
+          -If update boolean is true, the local Song List is updated with the correct song
+           information such as the number of Placemarks per map, per Song etc.
+          -If firstRun is true, it unlocks 5 random songs for the user to play.
+    */
     private fun update() {
         val needsUpdate = prefs.update
+        val firstRun = prefs.firstRun
         if (needsUpdate) {
             prefs.timeStamp = Helper().DownloadStampTask(MapsActivity.Companion).execute().get()
             for (i in 1..songs.size) {
                 var songTotal = 0
                 for (j in 1..5) {
-                    Log.v("Got this far", "i:$i, j:$j")
+                    //Log.v("Got this far", "i:$i, j:$j")
                     var mapTotal : Int
                     var layerTask = DownloadKMLTask(i, j, MapsActivity.Companion).execute()
                     val thisLayer = layerTask.get()
@@ -304,20 +323,22 @@ class MapsActivity : AppCompatActivity(),
 
             }
             //unlocking 5 random songs
-            for (i in 1..5){
-                val r = Helper().rand(0, songs.size)
-                //setting first song to be the first random song
-                if (i==1){
-                    currentSong = r
-                    currentMap = 1
-                    prefs.gameEditor.putInt("$currentUser Current Song", r)
-                    prefs.gameEditor.putInt("$currentUser Current Map", 1)
+            if (firstRun){
+                for (i in 1..5) {
+                    val r = Helper().rand(0, songs.size)
+                    //setting first song to be the first random song
+                    if (i == 1) {
+                        currentSong = r
+                        currentMap = 1
+                        prefs.gameEditor.putInt("$currentUser Current Song", r)
+                        prefs.gameEditor.putInt("$currentUser Current Map", 1)
+                        prefs.gameEditor.apply()
+                    }
+                    prefs.gameEditor.putBoolean("$currentUser Song $r locked", false)
+                    prefs.gameEditor.putBoolean("$currentUser Song $r Map 1 locked", false)
                     prefs.gameEditor.apply()
                 }
-                prefs.gameEditor.putBoolean("$currentUser Song $r locked", false)
-                prefs.gameEditor.putBoolean("$currentUser Song $r Map 1 locked", false)
-                prefs.gameEditor.apply()
-
+                prefs.firstRun = false
             }
             Log.v("prefs update", prefs.update.toString())
             prefs.update = false
@@ -333,6 +354,38 @@ class MapsActivity : AppCompatActivity(),
         mGoogleApiClient.connect()
 
     }
+
+    override fun onPause() {
+        super.onPause()
+        if ((closeBy.size != 0)){
+            loginNotification.setSmallIcon(R.drawable.ic_music_note_black_24dp)
+            loginNotification.setTicker("Placemark Closeby!")
+            loginNotification.setWhen(System.currentTimeMillis())
+            loginNotification.setContentTitle("Placemark Closeby!")
+            val soundPref = prefs.sharedPrefs.getBoolean("sounds", true)
+            if (soundPref){
+                loginNotification.setVibrate(longArrayOf(100,100,100))
+            }
+            val pm = Location("")
+            pm.latitude = closeBy[0].Lat
+            pm.longitude = closeBy[0].Long
+            val distance = mLastLocation.distanceTo(pm)
+            loginNotification.setContentText("The nearest Placemark is only $distance metres away!")
+            val intent = Intent(this, this::class.java)
+            val pendingIntent = PendingIntent.getActivity(this,0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            loginNotification.setContentIntent(pendingIntent)
+
+            val nm : NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            nm.notify(1234, loginNotification.build())
+
+        }
+    }
+
+/*  Function to interact with the user's guess and perform appropriate actions such as:
+          -Add Songle currency when guess is correct
+          -Decrease tries remaining on incorrect guess
+          -Decrease score after 3 incorrect guesses.
+*/
 
     private fun displayGuess() : AlertDialog {
 
@@ -382,7 +435,7 @@ class MapsActivity : AppCompatActivity(),
         return b.create()
     }
 
-    //Function to convert from one currency to another.
+    /*  Function to convert from one currency to another.      */
     private fun convertCurrency(from: String, to: String) : AlertDialog {
 
         val b = AlertDialog.Builder(this)
@@ -445,6 +498,7 @@ class MapsActivity : AppCompatActivity(),
 
     override fun onResume() {
         super.onResume()
+        loginNotification.setAutoCancel(true)
         val guessed = prefs.songGuessed(currentSong)
         if (guessed) currentSongTxt.text = "Current Song: ${songs[currentSong-1].title}"
         if (!guessed) currentSongTxt.text = "Current Song: $currentSong"
@@ -508,6 +562,7 @@ class MapsActivity : AppCompatActivity(),
 
     override fun onStop() {
         super.onStop()
+        mPlayer.stop()
         if (Helper().checkInternet(connectivityManager)) {
             prefs.currentSong = currentSong
             prefs.currentMap = currentMap
@@ -562,14 +617,15 @@ class MapsActivity : AppCompatActivity(),
             if (current == null) {
                 println("[onLocationChanged] Location unknown")
             } else {
-                val mLoc = LatLng(current.latitude, current.longitude)
+                /* As location has changed, we want to remove previous placemarks. */
+                closeBy.clear()
+                val mLoc = current
                 for (mark in layer) {
-                    var markLoc = LatLng(mark.Long, mark.Lat)
-                    if (abs(markLoc.latitude - mLoc.latitude) < 0.05 && abs(markLoc.longitude - mLoc.longitude) < 0.05) {
-                        if (mark !in closeBy) {
-                            closeBy.add(mark)
-                        }
-
+                    var markLoc = Location("")
+                    markLoc.longitude = mark.Long
+                    markLoc.latitude = mark.Lat
+                    if (mLoc.distanceTo(markLoc)<5000){
+                        closeBy.add(mark)
                     }
                 }
             }
@@ -577,19 +633,17 @@ class MapsActivity : AppCompatActivity(),
         job.join()
     }
 
-
+    /*  In onLocationChanged the following actions are performed:
+        -Calls the function 'checkCloseBy' to get a list of nearby Placemarks.
+        -When the 'Collect' Button is pressed:
+              -Checks whether a placemark has been previously collected.
+              -Finds the word associated with the placemark.
+              -Adds the placemark to the list of collected placemarks for this map and song.
+     */
     override fun onLocationChanged(current: Location?) {
         checkCloseBy(current)
-        //parse kmlplacemarks to placemarks and add them to the collected number
         collect.setOnClickListener {
             val parser = LyricParser()
-
-            /*iterates through every placemark and performs the following operations:
-            -Calculates the score depending on the score mode.
-            -Checks whether the placemark has been previously collected.
-            -Finds the word associated with the placemark
-            -Adds the placemark to the list of collected placemarks for this map and song.
-            */
 
             for (mark in closeBy) {
                 var collected = prefs.wordsCollected(currentSong, currentMap)
@@ -624,7 +678,13 @@ class MapsActivity : AppCompatActivity(),
                     prefs.setCollected(currentSong, currentMap, line, w)
                     collected++
                     prefs.setWordsCollected(currentSong, currentMap, collected)
-                    //toast("You collected the word '${word.word}'!")
+
+                    val soundPref = prefs.sharedPrefs.getBoolean("sounds", true)
+                    if (soundPref){
+                        mPlayer.start()
+                    }
+                    toast("You collected the word '${word.word}'!")
+
 
                 }
 

@@ -1,19 +1,15 @@
 package s1531567.songle
 
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.map_layout.view.*
-import kotlinx.android.synthetic.main.songs_layout.view.*
-import java.util.*
-import org.jetbrains.anko.toast
 
 /**
  * Created by holly on 08/11/17.
  */
-class MapAdapter (val maps: List<MapInfo>, val itemClick : (MapInfo)->Unit ) : RecyclerView.Adapter<MapAdapter.ViewHolder>() {
+class MapAdapter (val maps: List<MapInfo>, private val itemClick : (MapInfo)->Unit ) : RecyclerView.Adapter<MapAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MapAdapter.ViewHolder {
         val layoutInflator = LayoutInflater.from(parent.context)

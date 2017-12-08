@@ -74,7 +74,7 @@ class AchievementActivity : AppCompatActivity() {
             drawVertical(c!!, parent!!)
         }
 
-        fun drawVertical(c: Canvas, parent: RecyclerView) {
+        private fun drawVertical(c: Canvas, parent: RecyclerView) {
             val left = parent.paddingLeft
             val right = parent.width - parent.paddingRight
 

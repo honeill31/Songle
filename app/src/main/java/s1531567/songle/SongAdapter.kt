@@ -2,20 +2,16 @@ package s1531567.songle
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
-import android.content.SharedPreferences
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.maps.android.data.kml.KmlLayer
 import kotlinx.android.synthetic.main.songs_layout.view.*
-import java.util.*
-import org.jetbrains.anko.toast
 
 /**
  * Created by holly on 07/11/17.
  */
-class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (Song)->Unit) : RecyclerView.Adapter<SongAdapter.SongHolder>() {
+class SongAdapter(val context: Context, val songs: List<Song>, private val itemClick : (Song)->Unit) : RecyclerView.Adapter<SongAdapter.SongHolder>() {
 
 
     override fun onBindViewHolder(holder: SongAdapter.SongHolder, position: Int) {
@@ -32,16 +28,12 @@ class SongAdapter(val context: Context,val songs: List<Song>, val itemClick : (S
         return songs.size
     }
 
-    override fun getItemViewType(position: Int): Int {
-        return super.getItemViewType(position)
-    }
-
 
     class SongHolder(view: View, itemClick: (Song) -> Unit) : RecyclerView.ViewHolder(view) {
         private val mClick = itemClick
 
 
-        fun totalPlacemarks(songNum : Int) : String {
+        private fun totalPlacemarks(songNum : Int) : String {
             var collected = 0
 
             for (i in 1..5){
