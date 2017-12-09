@@ -17,6 +17,8 @@ import org.jetbrains.anko.toast
 /**
  * Created by holly on 07/11/17.
  */
+
+/* This class handles how Achievements are displayed  */
 class AchievementAdapter(val context: Context,val achievements: List<Achievement>, val itemClick : (Achievement)->Unit) : RecyclerView.Adapter<AchievementAdapter.AchievementHolder>() {
 
 

@@ -5,7 +5,7 @@ import android.content.Context
 /**
  * Created by holly on 02/12/17.
  */
-//Class to store achievements
+/* Class to store achievements */
 class Achievements(private val context: Context) {
     private val tag = "achievements"
 
