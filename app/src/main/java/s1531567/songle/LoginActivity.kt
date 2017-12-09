@@ -3,25 +3,28 @@ package s1531567.songle
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.TargetApi
-import android.support.v7.app.AppCompatActivity
 import android.app.LoaderManager.LoaderCallbacks
+import android.content.CursorLoader
+import android.content.Intent
+import android.content.Loader
 import android.database.Cursor
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.TextView
-import java.util.ArrayList
-import android.content.*
-import android.util.Log
-
 import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.toast
+import java.security.MessageDigest
+import java.security.SecureRandom
+import java.util.*
 
 /**
  * A login screen that offers login via email/password.
@@ -37,7 +40,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         // Set up the login form.
-       // populateAutoComplete()
+        // populateAutoComplete()
         password.setOnEditorActionListener(TextView.OnEditorActionListener { _, id, _ ->
             if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
                 attemptLogin()
@@ -201,7 +204,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
      * the user.
      */
     inner class UserLoginTask internal constructor(private val mEmail: String, private val mPassword: String) : AsyncTask<Void, Void, Boolean>() {
-        var newaccount = false
+        private var newaccount = false
 
         override fun doInBackground(vararg params: Void?): Boolean {
             val credentials = prefs.users
@@ -225,8 +228,16 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
             println("creds $creds")
 
-            if (creds == null){ //user doesn't exist
-                prefs.users = credentials.plus("$mEmail:$mPassword,")
+
+
+            //user doesn't exist
+            if (creds == null){
+                val salt = SecureRandom().generateSeed(20)
+                val newPword : String = (salt.toString() + mPassword)
+                Log.v("newPword", newPword)
+                val hashed = hashString256(newPword)
+                Log.v("Hashed", hashed.toString())
+                prefs.users = credentials.plus("$mEmail:$hashed:$salt,")
                 Log.v("previous user", prefs.currentUser)
                 Log.v("user email", mEmail)
                 prefs.currentUser = mEmail
@@ -237,11 +248,16 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             }
 
             if (creds != null) {
-                if (creds[1] == mPassword) {
+                newaccount = false
+                val salt = creds[2]
+                Log.v("getSalt", salt)
+                val test : String = salt + mPassword
+                val hashed = hashString256(test)
+                Log.v("getHashed", hashed.toString())
+                if (creds[1] == hashed) {
                     Log.v("previous user", prefs.currentUser)
                     prefs.currentUser = mEmail
                     Log.v("New user", prefs.currentUser)
-                    prefs.userPrefs.edit().putString("current user", prefs.currentUser).apply()
                     success = true
                 }
             }
@@ -262,7 +278,11 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
 
             if (success!!) {
+                val currentTime = System.currentTimeMillis()
+                prefs.loggedIn = true
+                prefs.lastLogin = currentTime.toString()
                 startActivity(Intent(this@LoginActivity, DefaultPage::class.java))
+
             } else {
                 password.error = getString(R.string.error_incorrect_password)
                 password.requestFocus()
@@ -274,6 +294,23 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             showProgress(false)
         }
     }
+
+    //uses SHA-256 algorithm for hashing
+    private fun hashString256(input: String): String {
+        val chars = "0123456789ABCDEF"
+        val bytes = MessageDigest.getInstance("SHA-256")
+                .digest(input.toByteArray())
+        val result = StringBuilder(bytes.size * 2)
+
+        bytes.forEach {
+            val i = it.toInt()
+            result.append(chars[i shr 4 and 0x0f])
+            result.append(chars[i and 0x0f])
+        }
+
+        return result.toString()
+    }
+
 
 
 }

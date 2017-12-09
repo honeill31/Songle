@@ -1,19 +1,22 @@
 package s1531567.songle
 
-import android.util.Log
+
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.widget.TextView
-
-
 import kotlinx.android.synthetic.main.activity_default.*
 import org.jetbrains.anko.connectivityManager
 import org.jetbrains.anko.toast
 
 
 class DefaultPage : AppCompatActivity() {
-        val WRITE_EXTERNAL_STORAGE = 1
+    private val PERMISSION_ACCESS_FINE_LOCATION = 1
     companion object : DownloadCompleteListener{
         override fun downloadComplete(result: Any) {
 
@@ -23,16 +26,24 @@ class DefaultPage : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_default)
-        prefs.userPrefs.all.entries.map { println("userPrefs + $it") }
-        prefs.gamePrefs.all.entries.map { println("gamePrefs + $it") }
-        println(prefs.userPrefs.all.entries == prefs.gamePrefs.all.entries)
+        if (!prefs.loggedIn){
+            startActivity(Intent(this, LoginActivity::class.java))
+        }
+        val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
 
 
 
         play.setOnClickListener {
             if (Helper().checkInternet(connectivityManager)){
                 val play = Intent(this, MapsActivity::class.java)
-                startActivity(play)
+                if (permissionCheck != PackageManager.PERMISSION_GRANTED){
+                    ActivityCompat.requestPermissions(this,
+                            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                            PERMISSION_ACCESS_FINE_LOCATION)
+
+                }
+                if (permissionCheck == PackageManager.PERMISSION_GRANTED) startActivity(play)
+
             }
             else toast("You must have an internet connection to play Songle")
 
@@ -40,7 +51,7 @@ class DefaultPage : AppCompatActivity() {
 
 
         songref.setOnClickListener {
-            val lead = Intent(this@DefaultPage, FaqActivity::class.java)
+            val lead = Intent(this@DefaultPage, SongList::class.java)
             startActivity(lead)
         }
 
@@ -61,15 +72,11 @@ class DefaultPage : AppCompatActivity() {
                 prefs.update = true
                 Log.v("songs size", songs.size.toString())
             }
-
-
-
-
         }
-    }
 
-    override fun onStart() {
-        super.onStart()
+        help.setOnClickListener {
+            startActivity(Intent(this, FaqActivity::class.java))
+        }
     }
 
     override fun onStop() {
@@ -79,7 +86,7 @@ class DefaultPage : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        val steps = prefs.userPrefs.getInt("steps", 0)
+        val steps = prefs.gamePrefs.getInt("steps", 0)
         var txt = findViewById<TextView>(R.id.textView)
         txt.text = "Total number of steps walked: $steps"
     }

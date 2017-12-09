@@ -85,7 +85,19 @@
         android:layout_centerHorizontal="true"
         android:textAlignment="center"
         android:textColor="@color/colorPrimary"
+        android:textSize="24sp"
+        android:textStyle="bold"
         tools:text="default" />
+
+    <Button
+        android:id="@+id/help"
+        style="@style/MyButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/userprofile"
+        android:layout_marginBottom="11dp"
+        android:text="@string/how_to_play" />
 
 
 </RelativeLayout>

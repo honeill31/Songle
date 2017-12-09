@@ -11,16 +11,9 @@ import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
-import android.view.View
 import android.widget.LinearLayout
-import com.google.maps.android.data.kml.KmlLayer
-import kotlinx.android.synthetic.main.activity_review.*
 import kotlinx.android.synthetic.main.activity_song_list.*
-import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.toast
-import s1531567.songle.R.string.current_song
-import s1531567.songle.R.string.menu_list
 
 class SongList : AppCompatActivity() {
     companion object : DownloadCompleteListener{
@@ -109,7 +102,7 @@ class SongList : AppCompatActivity() {
 
     }
 
-    fun unlockSongDialog(songNum: Int) : AlertDialog {
+    private fun unlockSongDialog(songNum: Int) : AlertDialog {
         val b = android.app.AlertDialog.Builder(this)
         b.setTitle("Unlock Song $songNum?")
         b.setMessage("You must have at least 1 Songle to do this.")
@@ -153,7 +146,7 @@ class SongList : AppCompatActivity() {
             drawVertical(c!!, parent!!)
         }
 
-        fun drawVertical(c: Canvas, parent: RecyclerView) {
+        private fun drawVertical(c: Canvas, parent: RecyclerView) {
             val left = parent.paddingLeft
             val right = parent.width - parent.paddingRight
 

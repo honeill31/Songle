@@ -1,6 +1,7 @@
 package s1531567.songle
 
 import android.content.Context
+import android.graphics.Typeface
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
@@ -8,11 +9,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
+import android.widget.ExpandableListView
 import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_faq.*
-import s1531567.songle.R.id.listTitle
-import android.graphics.Typeface
-import android.widget.ExpandableListView
 import org.jetbrains.anko.toast
 
 
@@ -74,9 +73,9 @@ class FaqActivity : AppCompatActivity() {
     }
 
     inner class ExpandableListAdapter(context: Context, title : List<String>, detail : HashMap<String, String>) : BaseExpandableListAdapter() {
-        val mContext = context
-        val mTitle = title
-        val mDetail = detail
+        private val mContext = context
+        private val mTitle = title
+        private val mDetail = detail
 
         override fun getChild(pos: Int, expandPos: Int): Any {
             return mDetail.get(mTitle.get(pos)) as Any

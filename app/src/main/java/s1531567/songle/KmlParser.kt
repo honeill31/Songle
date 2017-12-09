@@ -1,6 +1,5 @@
 package s1531567.songle
 
-import android.util.Log
 import android.util.Xml
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
@@ -76,7 +75,7 @@ class KmlParser {
             }
         }
         //Log.v("Placemark", Placemark(name, description, styleURL, point[0].toDouble(), point[1].toDouble()).toString())
-        return Placemark(name, description, styleURL, point[0].toDouble(), point[1].toDouble())
+        return Placemark(name, description, styleURL, point[1], point[0], name)
     }
 
     @Throws(IOException::class, XmlPullParserException::class)

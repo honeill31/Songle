@@ -14,7 +14,7 @@ class NetworkReceiver () : BroadcastReceiver() {
     override fun onReceive(p0: Context?, p1: Intent?) {
 
 
-        val networkPref = prefs.userPrefs.getString("Data", "Wi-Fi")
+        val networkPref = prefs.gamePrefs.getString("Data", "Wi-Fi")
 
         val connMgr =
                 p0?.getSystemService(Context.CONNECTIVITY_SERVICE)

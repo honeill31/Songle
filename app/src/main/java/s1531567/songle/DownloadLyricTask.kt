@@ -1,7 +1,6 @@
 package s1531567.songle
 
 import android.os.AsyncTask
-import com.google.maps.android.data.kml.KmlPlacemark
 import java.io.IOException
 import java.io.InputStream
 import java.net.HttpURLConnection

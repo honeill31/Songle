@@ -1,32 +1,21 @@
 package s1531567.songle
 
+import android.app.AlertDialog
 import android.content.Context
-import android.os.Bundle
-import android.support.design.widget.BottomNavigationView
-import android.support.v7.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_review.*
 import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.support.v4.app.NavUtils
-import android.support.v7.widget.DividerItemDecoration
+import android.os.Bundle
+import android.support.design.widget.BottomNavigationView
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.MenuItem
-import android.widget.EditText
 import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toolbar
-import kotlinx.android.synthetic.main.activity_song_list.*
-import org.jetbrains.anko.findOptional
-import org.jetbrains.anko.startActivityForResult
+import kotlinx.android.synthetic.main.activity_review.*
 import org.jetbrains.anko.toast
-import org.jetbrains.anko.toolbar
-import android.app.AlertDialog
 
 class ReviewActivity : AppCompatActivity() {
     companion object : DownloadCompleteListener{
@@ -103,7 +92,7 @@ class ReviewActivity : AppCompatActivity() {
 
     }
 
-    fun unlockMapDialog(mapNum: Int, songNum: Int) : AlertDialog {
+    private fun unlockMapDialog(mapNum: Int, songNum: Int) : AlertDialog {
         val b = android.app.AlertDialog.Builder(this)
         b.setTitle("Unlock Map $mapNum?")
         b.setMessage("If you unlock before guessing, your score will change.")
@@ -217,7 +206,7 @@ class ReviewActivity : AppCompatActivity() {
             drawVertical(c!!, parent!!)
         }
 
-        fun drawVertical(c: Canvas, parent: RecyclerView) {
+        private fun drawVertical(c: Canvas, parent: RecyclerView) {
             val left = parent.paddingLeft
             val right = parent.width - parent.paddingRight
 
