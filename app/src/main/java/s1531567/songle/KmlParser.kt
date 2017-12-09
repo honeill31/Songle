@@ -10,6 +10,7 @@ import java.io.InputStream
  * Created by holly on 05/12/17.
  */
 
+/* This class extracts information from the downloaded Kml file into my Placemark class */
 class KmlParser {
 
     private val ns: String? = null

@@ -11,6 +11,8 @@ import kotlinx.android.synthetic.main.songs_layout.view.*
 /**
  * Created by holly on 07/11/17.
  */
+
+/* Handles the display of Songs in SongList */
 class SongAdapter(val context: Context, val songs: List<Song>, private val itemClick : (Song)->Unit) : RecyclerView.Adapter<SongAdapter.SongHolder>() {
 
 

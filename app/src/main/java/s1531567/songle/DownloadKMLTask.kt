@@ -9,6 +9,7 @@ import java.net.URL
 /**
  * Created by holly on 24/10/17.
  */
+/* Class for Downloading Placemarks */
 class DownloadKMLTask(songNum : Int, mapNum : Int, private val caller: DownloadCompleteListener) : AsyncTask<String,Int,List<Placemark>>() {
     private val mSongNum = songNum
     private val mMapNum = mapNum

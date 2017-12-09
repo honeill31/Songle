@@ -15,6 +15,7 @@ import java.net.URL
 /**
  * Created by holly on 05/12/17.
  */
+/* Class for downloading styles */
 class DownloadStyleTask(songNum: Int, mapNum: Int) : AsyncTask<String, Int, List<Style>>() {
     private val mSongNum = songNum
     private val mMapNum = mapNum

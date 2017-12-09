@@ -6,6 +6,8 @@ import android.util.Log
  * Created by holly on 04/12/17.
  */
 
+/* Extension of Application to make preferences easier to manage */
+
 val prefs: Prefs by lazy {
     App.prefs!!
 }

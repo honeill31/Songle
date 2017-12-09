@@ -67,7 +67,7 @@ class MapsActivity : AppCompatActivity(),
     private var scoreMode = 0
     private var standardiser = 0
     private val loginNotification = NotificationCompat.Builder(this)
-    private lateinit var mPlayer : MediaPlayer
+    private lateinit var collectPlayer: MediaPlayer
     private lateinit var songs: List<Song>
     private val detect = StepDetector()
     private val sensorManager: SensorManager by lazy {
@@ -103,8 +103,7 @@ class MapsActivity : AppCompatActivity(),
         currentSong = prefs.currentSong
         currentMap = prefs.currentMap
         scoreMode = prefs.getScoreMode(currentSong)
-
-        mPlayer = MediaPlayer.create(this, R.raw.collect)
+        collectPlayer = MediaPlayer.create(this, R.raw.collect)
 
 
         bar.setOnNavigationItemSelectedListener { item ->
@@ -133,6 +132,7 @@ class MapsActivity : AppCompatActivity(),
         }
     }
 
+    /*This function increases the number of steps walked when it detects a step. */
     override fun step(timeNs: Long) {
         var steps = prefs.steps
         steps++
@@ -160,10 +160,11 @@ class MapsActivity : AppCompatActivity(),
 
 
     override fun onMapReady(googleMap: GoogleMap) {
-        val song = Helper().intToString(currentSong)
         mMap = googleMap
 
-        val total = prefs.getMapPlacemarkTotal(currentSong, currentMap)
+        val total = prefs.getPlacemarkTotal(currentSong)
+
+        // Setting the Score Standardiser for this Map.
         standardiser = 1 / total
 
 
@@ -173,16 +174,20 @@ class MapsActivity : AppCompatActivity(),
             Log.v("SE [onMapReady]", se.toString())
         }
         mMap.uiSettings.isMyLocationButtonEnabled = true
-        println("Adding layer! current map $currentMap")
+        //println("Adding layer! current map $currentMap")
         val layerTask = DownloadKMLTask(currentSong, currentMap, MapsActivity.Companion).execute()
         layer = layerTask.get()
         val styles = DownloadStyleTask(currentSong, currentMap).execute().get()
         //Log.v("Pms", layer.toString())
         addMarkers(styles)
+
+        // Adding the placemarks to the map.
         for (mark in markers){
             mMap.addMarker(mark)
         }
 
+        /* Listens for a user click event, displays the word of the placemark if collected, otherwise
+           just the line and number */
         mMap.setOnMarkerClickListener {
             it.showInfoWindow()
             val contains = it.title.contains(":")
@@ -200,10 +205,14 @@ class MapsActivity : AppCompatActivity(),
         }
     }
 
+    /* This function gets the correct information about each individual placemark such as whether
+     * it has been collected or not, the word associated with it and if it has been collected,
+      * assigning it a special 'green' collected style. Due to this taking a while to do it runs in
+      * a coroutine. */
     private fun addMarkers(styles : List<Style>) = runBlocking {
         val job = launch {
             var bitmap = BitmapFactory.decodeResource(resources, R.drawable.grn_stars)
-            val new = Bitmap.createScaledBitmap(bitmap, 100, 100, true)
+            val new = Bitmap.createScaledBitmap(bitmap, 75, 75, true)
 
                 for (mark in layer) {
                     val currentStyle = styles.firstOrNull { it.id == mark.description }
@@ -273,7 +282,8 @@ class MapsActivity : AppCompatActivity(),
             if (!collectedPrev){
                 var points = prefs.points
                 if (points >=cost){
-                    prefs.setCollected(currentSong, currentMap, line, w)//setting this word to collected
+                    // Setting this word to collected
+                    prefs.setCollected(currentSong, currentMap, line, w)
                     var collected = prefs.wordsCollected(currentSong, currentMap)
                     collected++
                     points -= cost
@@ -357,6 +367,10 @@ class MapsActivity : AppCompatActivity(),
 
     override fun onPause() {
         super.onPause()
+
+        /* Sending the user a Notification if they navigate away from the app with how close
+         * they are to a placemark. */
+
         if ((closeBy.size != 0)){
             loginNotification.setSmallIcon(R.drawable.ic_music_note_black_24dp)
             loginNotification.setTicker("Placemark Closeby!")
@@ -435,7 +449,7 @@ class MapsActivity : AppCompatActivity(),
         return b.create()
     }
 
-    /*  Function to convert from one currency to another.      */
+    /*  Function to convert from one in-game currency to another.      */
     private fun convertCurrency(from: String, to: String) : AlertDialog {
 
         val b = AlertDialog.Builder(this)
@@ -507,12 +521,18 @@ class MapsActivity : AppCompatActivity(),
         sensorManager.registerListener(this@MapsActivity, accel, SensorManager.SENSOR_DELAY_FASTEST)
 
 
+        /* When the user taps the Floating Action Button they will be able
+           to guess the name of the song.
+         */
         fab.setOnClickListener {
             val dialog = displayGuess()
             dialog.show()
 
         }
 
+        /* When the user holds in the Floating Action Button they will be able
+           to change the current song.
+         */
         fab.setOnLongClickListener {
             val menu = PopupMenu(this@MapsActivity, findViewById(R.id.fab))
             for (i in songs.indices) {
@@ -529,6 +549,7 @@ class MapsActivity : AppCompatActivity(),
 
 
             }
+            /* Handling the change of Song */
             menu.setOnMenuItemClickListener {
                 Log.v("Song Before", currentSong.toString())
                 currentSong = it.itemId
@@ -562,7 +583,7 @@ class MapsActivity : AppCompatActivity(),
 
     override fun onStop() {
         super.onStop()
-        mPlayer.stop()
+        collectPlayer.stop()
         if (Helper().checkInternet(connectivityManager)) {
             prefs.currentSong = currentSong
             prefs.currentMap = currentMap
@@ -610,7 +631,8 @@ class MapsActivity : AppCompatActivity(),
         }
     }
 
-
+    /* This function checks how close the user is to each placemark, and if they are close enough
+     * to collect the placemark, it adds them to the 'closeBy' list */
     private fun checkCloseBy(current: Location?)  = runBlocking {
         val job = launch {
 
@@ -624,7 +646,7 @@ class MapsActivity : AppCompatActivity(),
                     var markLoc = Location("")
                     markLoc.longitude = mark.Long
                     markLoc.latitude = mark.Lat
-                    if (mLoc.distanceTo(markLoc)<5000){
+                    if (mLoc.distanceTo(markLoc)<15){
                         closeBy.add(mark)
                     }
                 }
@@ -639,6 +661,7 @@ class MapsActivity : AppCompatActivity(),
               -Checks whether a placemark has been previously collected.
               -Finds the word associated with the placemark.
               -Adds the placemark to the list of collected placemarks for this map and song.
+              -Adjusts user score accordingly.
      */
     override fun onLocationChanged(current: Location?) {
         checkCloseBy(current)
@@ -681,7 +704,7 @@ class MapsActivity : AppCompatActivity(),
 
                     val soundPref = prefs.sharedPrefs.getBoolean("sounds", true)
                     if (soundPref){
-                        mPlayer.start()
+                        collectPlayer.start()
                     }
                     toast("You collected the word '${word.word}'!")
 

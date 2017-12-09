@@ -3,6 +3,8 @@ package s1531567.songle
 /**
  * Created by s1531567 on 26/11/17.
  */
+
+/* Used to adjust steps */
 object SensorFilter {
 
     fun sum(array: FloatArray): Float {

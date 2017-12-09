@@ -38,6 +38,10 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+        if (prefs.loggedIn){
+            startActivity(Intent(this, DefaultPage::class.java))
+        }
+
         setContentView(R.layout.activity_login)
         // Set up the login form.
         // populateAutoComplete()
@@ -230,7 +234,8 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
 
 
-            //user doesn't exist
+            //user doesn't exist, we hash and salt the password, storing the new hashed password and original salt.
+
             if (creds == null){
                 val salt = SecureRandom().generateSeed(20)
                 val newPword : String = (salt.toString() + mPassword)

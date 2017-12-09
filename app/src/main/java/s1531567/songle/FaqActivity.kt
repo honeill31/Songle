@@ -14,7 +14,7 @@ import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_faq.*
 import org.jetbrains.anko.toast
 
-
+/* A class for introducing new players to the game. */
 class FaqActivity : AppCompatActivity() {
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->

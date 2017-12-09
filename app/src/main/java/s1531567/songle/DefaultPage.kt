@@ -26,23 +26,30 @@ class DefaultPage : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_default)
+
+        // Checks whether there is a user currently logged in.
         if (!prefs.loggedIn){
             startActivity(Intent(this, LoginActivity::class.java))
         }
+
+        // Check if accessing the user's location is allowed, and letting them play Songle if so/
         val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
 
 
 
         play.setOnClickListener {
+            val play = Intent(this, MapsActivity::class.java)
             if (Helper().checkInternet(connectivityManager)){
-                val play = Intent(this, MapsActivity::class.java)
                 if (permissionCheck != PackageManager.PERMISSION_GRANTED){
                     ActivityCompat.requestPermissions(this,
                             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                             PERMISSION_ACCESS_FINE_LOCATION)
+                    toast("You must enable Location to play Songle")
 
                 }
-                if (permissionCheck == PackageManager.PERMISSION_GRANTED) startActivity(play)
+                if (permissionCheck == PackageManager.PERMISSION_GRANTED){
+                    startActivity(play)
+                }
 
             }
             else toast("You must have an internet connection to play Songle")
@@ -51,8 +58,8 @@ class DefaultPage : AppCompatActivity() {
 
 
         songref.setOnClickListener {
-            val lead = Intent(this@DefaultPage, SongList::class.java)
-            startActivity(lead)
+            val song = Intent(this@DefaultPage, SongList::class.java)
+            startActivity(song)
         }
 
         userprofile.setOnClickListener {

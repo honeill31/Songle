@@ -50,6 +50,8 @@ class UserActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user)
+
+        // Displaying the correct User Score and User Name.
         val userScore = prefs.gamePrefs.getInt("total score", 0).toString()
         if (prefs.sharedPrefs.getString("username", "") != ""){
             user_profile_name.text = prefs.sharedPrefs.getString("username", "")
@@ -94,6 +96,7 @@ class UserActivity : AppCompatActivity() {
 
     }
 
+    // This function displays the user's preferred image as their profile photo.
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 

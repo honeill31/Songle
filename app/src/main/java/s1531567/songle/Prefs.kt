@@ -7,17 +7,19 @@ import org.jetbrains.anko.defaultSharedPreferences
 /**
  * Created by holly on 04/12/17.
  */
+
+/* This class was created to make the storage of persistent data easier. */
 class Prefs(context: Context) {
 
     /*----------------- Variables to be passed between activities ------------------ */
 
 
-    //stores state of game across players
+    // Stores state of game across players
     val gamePrefs : SharedPreferences = context.getSharedPreferences(context.getString(R.string.PREFS_FILE), Context.MODE_PRIVATE)
     val gameEditor = gamePrefs.edit()
 
+    // Stores user preferences
     val sharedPrefs : SharedPreferences = context.defaultSharedPreferences
-    val sharedEditor = sharedPrefs.edit()
 
     var lastLogin : String
         get() = gamePrefs.getString("$currentUser last login", "")
@@ -79,12 +81,11 @@ class Prefs(context: Context) {
 
 
 
-    var songTotal : Int
-        get() =         gamePrefs.getInt("$currentUser Song Count", 1)
-        set(value) = gamePrefs.edit().putInt("$currentUser Song Count", value).apply()
-
-
 /* ------------------------- Song Functions --------------------------- */
+
+    var songTotal : Int
+        get() =         gamePrefs.getInt("Song Count", 1)
+        set(value) = gamePrefs.edit().putInt("Song Count", value).apply()
 
     fun collectedPrev(song: Int, map: Int, line: Int, w: Int) : Boolean {
         return gamePrefs.getBoolean("$currentUser $song $map $line $w", false)
@@ -159,6 +160,7 @@ class Prefs(context: Context) {
     }
 
     fun setSongScore (song: Int, value: Int) {
+        gameEditor.putInt("$currentUser Song $song total score", value).apply()
 
     }
 

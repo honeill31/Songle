@@ -24,6 +24,9 @@ class LyricParser() {
         return result
     }
 
+
+    /* This function is used to find the correct word to display in the lyrics activity,
+     * only showing words they have collected */
     fun displayPlacemarkInLyrics(lyrics: String, songNum : Int, mapNum: Int) : String {
 
         var editedLyrics : String = lyrics

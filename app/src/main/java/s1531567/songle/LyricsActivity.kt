@@ -8,10 +8,12 @@ import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter
 import kotlinx.android.synthetic.main.activity_lyrics.*
 import kotlinx.android.synthetic.main.content_lyrics.*
 
+/* This class displays the correct collected words in the form of a lyric sheet. */
 class LyricsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        actionBar.title = "Lyrics"
         setContentView(R.layout.activity_lyrics)
 
         val extras = intent.extras

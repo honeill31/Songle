@@ -13,6 +13,8 @@ import java.util.*
 /**
  * Created by holly on 04/12/17.
  */
+
+/* A class to store repeated and useful functions.  */
 class Helper {
 
     fun intToString(num : Int) : String {

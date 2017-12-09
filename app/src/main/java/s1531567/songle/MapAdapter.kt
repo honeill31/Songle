@@ -9,6 +9,8 @@ import kotlinx.android.synthetic.main.map_layout.view.*
 /**
  * Created by holly on 08/11/17.
  */
+
+/* This class controls the display of Map progress for each Song in the Review Activity */
 class MapAdapter (val maps: List<MapInfo>, private val itemClick : (MapInfo)->Unit ) : RecyclerView.Adapter<MapAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MapAdapter.ViewHolder {

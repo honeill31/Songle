@@ -61,6 +61,7 @@ class ReviewActivity : AppCompatActivity() {
         val task = DownloadXMLTask(ReviewActivity.Companion)
         task.execute()
 
+        /* Getting the correct number of Placemarks to display to the user */
         for (i in 1..5){
             val totalPlacemark = prefs.getMapPlacemarkTotal(song, i)
             Log.v("totalplacemark", totalPlacemark.toString())
@@ -92,6 +93,9 @@ class ReviewActivity : AppCompatActivity() {
 
     }
 
+    /* This function unlocks a new map if the user has collected over 2/3's of the placemarks in previous maps.
+     * As score depends on the number of placemarks available, more will become available upon unlocking a new map
+      * and so the score mode will change.*/
     private fun unlockMapDialog(mapNum: Int, songNum: Int) : AlertDialog {
         val b = android.app.AlertDialog.Builder(this)
         b.setTitle("Unlock Map $mapNum?")
@@ -106,8 +110,8 @@ class ReviewActivity : AppCompatActivity() {
                 i++
             }
             if ((collected/total)<(0.66)){
-                Log.v("Collectedfalse:", collected.toString())
-                Log.v("total false :", total.toString())
+                //Log.v("Collectedfalse:", collected.toString())
+                //Log.v("total false :", total.toString())
                 toast("Error, you have not collected enough placemarks to unlock the next map")
             }
 
@@ -140,6 +144,7 @@ class ReviewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_review)
+        // Getting information from the SongList activity.
         val extras = intent.extras
         val title = extras.getString("title")
         val artist = extras.getString("artist")
@@ -152,6 +157,7 @@ class ReviewActivity : AppCompatActivity() {
         val guessed = prefs.songGuessed(song)
         val givenUp = prefs.givenUp(song)
 
+        /* Displaying the correct information to the user. */
         if (guessed || givenUp){
             play_giveup.text = getString(R.string.playSong)
             review_title.text = title
@@ -192,7 +198,7 @@ class ReviewActivity : AppCompatActivity() {
 
     }
 
-
+    // Class to handle the display of the Songs.
     inner class DividerItemDecoration(context: Context) : RecyclerView.ItemDecoration(){
         private var divider: Drawable? = null
 

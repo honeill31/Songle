@@ -3,6 +3,7 @@ package s1531567.songle
 /**
  * Created by s1531567 on 26/11/17.
  */
+/* This class is used to detect the number of steps the user has walked */
 class StepDetector {
 
     private var accelRingCounter = 0
