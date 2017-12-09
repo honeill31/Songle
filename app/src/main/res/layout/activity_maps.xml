@@ -42,6 +42,7 @@
         android:layout_marginEnd="16dp"
         android:tint="@color/colorPrimaryDark"
         app:background="@color/colorPrimary"
+        app:fabSize="mini"
         app:layout_constraintBottom_toTopOf="@+id/bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:rippleColor="@color/primaryDarkColor"
@@ -59,6 +60,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         design:itemBackground="@color/colorPrimary"
+        design:itemTextColor="@color/primaryTextColor"
         design:itemIconTint="@color/colorPrimaryDark"
         design:menu="@menu/bottom_nav_values">
     </android.support.design.widget.BottomNavigationView>

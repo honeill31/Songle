@@ -231,13 +231,13 @@
     <string name="giveUp">Give up</string>
     <string name="questionMarks">\???</string>
     <string name="title_activity_lyrics">LyricsActivity</string>
-    <string name="title_activity_user">UserActivity</string>
+    <string name="title_activity_user">User Profile</string>
     <string name="map">Map</string>
     <string name="play">Play</string>
     <string name="view_song_list">View Song List</string>
     <string name="user_profile">User Profile</string>
     <string name="check_for_updates">Check for Updates</string>
-    <string name="title_activity_faq">FaqActivity</string>
+    <string name="title_activity_faq">Help</string>
     <string name="proximity">Proximity Notifications</string>
     <string name="how_to_play">How to play</string>
 </resources>

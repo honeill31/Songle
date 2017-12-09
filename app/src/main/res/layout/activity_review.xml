@@ -93,6 +93,7 @@
         android:layout_toEndOf="@+id/imageView"
         app:layout_constraintBottom_toBottomOf="parent"
         design:itemBackground="@color/colorPrimary"
+        design:itemTextColor="@color/primaryTextColor"
         design:itemIconTint="@color/colorPrimaryDark"
         design:menu="@menu/bottom_nav_values"
         tools:layout_editor_absoluteX="0dp" />

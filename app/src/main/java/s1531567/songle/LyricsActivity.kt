@@ -2,7 +2,9 @@ package s1531567.songle
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.Toolbar
 import android.view.MenuItem
+import android.view.View
 import io.github.yavski.fabspeeddial.FabSpeedDial
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter
 import kotlinx.android.synthetic.main.activity_lyrics.*
@@ -13,8 +15,10 @@ class LyricsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        actionBar.title = "Lyrics"
         setContentView(R.layout.activity_lyrics)
+        val bar = findViewById<View>(R.id.toolbar) as Toolbar
+        setSupportActionBar(bar)
+        supportActionBar!!.title = "Lyrics"
 
         val extras = intent.extras
         val song = extras.getInt("Song number", 1)

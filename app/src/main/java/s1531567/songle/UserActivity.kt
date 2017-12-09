@@ -52,7 +52,7 @@ class UserActivity : AppCompatActivity() {
         setContentView(R.layout.activity_user)
 
         // Displaying the correct User Score and User Name.
-        val userScore = prefs.gamePrefs.getInt("total score", 0).toString()
+        val userScore = prefs.totalScore
         if (prefs.sharedPrefs.getString("username", "") != ""){
             user_profile_name.text = prefs.sharedPrefs.getString("username", "")
         }

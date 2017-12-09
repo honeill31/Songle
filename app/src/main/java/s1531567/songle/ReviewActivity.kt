@@ -68,6 +68,7 @@ class ReviewActivity : AppCompatActivity() {
             val collectedPlacemark = prefs.getMapCollected(song, i)
             val locked = prefs.mapLocked(song, i)
             mapList.add(MapInfo(totalPlacemark,collectedPlacemark,song,i,locked))
+
         }
 
         layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)

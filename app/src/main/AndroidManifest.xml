@@ -40,9 +40,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".DefaultPage"
-                  android:label="@string/title_activity_default_page"/>
+                  android:label="@string/title_activity_default_page"
+            android:screenOrientation="portrait"/>
 
-        <activity android:name=".LeaderboardActivity" />
         <activity
             android:name=".MapsActivity"
             android:label="Map"
@@ -61,15 +61,10 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".MainActivity"
-            android:label="Main"
-            android:screenOrientation="portrait"/>
-        <activity
             android:name=".SongList"
             android:label="@string/title_activity_song_list"
             android:theme="@style/AppTheme"
             android:screenOrientation="portrait"/>
-        <activity android:name=".Favourites" />
         <activity
             android:name=".ReviewActivity"
             android:label="@string/title_activity_review"

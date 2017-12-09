@@ -137,18 +137,19 @@ class MapsActivity : AppCompatActivity(),
         var steps = prefs.steps
         steps++
         prefs.steps = steps
-        if (steps % 500 == 0 && steps != 0) {
+        if (steps % 100 == 0 && steps != 0) {
             // For user feedback while walking.
             val v = vibrator
             val soundPref = prefs.sharedPrefs.getBoolean("sounds", true)
             if (soundPref){
-                v.vibrate(1000)
+                v.vibrate(100)
             }
 
             var points = prefs.points
             points++
             prefs.points = points
-            toast("You walked 500 more steps! Point added.")
+            Log.v("Points", prefs.points.toString())
+            toast("You walked 100 more steps! Point added.")
         }
         val stepListener = Achievements(this).stepListener(steps)
         if (stepListener != null) {
@@ -481,8 +482,8 @@ class MapsActivity : AppCompatActivity(),
 
             val userAmount = txt.text.toString().toInt()
             when(from){
-                "points" -> cost = userAmount * 10
-                "songles" -> userAmount / 10
+                "points" -> cost = userAmount * 1000
+                "songles" -> cost = userAmount / 1000
             }
 
             val fromTotal = fromCurrency-cost
@@ -592,8 +593,6 @@ class MapsActivity : AppCompatActivity(),
         if (mGoogleApiClient.isConnected) {
             mGoogleApiClient.disconnect()
         }
-        sensorManager.unregisterListener(this@MapsActivity)
-        detect.unregisterListener(this)
     }
 
     private fun createLocationRequest() {
@@ -623,8 +622,17 @@ class MapsActivity : AppCompatActivity(),
         if (ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            mLastLocation =
-                    LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient)
+            val lastLoc = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient)
+            if (lastLoc == null){
+                mLastLocation = Location("")
+                mLastLocation.longitude = -3.187
+                mLastLocation.latitude = 55.9445
+            }
+            if (lastLoc != null){
+                mLastLocation =
+                        LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient)
+            }
+
         } else {
             ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
@@ -646,7 +654,7 @@ class MapsActivity : AppCompatActivity(),
                     var markLoc = Location("")
                     markLoc.longitude = mark.Long
                     markLoc.latitude = mark.Lat
-                    if (mLoc.distanceTo(markLoc)<15){
+                    if (mLoc.distanceTo(markLoc)<25){
                         closeBy.add(mark)
                     }
                 }

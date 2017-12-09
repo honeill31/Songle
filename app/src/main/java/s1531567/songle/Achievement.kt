@@ -8,4 +8,5 @@ data class Achievement(val title : String,
                        val difficulty : String,
                        val id: Int,
                        val stepRqmt : Int,
+                       val pmRqmt : Int,
                        var locked : Boolean)
