@@ -16,7 +16,7 @@ class Achievements(private val context: Context) {
             difficulty = "Easy",
             id = 0,
             pmRqmt = 10000000,
-            stepRqmt = 2000,
+            stepRqmt = 5000,
             locked = true
     ), Achievement(
             title = "500 miles",

@@ -47,8 +47,7 @@ class AchievementAdapter(val context: Context,val achievements: List<Achievement
 
         fun bind(achievement: Achievement)  {
             with(achievement) {
-                itemView.achievement_title.highlightColor = 1
-                if (!prefs.checkAchievement(achievement.id)){
+                if (prefs.checkAchievement(achievement.id)){
                     itemView.achievement_title.text = "???"//achievement.title.map { it -> '?' }.toString()
                     itemView.achievement_description.text = "???" //achievement.description.map { it -> '?' }.toString()
 

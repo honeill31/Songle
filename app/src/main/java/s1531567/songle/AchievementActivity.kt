@@ -11,6 +11,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.widget.LinearLayout
 import kotlinx.android.synthetic.main.activity_achievement.*
+import org.jetbrains.anko.connectivityManager
+import org.jetbrains.anko.toast
 
 class AchievementActivity : AppCompatActivity() {
 
@@ -23,13 +25,19 @@ class AchievementActivity : AppCompatActivity() {
                 return@OnNavigationItemSelectedListener true
             }
             R.id.menu_map -> {
-                val map = Intent(this, MapsActivity::class.java)
-                startActivity(map)
+                if (Helper().checkInternet(connectivityManager)) {
+                    val hmm = Intent(this@AchievementActivity, MapsActivity::class.java)
+                    startActivity(hmm)
+                }
+                else toast("Connect to the internet to view the Map.")
                 return@OnNavigationItemSelectedListener true
             }
             R.id.menu_list -> {
-                val list = Intent(this, SongList::class.java)
-                startActivity(list)
+                if (Helper().checkInternet(connectivityManager)) {
+                    val hmm = Intent(this@AchievementActivity, SongList::class.java)
+                    startActivity(hmm)
+                }
+                else toast("Connect to the internet to view the SongList.")
                 return@OnNavigationItemSelectedListener true
             }
         }

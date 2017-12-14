@@ -17,18 +17,7 @@ class DownloadKMLTask(songNum : Int, mapNum : Int, private val caller: DownloadC
     override fun doInBackground(vararg params: String): List<Placemark> {
         val u = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${Helper().intToString(mSongNum)}/map$mMapNum.txt"
         //Log.v("doInBG Value", u)
-        var pms = loadKMLFromNetwork(u)
-/*        for (mark in pms){
-            val lyrics = DownloadLyricTask(mSongNum).execute().get()
-            val word = LyricParser().findLyric(lyrics, mark)
-            val line = mark.name.split(":")[0].toInt()
-            val w = mark.name.split(":")[1].toInt()
-            val collectedPrev = prefs.collectedPrev(mSongNum, mMapNum, line, w)
-            if (collectedPrev){
-                mark.word = word.word
-            }
-            else mark.word = mark.name
-        }*/
+
         return loadKMLFromNetwork(u)
     }
 

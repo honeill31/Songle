@@ -4,6 +4,7 @@ package s1531567.songle
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -13,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.widget.LinearLayout
 import kotlinx.android.synthetic.main.activity_song_list.*
+import org.jetbrains.anko.connectivityManager
 import org.jetbrains.anko.toast
 
 class SongList : AppCompatActivity() {
@@ -31,8 +33,11 @@ class SongList : AppCompatActivity() {
                 startActivity(home)
             }
             R.id.menu_map -> {
-                val hmm = Intent(this@SongList, MapsActivity::class.java)
-                startActivity(hmm)
+                if (Helper().checkInternet(connectivityManager)) {
+                    val hmm = Intent(this@SongList, MapsActivity::class.java)
+                    startActivity(hmm)
+                }
+                else toast("Connect to the internet to view the Map")
 
 
             }
@@ -56,7 +61,11 @@ class SongList : AppCompatActivity() {
         setContentView(R.layout.activity_song_list)
         list_bar.selectedItemId = R.id.menu_list
         list_bar.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-        initialise()
+        if (Helper().checkInternet(connectivityManager)) {
+            initialise()
+        }
+
+        else toast("Connect to the internet to view the SongList")
 
         }
 

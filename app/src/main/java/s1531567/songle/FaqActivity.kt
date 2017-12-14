@@ -25,9 +25,7 @@ class FaqActivity : AppCompatActivity() {
         val expandableListTitle = ArrayList<String>(expandableListDetail.keys)
         val expandableListAdapter = ExpandableListAdapter(this, expandableListTitle, expandableListDetail)
         expandableListView.setAdapter(expandableListAdapter)
-        expandableListView.setOnGroupExpandListener {
-            toast("list expanded")
-        }
+
 
 
     }
@@ -41,13 +39,14 @@ class FaqActivity : AppCompatActivity() {
             val map = HashMap<String, String>()
 
             map.put("What is Songle?", getString(R.string.what_is_songle))
-            map.put("How do I collect a Placemark", getString(R.string.collecting_placemarks))
+            map.put("How do I collect a Placemark?", getString(R.string.collecting_placemarks))
             map.put("How do I guess the song?", getString(R.string.guess_song))
             map.put("How do I change the song?", getString(R.string.change_song))
             map.put("What are the Dollar and Music Buttons for?", getString(R.string.dollar_music))
-            map.put("What can I spend my currency on", getString(R.string.purchases))
+            map.put("What can I spend my currency on?", getString(R.string.purchases))
             map.put("Placemark Cost", getString(R.string.placemark_cost))
             map.put("Currency Conversion", getString(R.string.currency_conversion))
+
 
 
             return map

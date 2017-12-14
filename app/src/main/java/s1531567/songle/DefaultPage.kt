@@ -75,17 +75,21 @@ class DefaultPage : AppCompatActivity() {
 
 
         update.setOnClickListener {
-            val stamp = Helper().DownloadStampTask(DefaultPage.Companion)
+            if (Helper().checkInternet(connectivityManager)) {
+
+                val stamp = Helper().DownloadStampTask(DefaultPage.Companion)
                         .execute()
                         .get()
-            Log.v("timestamp", stamp)
-            if (stamp != prefs.timeStamp){
-                val songs = DownloadXMLTask(DefaultPage.Companion).execute().get()
-                prefs.songTotal = songs.size
-                prefs.timeStamp = stamp
-                prefs.update = true
-                Log.v("songs size", songs.size.toString())
-            }
+                Log.v("timestamp", stamp)
+                if (stamp != prefs.timeStamp) {
+                    val songs = DownloadXMLTask(DefaultPage.Companion).execute().get()
+                    prefs.songTotal = songs.size
+                    prefs.timeStamp = stamp
+                    prefs.update = true
+                    Log.v("songs size", songs.size.toString())
+                }
+            } else toast("Please check your internet connection.")
+
         }
 
         help.setOnClickListener {

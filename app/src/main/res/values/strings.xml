@@ -152,8 +152,22 @@
         The main purpose of the Points you get by walking is to purchase more Placemarks.
         \n The main purpose of the Songles you get by guessing the Song is to purchase more songs.
     </string>
-    <string name="currency_conversion"></string>
-    <string name="placemark_cost"></string>
+    <string name="currency_conversion">You can convert a Songle for 1000 points. You can also convert 1000 Points for a Songle.</string>
+    <string name="placemark_cost">Placemarks will differ according to how \'interesting\' their word is. The following table displays
+        the cost of each one:
+        \n _______________________________
+        |......Type.......|.Point Cost.|\n
+        |.unclassified....|.1..........|\n
+        |.boring..........|.5..........|\n
+        |.notboring.......|.10.........|\n
+        |.interesting.....|.50.........|\n
+        |.veryinteresting.|.100........|\n
+         ________________________________
+
+
+
+
+    </string>
 
     <!-- Strings related to Settings -->
 

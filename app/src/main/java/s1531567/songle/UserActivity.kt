@@ -16,10 +16,7 @@ import android.support.v4.app.NotificationCompat
 import android.support.v7.app.AppCompatActivity
 import android.widget.ImageView
 import kotlinx.android.synthetic.main.activity_user.*
-import org.jetbrains.anko.alert
-import org.jetbrains.anko.noButton
-import org.jetbrains.anko.toast
-import org.jetbrains.anko.yesButton
+import org.jetbrains.anko.*
 import java.io.FileNotFoundException
 import java.io.IOException
 
@@ -36,11 +33,18 @@ class UserActivity : AppCompatActivity() {
                 return@OnNavigationItemSelectedListener true
             }
             R.id.menu_map -> {
-                startActivity(Intent(this@UserActivity, MapsActivity::class.java))
-                return@OnNavigationItemSelectedListener true
+                if (Helper().checkInternet(connectivityManager)) {
+                    val hmm = Intent(this@UserActivity, MapsActivity::class.java)
+                    startActivity(hmm)
+                }
+                else toast("Connect to the internet to view the Map.")
             }
             R.id.menu_list -> {
-                startActivity(Intent(this@UserActivity, SongList::class.java))
+                if (Helper().checkInternet(connectivityManager)) {
+                    val hmm = Intent(this@UserActivity, MapsActivity::class.java)
+                    startActivity(hmm)
+                }
+                else toast("Connect to the internet to view the SongList.")
                 return@OnNavigationItemSelectedListener true
             }
         }

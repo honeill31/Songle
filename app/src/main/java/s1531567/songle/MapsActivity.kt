@@ -263,8 +263,8 @@ class MapsActivity : AppCompatActivity(),
             "#unclassified" -> cost = 1
             "#boring" -> cost = 5
             "#notboring" -> cost = 10
-            "#interesting" -> cost = 150
-            "#veryinteresting" -> cost = 200
+            "#interesting" -> cost = 50
+            "#veryinteresting" -> cost = 100
         }
 
         b.setMessage("This will cost $cost points")
