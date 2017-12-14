@@ -92,6 +92,9 @@ class UserActivity : AppCompatActivity() {
                     val usersAfter = users.dropWhile { it.split(":")[0] != userAccount }
                     prefs.users = "$usersBefore$usersAfter"
                     toast("Goodbye...")
+                    prefs.currentUser = ""
+                    prefs.loggedIn = false
+                    startActivity(Intent(this@UserActivity, LoginActivity::class.java))
                 }
                 noButton { }
 
