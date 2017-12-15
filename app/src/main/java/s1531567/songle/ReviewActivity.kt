@@ -15,6 +15,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.widget.LinearLayout
 import kotlinx.android.synthetic.main.activity_review.*
+import org.jetbrains.anko.connectivityManager
 import org.jetbrains.anko.toast
 
 class ReviewActivity : AppCompatActivity() {
@@ -76,13 +77,14 @@ class ReviewActivity : AppCompatActivity() {
             if (it.locked) {
                 unlockMapDialog(it.mapNumber, it.songNumber).show()
             }
-            if (!it.locked){
-                toast("Activating Map ${it.mapNumber}")
-                prefs.currentSong = it.songNumber
-                prefs.currentMap = it.mapNumber
-                startActivity(Intent(this@ReviewActivity, MapsActivity::class.java))
-
-
+            if (!it.locked ){
+                if (Helper().checkInternet(connectivityManager)){
+                    toast("Activating Map ${it.mapNumber}")
+                    prefs.currentSong = it.songNumber
+                    prefs.currentMap = it.mapNumber
+                    startActivity(Intent(this@ReviewActivity, MapsActivity::class.java))
+                }
+                else toast("You must connect to the internet to play this map.")
             }
 
         }

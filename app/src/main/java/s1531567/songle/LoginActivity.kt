@@ -1,5 +1,6 @@
 package s1531567.songle
 
+import android.Manifest
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.TargetApi
@@ -7,12 +8,15 @@ import android.app.LoaderManager.LoaderCallbacks
 import android.content.CursorLoader
 import android.content.Intent
 import android.content.Loader
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.util.Log
@@ -34,12 +38,22 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private var mAuthTask: UserLoginTask? = null
+    private val PERMISSION_ACCESS_FINE_LOCATION = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         if (prefs.loggedIn){
             startActivity(Intent(this, DefaultPage::class.java))
+        }
+
+        // Check if accessing the user's location is allowed, and letting them play Songle if so.
+        var permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    PERMISSION_ACCESS_FINE_LOCATION)
+
         }
 
         setContentView(R.layout.activity_login)

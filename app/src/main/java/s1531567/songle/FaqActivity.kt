@@ -42,6 +42,7 @@ class FaqActivity : AppCompatActivity() {
             map.put("How do I collect a Placemark?", getString(R.string.collecting_placemarks))
             map.put("How do I guess the song?", getString(R.string.guess_song))
             map.put("How do I change the song?", getString(R.string.change_song))
+            map.put("How do I change the map?", getString(R.string.change_map))
             map.put("What are the Dollar and Music Buttons for?", getString(R.string.dollar_music))
             map.put("What can I spend my currency on?", getString(R.string.purchases))
             map.put("Placemark Cost", getString(R.string.placemark_cost))

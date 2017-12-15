@@ -16,7 +16,6 @@ import org.jetbrains.anko.toast
 
 
 class DefaultPage : AppCompatActivity() {
-    private val PERMISSION_ACCESS_FINE_LOCATION = 1
     companion object : DownloadCompleteListener{
         override fun downloadComplete(result: Any) {
 
@@ -27,13 +26,7 @@ class DefaultPage : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_default)
 
-        // Check if accessing the user's location is allowed, and letting them play Songle if so.
-        val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    PERMISSION_ACCESS_FINE_LOCATION)
-        }
+
 
 
 
@@ -53,11 +46,7 @@ class DefaultPage : AppCompatActivity() {
         play.setOnClickListener {
             val play = Intent(this, MapsActivity::class.java)
             if (Helper().checkInternet(connectivityManager)){
-                if (permissionCheck == PackageManager.PERMISSION_GRANTED){
-                    startActivity(play)
-                }
-                else toast("You must enable location to play Songle.")
-
+                startActivity(play)
             }
             else toast("You must have an internet connection to play Songle")
 
