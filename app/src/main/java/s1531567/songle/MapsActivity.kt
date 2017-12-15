@@ -654,7 +654,7 @@ class MapsActivity : AppCompatActivity(),
                     var markLoc = Location("")
                     markLoc.longitude = mark.Long
                     markLoc.latitude = mark.Lat
-                    if (mLoc.distanceTo(markLoc)<5000){
+                    if (mLoc.distanceTo(markLoc)<25){
                         closeBy.add(mark)
                     }
                 }
